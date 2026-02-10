@@ -1,5 +1,11 @@
 ---
 import "../styles/global.css";
+
+const {
+  title = "Zahid | Cloud Engineer",
+  description,
+  image,
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -7,7 +13,11 @@ import "../styles/global.css";
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>Zahid | Cloud Engineer</title>
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    {description && <meta property="og:description" content={description} />}
+    <meta property="og:title" content={title} />
+    {image && <meta property="og:image" content={image} />}
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
