@@ -1,159 +1,77 @@
 
 ---
 
-## 📄 AGENTS.md — BLUEPRINT FOR ZAHIDABDILLAH.DEV
+## 📄 AGENTS.md — ZAHIDABDILLAH.DEV
 
-````markdown
-# AGENTS.md
+Professional summary of the current project state and operating conventions.
 
-## Project Overview
-This is the personal portfolio website and admin dashboard for Zahid Abdillah — a Cloud Engineer portfolio built with Astro, using Tailwind CSS for styling, and deployed to Cloudflare Pages.  
-Primary goals:
-- Showcase projects, tools stack, and technical blogs
-- Provide a private admin dashboard with CRUD capabilities
-- Use Cloudflare Workers + D1 Database for backend services
+## Project Summary
+Personal portfolio website + private admin dashboard for Zahid Abdillah (Cloud Engineer).  
+The public site reads **published** data in real time via public read-only endpoints.  
+The admin dashboard (protected by Cloudflare Access) manages CRUD for Projects, Blogs, Tools, and Profile Assets.
 
-Tech stack:
+## Tech Stack
 - Astro (frontend)
-- Tailwind CSS (styling)
-- Iconify via web component (icons)
+- Tailwind CSS v4 (utility-only, CSS-first)
+- Iconify web component (icons via CDN)
 - Cloudflare Pages (hosting)
-- Cloudflare Workers (API)
+- Cloudflare Workers / Pages Functions (API)
 - Cloudflare D1 (SQLite)
-- Cloudflare Access (admin auth)
+- Cloudflare R2 (object storage)
+- Cloudflare Zero Trust (Access)
 
----
+## Dev Environment
+- Node.js >=18
+- Local dev: `npm run dev -- --host` (VS Code Remote Tunnel)
+- Base styles: `src/layouts/Layout.astro` → `src/styles/global.css`
+- No inline styles, utility classes only
 
-## Dev Environment Setup
-- Node.js >=18 installed
-- Dev runs via `npm run dev -- --host`
-- Tailwind CSS configured manually
-- Iconify used via CDN in Layout
-- Use VS Code with remote tunnel for editing
-- Git repository initialized and commits should be atomic
+## Cloudflare Resources (current)
+- D1 database: `astro-db` (binding: `DB`)
+- R2 bucket: `astro-r2` (binding: `STORAGE`)
+- Access: `/admin*` protected via Zero Trust policy (email allow list)
 
----
+## API Surface (current)
+**Private (Access-protected):**
+- `GET/POST /api/projects`
+- `PUT/DELETE /api/projects/:id`
+- `GET/POST /api/blogs`
+- `PUT/DELETE /api/blogs/:id`
+- `GET/POST /api/tools`
+- `PUT/DELETE /api/tools/:id`
+- `GET/PUT /api/profile-assets`
+- `POST /api/uploads/:type` (`avatar`, `photo`, `resume`)
 
-## Build & Preview
-Build the production version:
+**Public (read-only, no Access):**
+- `GET /public/projects` (published only)
+- `GET /public/blogs` (published only)
+- `GET /public/tools` (published only)
+- `GET /public/profile-assets`
+- `GET /public/media/*` (R2 file proxy)
 
+## Data Model Notes
+- Projects: `name`, `summary`, `href`, `status`
+- Blogs: `title`, `summary`, `slug`, `content`, `reading_time`, `date`, `author`, `status`
+- Tools: `name`, `icon`, `status`
+- Profile Assets: `avatar_key`, `photo_key`, `resume_key`, `summary`
+
+## UI Notes
+- Public pages show placeholders when no published data is available.
+- Admin UI supports full CRUD + inline edit.
+- Blog editor includes Markdown preview.
+
+## Auth
+- `/admin` and `/api/*` guarded by `functions/_middleware.ts`.
+- Access validation via `cf-access-jwt-assertion` and `/cdn-cgi/access/get-identity`.
+
+## Build & Verification
 ```bash
 npm run build
-````
-
-Preview the production build locally:
-
-```bash
 npm run preview
 ```
 
----
-
-## Tailwind CSS Guidelines
-
-* Use only utility classes
-* Never use inline CSS styles
-* Base styles are imported in `src/layouts/Layout.astro`
-* Responsive prefixes (`sm:`, `md:`, etc.) should be consistently used
-
----
-
-## Component Structure
-
-Clear atomic component separation:
-
-```
-src/
-├─ components/
-│  ├─ Hero.astro
-│  ├─ Tools.astro
-│  ├─ Projects.astro
-│  ├─ BlogList.astro
-│  ├─ Navbar.astro
-│  └─ Footer.astro
-├─ layouts/
-│  └─ Layout.astro
-├─ pages/
-│  ├─ index.astro
-│  ├─ projects.astro
-│  ├─ blog.astro
-│  └─ admin.astro
-```
-
-Components:
-
-* Hero — homepage top section
-* Tools — stack icons & skills
-* Projects — GitHub linked cards
-* BlogList — list of blog post previews
-* Navbar & Footer — consistent layout
-
----
-
-## Code Style
-
-* Astro files use structural frontmatter at top
-* No redundant comments inside components
-* Use descriptive class names instead of arbitrary utilities where logical
-* Keep components single-purpose and small
-* Accessibility best practices for interactive elements
-
----
-
-## Cloudflare Integration
-
-1. Create a Cloudflare Pages project linked to GitHub repo.
-2. Define environment variables in dashboard (if needed).
-3. Bind Cloudflare Workers to Pages.
-4. Create D1 Database instance.
-5. Migrate database schema with Workers.
-6. Protect `/admin` route with Cloudflare Access (allow list email only).
-
----
-
-## API & Backend Rules
-
-* All API logic under `functions/` directory
-* Endpoints follow REST naming conventions
-* CRUD routes for projects and blogs:
-
-  * `GET /api/projects`
-  * `POST /api/projects`
-  * `PUT /api/projects/:id`
-  * `DELETE /api/projects/:id`
-
----
-
-## Testing & Verification
-
-* After code changes, run build locally before pushing:
-
-  ```bash
-  npm run build && npm run preview
-  ```
-* Check layout, responsive views, SEO tags
-* Validate icons render correctly
-
-````
----
-
-## 🌀 NEXT STEPS YOU CAN DO WITH THIS
-
-Once `AGENTS.md` is in the root of your repository:
-
-1. Run Codex CLI in project root:
-   ```bash
-   codex
-````
-
-2. Ask it to *generate components and pages* per blueprint:
-
-   * “Create Hero component”
-   * “Write Projects page using Projects.astro component”
-3. Ask for *Cloudflare Workers API routes*:
-
-   * “Generate D1 CRUD API functions”
-4. Ask for *dashboard UI scaffolding*
-5. Ask for *Cloudflare Access integration instructions*
-
----
+## Conventions
+- Keep Astro components small and single-purpose.
+- Avoid redundant comments.
+- Prefer descriptive class groupings and consistent spacing.
+- Public site reads from public endpoints only (never from `/api/*`).
