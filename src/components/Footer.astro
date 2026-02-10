@@ -22,9 +22,7 @@ const socials = [
       <div class="space-y-6">
         <form
           class="grid gap-4 rounded-2xl border border-slate-800 bg-slate-900/60 p-5"
-          action="mailto:contact@zahidabdillah.dev"
-          method="post"
-          enctype="text/plain"
+          data-contact-form
         >
           <div class="grid gap-2">
             <label class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" for="contact-name">
@@ -90,3 +88,23 @@ const socials = [
     </div>
   </div>
 </footer>
+
+<script>
+  const contactForm = document.querySelector("[data-contact-form]");
+
+  if (contactForm) {
+    contactForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const formData = new FormData(contactForm);
+      const name = (formData.get("name") || "").toString().trim();
+      const email = (formData.get("email") || "").toString().trim();
+      const message = (formData.get("message") || "").toString().trim();
+
+      const subject = encodeURIComponent(`Portfolio Contact - ${name || "New message"}`);
+      const body = encodeURIComponent(
+        `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`
+      );
+      window.location.href = `mailto:contact@zahidabdillah.dev?subject=${subject}&body=${body}`;
+    });
+  }
+</script>
