@@ -1,0 +1,58 @@
+---
+const tools = [
+  { name: "AWS", icon: "logos:aws" },
+  { name: "Google Cloud", icon: "logos:google-cloud" },
+  { name: "Docker", icon: "logos:docker-icon" },
+  { name: "Kubernetes", icon: "logos:kubernetes" },
+  { name: "Terraform", icon: "logos:terraform-icon" },
+  { name: "GitHub Actions", icon: "logos:github-actions" },
+  { name: "Prometheus", icon: "logos:prometheus" },
+  { name: "Grafana", icon: "logos:grafana" },
+  { name: "Linux", icon: "logos:linux-tux" },
+];
+
+const focuses = [
+  "Infrastructure as Code",
+  "Observability and SRE",
+  "Cost governance",
+  "Zero-downtime releases",
+];
+---
+
+<section class="mx-auto w-full max-w-6xl px-6 py-16" id="tools">
+  <div class="flex flex-wrap items-end justify-between gap-6">
+    <div class="space-y-3">
+      <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
+        Tool Stack
+      </p>
+      <h2 class="font-display text-3xl font-semibold text-slate-900">
+        Infrastructure tools I trust in production.
+      </h2>
+      <p class="max-w-2xl text-slate-600">
+        I blend cloud-native services with open-source tooling to ship platforms that are
+        resilient, secure, and easy to operate.
+      </p>
+    </div>
+    <div class="flex flex-wrap gap-3">
+      {focuses.map((item) => (
+        <span class="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600">
+          {item}
+        </span>
+      ))}
+    </div>
+  </div>
+
+  <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    {tools.map((tool) => (
+      <div class="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-3xl">
+          <iconify-icon icon={tool.icon}></iconify-icon>
+        </span>
+        <div>
+          <p class="text-sm font-semibold text-slate-900">{tool.name}</p>
+          <p class="text-xs text-slate-500">Production ready</p>
+        </div>
+      </div>
+    ))}
+  </div>
+</section>

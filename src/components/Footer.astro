@@ -1,0 +1,37 @@
+---
+const socials = [
+  { label: "GitHub", href: "https://github.com/" },
+  { label: "LinkedIn", href: "https://linkedin.com/" },
+  { label: "Email", href: "mailto:hello@zahidabdillah.dev" },
+];
+---
+
+<footer class="border-t border-slate-200 bg-white" id="contact">
+  <div class="mx-auto w-full max-w-6xl px-6 py-12">
+    <div class="grid gap-8 md:grid-cols-[1.2fr_0.8fr]">
+      <div class="space-y-4">
+        <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
+          Get In Touch
+        </p>
+        <h2 class="font-display text-2xl font-semibold text-slate-900">
+          Ready to build a calmer cloud stack?
+        </h2>
+        <p class="text-slate-600">
+          I am available for consulting, audits, and long-term platform partnerships.
+        </p>
+      </div>
+      <div class="flex flex-col gap-3 text-sm font-semibold text-slate-700">
+        {socials.map((item) => (
+          <a class="flex items-center gap-2 transition hover:text-slate-900" href={item.href}>
+            <iconify-icon icon="ph:arrow-up-right-bold"></iconify-icon>
+            {item.label}
+          </a>
+        ))}
+      </div>
+    </div>
+    <div class="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 pt-6 text-xs text-slate-500">
+      <p>© 2026 Zahid Abdillah. All rights reserved.</p>
+      <p>Built with Astro, Tailwind CSS, and Cloudflare Pages.</p>
+    </div>
+  </div>
+</footer>
