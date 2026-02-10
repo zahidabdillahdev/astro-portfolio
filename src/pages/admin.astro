@@ -101,14 +101,17 @@ import Navbar from "../components/Navbar.astro";
               name="summary"
               rows="4"
             ></textarea>
+          </form>
+          <div class="mt-4 flex flex-wrap items-center gap-3">
             <button
               class="rounded-full border border-slate-700 px-4 py-2 text-xs font-semibold text-slate-200"
-              type="submit"
+              type="button"
+              data-profile-save
             >
               Save profile changes
             </button>
-            <p class="text-xs text-slate-500" data-summary-status></p>
-          </form>
+            <p class="text-xs text-slate-500" data-profile-save-status></p>
+          </div>
         </div>
 
         <div class="grid gap-6 lg:grid-cols-2">
@@ -669,7 +672,8 @@ import Navbar from "../components/Navbar.astro";
     const toastContainer = document.querySelector("[data-toast-container]");
     const uploadForms = document.querySelectorAll("[data-upload-form]");
     const summaryForm = document.querySelector("[data-summary-form]");
-    const summaryStatus = document.querySelector("[data-summary-status]");
+    const profileSaveButton = document.querySelector("[data-profile-save]");
+    const profileSaveStatus = document.querySelector("[data-profile-save-status]");
     const assetCurrent = {
       avatar: document.querySelector("[data-asset-current='avatar']"),
       photo: document.querySelector("[data-asset-current='photo']"),
@@ -1233,32 +1237,36 @@ import Navbar from "../components/Navbar.astro";
       });
     };
 
-    const bindSummary = () => {
-      if (!summaryForm) return;
-      summaryForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        if (summaryStatus) summaryStatus.textContent = "Saving...";
-        const textarea = summaryForm.querySelector("textarea[name='summary']");
-        const summary = textarea ? textarea.value : "";
-        const payload = { summary };
-        uploadForms.forEach((form) => {
-          const type = form.dataset.uploadForm;
-          const keyInput = form.querySelector(`input[name='${type}_key']`);
-          if (type && keyInput?.value) {
-            payload[`${type}_key`] = keyInput.value;
-          }
-        });
+    const buildProfilePayload = () => {
+      const textarea = summaryForm?.querySelector("textarea[name='summary']");
+      const payload = {
+        summary: textarea ? textarea.value : "",
+      };
+      uploadForms.forEach((form) => {
+        const type = form.dataset.uploadForm;
+        const keyInput = form.querySelector(`input[name='${type}_key']`);
+        if (type && keyInput?.value) {
+          payload[`${type}_key`] = keyInput.value;
+        }
+      });
+      return payload;
+    };
+
+    const bindProfileSave = () => {
+      if (!profileSaveButton) return;
+      profileSaveButton.addEventListener("click", async () => {
+        if (profileSaveStatus) profileSaveStatus.textContent = "Saving...";
         try {
           const response = await fetch("/api/profile-assets", {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
+            body: JSON.stringify(buildProfilePayload()),
           });
           if (!response.ok) throw new Error("Failed");
-          if (summaryStatus) summaryStatus.textContent = "Saved.";
+          if (profileSaveStatus) profileSaveStatus.textContent = "Saved.";
           showToast("Profile updated.", "success");
         } catch (error) {
-          if (summaryStatus) summaryStatus.textContent = "Failed to save.";
+          if (profileSaveStatus) profileSaveStatus.textContent = "Failed to save.";
           showToast("Profile update failed.", "error");
         }
       });
@@ -1314,7 +1322,7 @@ import Navbar from "../components/Navbar.astro";
     };
 
     bindUploads();
-    bindSummary();
+    bindProfileSave();
     bindMarkdownPreview();
     bindCertUpload();
     fetchAndBind();
