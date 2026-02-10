@@ -1,0 +1,11 @@
+name = "astro-portfolio"
+compatibility_date = "2026-02-10"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "astro-db"
+database_id = "c970d5c9-9b40-4094-b2de-47cecfdfe888"
+
+[[r2_buckets]]
+binding = "STORAGE"
+bucket_name = "astro-r2"

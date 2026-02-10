@@ -2,7 +2,7 @@ type JsonValue = Record<string, unknown> | unknown[];
 
 type ApiContext = {
   request: Request;
-  env: Record<string, unknown> & { DB?: D1Database };
+  env: Record<string, unknown> & { DB?: D1Database; STORAGE?: R2Bucket };
   params?: Record<string, string>;
 };
 
@@ -31,4 +31,12 @@ export const getDb = (context: ApiContext) => {
   }
 
   return context.env.DB;
+};
+
+export const getBucket = (context: ApiContext) => {
+  if (!context.env.STORAGE) {
+    throw new Error("Missing R2 binding: STORAGE");
+  }
+
+  return context.env.STORAGE;
 };

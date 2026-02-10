@@ -1,0 +1,6 @@
+ALTER TABLE blogs ADD COLUMN content TEXT;
+ALTER TABLE blogs ADD COLUMN reading_time INTEGER;
+ALTER TABLE blogs ADD COLUMN date TEXT;
+ALTER TABLE blogs ADD COLUMN author TEXT;
+
+CREATE INDEX IF NOT EXISTS idx_blogs_date ON blogs(date);

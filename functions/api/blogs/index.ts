@@ -5,7 +5,10 @@ type BlogInput = {
   summary: string;
   slug: string;
   status?: "draft" | "published";
-  published_at?: string | null;
+  content?: string | null;
+  reading_time?: number | null;
+  date?: string | null;
+  author?: string | null;
 };
 
 export const onRequestGet: PagesFunction = async (context) => {
@@ -13,7 +16,7 @@ export const onRequestGet: PagesFunction = async (context) => {
     const db = getDb(context);
     const { results } = await db
       .prepare(
-        "SELECT id, title, summary, slug, status, published_at, created_at, updated_at FROM blogs ORDER BY updated_at DESC"
+        "SELECT id, title, summary, slug, status, content, reading_time, date, author, created_at, updated_at FROM blogs ORDER BY updated_at DESC"
       )
       .all();
 
@@ -32,14 +35,27 @@ export const onRequestPost: PagesFunction = async (context) => {
     }
 
     const status = body.status ?? "draft";
-    const publishedAt = body.published_at ?? null;
+    const content = body.content ?? null;
+    const readingTime =
+      typeof body.reading_time === "number" ? body.reading_time : null;
+    const date = body.date ?? null;
+    const author = body.author ?? null;
 
     const db = getDb(context);
     const result = await db
       .prepare(
-        "INSERT INTO blogs (title, summary, slug, status, published_at) VALUES (?, ?, ?, ?, ?)"
+        "INSERT INTO blogs (title, summary, slug, status, content, reading_time, date, author) VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
       )
-      .bind(body.title, body.summary, body.slug, status, publishedAt)
+      .bind(
+        body.title,
+        body.summary,
+        body.slug,
+        status,
+        content,
+        readingTime,
+        date,
+        author
+      )
       .run();
 
     return json({ ok: true, id: result.meta.last_row_id }, { status: 201 });

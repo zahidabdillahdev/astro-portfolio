@@ -5,7 +5,10 @@ type BlogInput = {
   summary?: string;
   slug?: string;
   status?: "draft" | "published";
-  published_at?: string | null;
+  content?: string | null;
+  reading_time?: number | null;
+  date?: string | null;
+  author?: string | null;
 };
 
 export const onRequestPut: PagesFunction = async (context) => {
@@ -35,13 +38,17 @@ export const onRequestPut: PagesFunction = async (context) => {
     const summary = body.summary ?? null;
     const slug = body.slug ?? null;
     const status = body.status ?? null;
-    const publishedAt = body.published_at ?? null;
+    const content = body.content ?? null;
+    const readingTime =
+      typeof body.reading_time === "number" ? body.reading_time : null;
+    const date = body.date ?? null;
+    const author = body.author ?? null;
 
     await db
       .prepare(
-        "UPDATE blogs SET title = COALESCE(?, title), summary = COALESCE(?, summary), slug = COALESCE(?, slug), status = COALESCE(?, status), published_at = COALESCE(?, published_at), updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+        "UPDATE blogs SET title = COALESCE(?, title), summary = COALESCE(?, summary), slug = COALESCE(?, slug), status = COALESCE(?, status), content = COALESCE(?, content), reading_time = COALESCE(?, reading_time), date = COALESCE(?, date), author = COALESCE(?, author), updated_at = CURRENT_TIMESTAMP WHERE id = ?"
       )
-      .bind(title, summary, slug, status, publishedAt, id)
+      .bind(title, summary, slug, status, content, readingTime, date, author, id)
       .run();
 
     return json({ ok: true });
