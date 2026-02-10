@@ -1,0 +1,25 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Navbar from "../components/Navbar.astro";
+import BlogList from "../components/BlogList.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<Layout>
+  <Navbar />
+  <main>
+    <section class="mx-auto w-full max-w-6xl px-6 pt-16">
+      <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
+        Cloud Notes
+      </p>
+      <h1 class="mt-3 font-display text-4xl font-semibold text-slate-900">
+        Writing about infrastructure that scales without stress.
+      </h1>
+      <p class="mt-4 max-w-2xl text-slate-600">
+        Articles, playbooks, and field notes from shipping cloud systems with modern teams.
+      </p>
+    </section>
+    <BlogList />
+  </main>
+  <Footer />
+</Layout>
