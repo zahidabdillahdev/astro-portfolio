@@ -277,6 +277,14 @@ import Navbar from "../components/Navbar.astro";
                   rows="6"
                 ></textarea>
               </div>
+              <div class="rounded-2xl border border-slate-800 bg-slate-950/50 p-4">
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                  Markdown Preview
+                </p>
+                <div class="prose prose-invert mt-3 max-w-none text-slate-200" data-blog-preview>
+                  Preview will appear here.
+                </div>
+              </div>
               <div class="grid gap-2">
                 <label class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" for="blog-status">
                   Status
@@ -390,6 +398,17 @@ import Navbar from "../components/Navbar.astro";
 
           <div class="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 shadow-sm">
             <h2 class="font-display text-lg font-semibold text-white">Tools List</h2>
+            <div class="mt-3 flex items-center gap-3 text-xs text-slate-400">
+              <span>Status</span>
+              <select
+                class="rounded-full border border-slate-700 bg-slate-950/80 px-3 py-1 text-xs text-slate-200"
+                data-tool-filter
+              >
+                <option value="all">All</option>
+                <option value="draft">Draft</option>
+                <option value="published">Published</option>
+              </select>
+            </div>
             <div class="mt-5 overflow-hidden rounded-2xl border border-slate-800">
               <div class="grid grid-cols-[1.2fr_0.8fr_0.6fr_0.5fr] gap-4 bg-slate-900/80 px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
                 <span>Name</span>
@@ -407,6 +426,17 @@ import Navbar from "../components/Navbar.astro";
         <div class="grid gap-6 lg:grid-cols-2">
           <div class="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 shadow-sm">
             <h2 class="font-display text-lg font-semibold text-white">Projects</h2>
+            <div class="mt-3 flex items-center gap-3 text-xs text-slate-400">
+              <span>Status</span>
+              <select
+                class="rounded-full border border-slate-700 bg-slate-950/80 px-3 py-1 text-xs text-slate-200"
+                data-project-filter
+              >
+                <option value="all">All</option>
+                <option value="draft">Draft</option>
+                <option value="published">Published</option>
+              </select>
+            </div>
             <div class="mt-5 overflow-hidden rounded-2xl border border-slate-800">
               <div class="grid grid-cols-[1.4fr_0.7fr_0.6fr_0.5fr] gap-4 bg-slate-900/80 px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
                 <span>Title</span>
@@ -422,6 +452,17 @@ import Navbar from "../components/Navbar.astro";
 
           <div class="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 shadow-sm">
             <h2 class="font-display text-lg font-semibold text-white">Blog Posts</h2>
+            <div class="mt-3 flex items-center gap-3 text-xs text-slate-400">
+              <span>Status</span>
+              <select
+                class="rounded-full border border-slate-700 bg-slate-950/80 px-3 py-1 text-xs text-slate-200"
+                data-blog-filter
+              >
+                <option value="all">All</option>
+                <option value="draft">Draft</option>
+                <option value="published">Published</option>
+              </select>
+            </div>
             <div class="mt-5 overflow-hidden rounded-2xl border border-slate-800">
               <div class="grid grid-cols-[1.4fr_0.7fr_0.6fr_0.5fr] gap-4 bg-slate-900/80 px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
                 <span>Title</span>
@@ -438,7 +479,8 @@ import Navbar from "../components/Navbar.astro";
       </div>
     </section>
   </main>
-  <script>
+  <script type="module">
+    import { marked } from "marked";
     const projectList = document.querySelector("[data-project-list]");
     const blogList = document.querySelector("[data-blog-list]");
     const refreshButton = document.querySelector("[data-refresh]");
@@ -450,11 +492,15 @@ import Navbar from "../components/Navbar.astro";
     const blogReset = document.querySelector("[data-blog-reset]");
     const projectSubmit = document.querySelector("[data-project-submit]");
     const blogSubmit = document.querySelector("[data-blog-submit]");
+    const blogPreview = document.querySelector("[data-blog-preview]");
     const toolList = document.querySelector("[data-tool-list]");
     const toolForm = document.querySelector("[data-tool-form]");
     const toolStatus = document.querySelector("[data-tool-status]");
     const toolReset = document.querySelector("[data-tool-reset]");
     const toolSubmit = document.querySelector("[data-tool-submit]");
+    const projectFilter = document.querySelector("[data-project-filter]");
+    const blogFilter = document.querySelector("[data-blog-filter]");
+    const toolFilter = document.querySelector("[data-tool-filter]");
     const uploadForms = document.querySelectorAll("[data-upload-form]");
     const summaryForm = document.querySelector("[data-summary-form]");
     const summaryStatus = document.querySelector("[data-summary-status]");
@@ -532,6 +578,11 @@ import Navbar from "../components/Navbar.astro";
         .join("");
     };
 
+    const filterItems = (items, filterValue) => {
+      if (!filterValue || filterValue === "all") return items;
+      return items.filter((item) => item.status === filterValue);
+    };
+
     const fetchData = async () => {
       try {
         const [projectsResponse, blogsResponse, toolsResponse] = await Promise.all([
@@ -544,9 +595,13 @@ import Navbar from "../components/Navbar.astro";
         const blogsJson = await blogsResponse.json();
         const toolsJson = await toolsResponse.json();
 
-        renderRows(projectsJson.data ?? [], projectList, "project");
-        renderRows(blogsJson.data ?? [], blogList, "blog");
-        renderTools(toolsJson.data ?? []);
+        const projects = projectsJson.data ?? [];
+        const blogs = blogsJson.data ?? [];
+        const tools = toolsJson.data ?? [];
+
+        renderRows(filterItems(projects, projectFilter?.value), projectList, "project");
+        renderRows(filterItems(blogs, blogFilter?.value), blogList, "blog");
+        renderTools(filterItems(tools, toolFilter?.value));
       } catch (error) {
         if (projectList) {
           projectList.innerHTML = '<div class="px-4 py-4 text-sm text-rose-400">Failed to load.</div>';
@@ -636,6 +691,7 @@ import Navbar from "../components/Navbar.astro";
             form.querySelector("#blog-reading").value = item.reading_time ?? "";
             form.querySelector("#blog-content").value = item.content ?? "";
             form.querySelector("#blog-status").value = item.status ?? "draft";
+            renderBlogPreview();
           } else {
             form.querySelector("#tool-name").value = item.name ?? "";
             form.querySelector("#tool-icon").value = item.icon ?? "logos:aws";
@@ -764,9 +820,9 @@ import Navbar from "../components/Navbar.astro";
         const blogs = blogsJson.data ?? [];
         const tools = toolsJson.data ?? [];
 
-        renderRows(projects, projectList, "project");
-        renderRows(blogs, blogList, "blog");
-        renderTools(tools);
+        renderRows(filterItems(projects, projectFilter?.value), projectList, "project");
+        renderRows(filterItems(blogs, blogFilter?.value), blogList, "blog");
+        renderTools(filterItems(tools, toolFilter?.value));
 
         bindListHandlers(
           projectList,
@@ -795,6 +851,18 @@ import Navbar from "../components/Navbar.astro";
           "Create Tool",
           tools
         );
+
+        if (projectFilter) {
+          projectFilter.onchange = () =>
+            renderRows(filterItems(projects, projectFilter.value), projectList, "project");
+        }
+        if (blogFilter) {
+          blogFilter.onchange = () =>
+            renderRows(filterItems(blogs, blogFilter.value), blogList, "blog");
+        }
+        if (toolFilter) {
+          toolFilter.onchange = () => renderTools(filterItems(tools, toolFilter.value));
+        }
       } catch (error) {
         if (projectList) {
           projectList.innerHTML = '<div class="px-4 py-4 text-sm text-rose-400">Failed to load.</div>';
@@ -908,8 +976,26 @@ import Navbar from "../components/Navbar.astro";
       });
     };
 
+    let renderBlogPreview = () => {};
+
+    const bindMarkdownPreview = () => {
+      if (!blogPreview || !blogForm) return;
+      const textarea = blogForm.querySelector("#blog-content");
+      if (!textarea) return;
+
+      const render = () => {
+        const value = textarea.value || "";
+        blogPreview.innerHTML = value ? marked.parse(value) : "Preview will appear here.";
+      };
+
+      renderBlogPreview = render;
+      textarea.addEventListener("input", render);
+      render();
+    };
+
     bindUploads();
     bindSummary();
+    bindMarkdownPreview();
     fetchAndBind();
     fetchProfileAssets();
   </script>

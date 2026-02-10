@@ -63,7 +63,7 @@
     link.className =
       "mt-auto inline-flex items-center gap-2 pt-6 text-sm font-semibold text-slate-300 transition hover:text-white";
     link.textContent = "Open article";
-    link.href = "/blog";
+    link.href = post.slug ? `/blog/${post.slug}` : "/blog";
 
     const icon = document.createElement("iconify-icon");
     icon.setAttribute("icon", "ph:arrow-up-right-bold");
