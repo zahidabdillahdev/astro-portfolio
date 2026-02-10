@@ -1,29 +1,3 @@
----
-const projects = [
-  {
-    name: "Multi-Region Cloud Platform",
-    summary:
-      "Designed a multi-region foundation with automated failover and routine resilience testing.",
-    tags: ["AWS", "Terraform", "ArgoCD"],
-    href: "https://github.com/",
-  },
-  {
-    name: "Cost Governance Program",
-    summary:
-      "Implemented cost visibility and right-sizing workflows across core services.",
-    tags: ["FinOps", "BigQuery", "Cloud Run"],
-    href: "https://github.com/",
-  },
-  {
-    name: "Observability Platform",
-    summary:
-      "Unified metrics, logs, and traces with clear alerting and escalation paths.",
-    tags: ["Grafana", "Prometheus", "Loki"],
-    href: "https://github.com/",
-  },
-];
----
-
 <section class="mx-auto w-full max-w-6xl px-6 py-16" id="projects">
   <div class="flex flex-wrap items-end justify-between gap-6">
     <div class="space-y-3">
@@ -43,31 +17,84 @@ const projects = [
     </a>
   </div>
 
-  <div class="mt-10 grid gap-6 md:grid-cols-3">
-    {projects.map((project) => (
-      <article class="flex h-full flex-col rounded-3xl border border-slate-800 bg-slate-900/60 p-6 shadow-sm">
-        <div class="flex items-center justify-between">
-          <h3 class="font-display text-xl font-semibold text-white">
-            {project.name}
-          </h3>
-          <iconify-icon icon="ph:rocket-launch" class="text-xl text-slate-500"></iconify-icon>
-        </div>
-        <p class="mt-4 text-sm text-slate-300">{project.summary}</p>
-        <div class="mt-6 flex flex-wrap gap-2">
-          {project.tags.map((tag) => (
-            <span class="rounded-full border border-slate-800 bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-300">
-              {tag}
-            </span>
-          ))}
-        </div>
-        <a
-          href={project.href}
-          class="mt-auto inline-flex items-center gap-2 pt-6 text-sm font-semibold text-slate-300 transition hover:text-white"
-        >
-          View details
-          <iconify-icon icon="ph:arrow-up-right-bold"></iconify-icon>
-        </a>
-      </article>
-    ))}
+  <div class="mt-10 grid gap-6 md:grid-cols-3" data-projects-grid>
+    <div class="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 text-sm text-slate-400">
+      Projects are being prepared. Check back soon.
+    </div>
   </div>
 </section>
+
+<script>
+  const grid = document.querySelector("[data-projects-grid]");
+
+  const buildTag = (text) => {
+    const span = document.createElement("span");
+    span.className =
+      "rounded-full border border-slate-800 bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-300";
+    span.textContent = text;
+    return span;
+  };
+
+  const buildCard = (project) => {
+    const card = document.createElement("article");
+    card.className =
+      "flex h-full flex-col rounded-3xl border border-slate-800 bg-slate-900/60 p-6 shadow-sm";
+
+    const header = document.createElement("div");
+    header.className = "flex items-center justify-between";
+
+    const title = document.createElement("h3");
+    title.className = "font-display text-xl font-semibold text-white";
+    title.textContent = project.name ?? "Untitled project";
+
+    const icon = document.createElement("iconify-icon");
+    icon.setAttribute("icon", "ph:rocket-launch");
+    icon.className = "text-xl text-slate-500";
+
+    header.append(title, icon);
+
+    const summary = document.createElement("p");
+    summary.className = "mt-4 text-sm text-slate-300";
+    summary.textContent = project.summary ?? "";
+
+    const tags = document.createElement("div");
+    tags.className = "mt-6 flex flex-wrap gap-2";
+    (project.tags ?? []).forEach((tag) => tags.append(buildTag(tag)));
+
+    const link = document.createElement("a");
+    link.className =
+      "mt-auto inline-flex items-center gap-2 pt-6 text-sm font-semibold text-slate-300 transition hover:text-white";
+    link.textContent = "View details";
+    if (project.href) {
+      link.href = project.href;
+    } else {
+      link.href = "#";
+      link.setAttribute("aria-disabled", "true");
+    }
+
+    const linkIcon = document.createElement("iconify-icon");
+    linkIcon.setAttribute("icon", "ph:arrow-up-right-bold");
+    link.append(linkIcon);
+
+    card.append(header, summary, tags, link);
+    return card;
+  };
+
+  const loadProjects = async () => {
+    if (!grid) return;
+    try {
+      const response = await fetch("/public/projects");
+      if (!response.ok) throw new Error("Failed");
+      const json = await response.json();
+      const items = json.data ?? [];
+
+      if (!items.length) return;
+      grid.innerHTML = "";
+      items.forEach((item) => grid.append(buildCard(item)));
+    } catch (error) {
+      // Keep placeholder
+    }
+  };
+
+  loadProjects();
+</script>

@@ -4,6 +4,7 @@ type ProfilePayload = {
   avatar_key?: string | null;
   photo_key?: string | null;
   resume_key?: string | null;
+  summary?: string | null;
 };
 
 export const onRequestGet: PagesFunction = async (context) => {
@@ -11,7 +12,7 @@ export const onRequestGet: PagesFunction = async (context) => {
     const db = getDb(context);
     const row = await db
       .prepare(
-        "SELECT avatar_key, photo_key, resume_key, updated_at FROM profile_assets WHERE id = 1"
+        "SELECT avatar_key, photo_key, resume_key, summary, updated_at FROM profile_assets WHERE id = 1"
       )
       .first();
 
@@ -28,18 +29,22 @@ export const onRequestPut: PagesFunction = async (context) => {
     const photoKey = body.photo_key ?? null;
     const resumeKey = body.resume_key ?? null;
 
+    const summary = body.summary ?? null;
+
     const db = getDb(context);
     await db
       .prepare(
-        "INSERT INTO profile_assets (id, avatar_key, photo_key, resume_key) VALUES (1, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET avatar_key = COALESCE(?, avatar_key), photo_key = COALESCE(?, photo_key), resume_key = COALESCE(?, resume_key), updated_at = CURRENT_TIMESTAMP"
+        "INSERT INTO profile_assets (id, avatar_key, photo_key, resume_key, summary) VALUES (1, ?, ?, ?, ?) ON CONFLICT(id) DO UPDATE SET avatar_key = COALESCE(?, avatar_key), photo_key = COALESCE(?, photo_key), resume_key = COALESCE(?, resume_key), summary = COALESCE(?, summary), updated_at = CURRENT_TIMESTAMP"
       )
       .bind(
         avatarKey,
         photoKey,
         resumeKey,
+        summary,
         avatarKey,
         photoKey,
-        resumeKey
+        resumeKey,
+        summary
       )
       .run();
 

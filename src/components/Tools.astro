@@ -1,15 +1,4 @@
 ---
-const tools = [
-  { name: "AWS", icon: "logos:aws" },
-  { name: "Google Cloud", icon: "logos:google-cloud" },
-  { name: "Docker", icon: "logos:docker-icon" },
-  { name: "Kubernetes", icon: "logos:kubernetes" },
-  { name: "Terraform", icon: "logos:terraform-icon" },
-  { name: "GitHub Actions", icon: "logos:github-actions" },
-  { name: "Prometheus", icon: "logos:prometheus" },
-  { name: "Grafana", icon: "logos:grafana" },
-  { name: "Linux", icon: "logos:linux-tux" },
-];
 ---
 
 <section class="mx-auto w-full max-w-6xl px-6 py-16" id="tools">
@@ -27,13 +16,47 @@ const tools = [
     </div>
   </div>
 
-  <div class="mt-10 grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
-    {tools.map((tool) => (
-      <div class="group aspect-square w-20 rounded-2xl border border-slate-800 bg-slate-900/60 p-3 shadow-sm transition hover:border-slate-500 hover:bg-slate-800/80">
-        <span class="flex h-full w-full items-center justify-center rounded-xl bg-slate-800 text-4xl transition group-hover:bg-slate-200 group-hover:text-slate-900">
-          <iconify-icon icon={tool.icon}></iconify-icon>
-        </span>
-      </div>
-    ))}
+  <div class="mt-10 grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6" data-tools-grid>
+    <div class="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 text-sm text-slate-400">
+      Tool stack will be listed once available.
+    </div>
   </div>
 </section>
+
+<script>
+  const grid = document.querySelector("[data-tools-grid]");
+
+  const buildCard = (tool) => {
+    const card = document.createElement("div");
+    card.className =
+      "group aspect-square w-20 rounded-2xl border border-slate-800 bg-slate-900/60 p-3 shadow-sm transition hover:border-slate-500 hover:bg-slate-800/80";
+
+    const iconWrap = document.createElement("span");
+    iconWrap.className =
+      "flex h-full w-full items-center justify-center rounded-xl bg-slate-800 text-4xl transition group-hover:bg-slate-200 group-hover:text-slate-900";
+
+    const icon = document.createElement("iconify-icon");
+    icon.setAttribute("icon", tool.icon || "ph:app-window");
+    iconWrap.append(icon);
+    card.append(iconWrap);
+    return card;
+  };
+
+  const loadTools = async () => {
+    if (!grid) return;
+    try {
+      const response = await fetch("/public/tools");
+      if (!response.ok) throw new Error("Failed");
+      const json = await response.json();
+      const items = json.data ?? [];
+
+      if (!items.length) return;
+      grid.innerHTML = "";
+      items.forEach((item) => grid.append(buildCard(item)));
+    } catch (error) {
+      // Keep placeholder
+    }
+  };
+
+  loadTools();
+</script>

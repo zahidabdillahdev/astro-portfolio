@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS tools (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  icon TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT "draft",
+  created_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP),
+  updated_at TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP)
+);
+
+CREATE INDEX IF NOT EXISTS idx_tools_status ON tools(status);
+CREATE INDEX IF NOT EXISTS idx_tools_updated_at ON tools(updated_at);
