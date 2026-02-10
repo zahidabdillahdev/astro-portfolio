@@ -1,24 +1,9 @@
 # Zahid Abdillah Portfolio
 
-A clean, modern portfolio and private content hub.
+Minimal docs live in `.BLUEPRINT.md`.
 
-## Tech Stack
-- Astro
-- Tailwind CSS
-- Cloudflare Pages
-
-## Getting Started
+## Quick Start
 ```bash
 npm install
 npm run dev -- --host
 ```
-
-## Build
-```bash
-npm run build
-npm run preview
-```
-
-## Notes
-- Admin area is private and protected.
-- Content is managed through the admin dashboard.
