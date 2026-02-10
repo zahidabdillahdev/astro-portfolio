@@ -29,7 +29,7 @@ import Footer from "../../components/Footer.astro";
     const dateEl = document.querySelector("[data-post-date]");
     const metaEl = document.querySelector("[data-post-meta]");
     const contentEl = document.querySelector("[data-post-content]");
-    const slug = window.location.pathname.split("/").pop();
+    const slug = window.location.pathname.split("/").filter(Boolean).pop();
 
     const formatDate = (value) => {
       if (!value) return "-";
