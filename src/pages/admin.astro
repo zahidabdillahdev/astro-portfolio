@@ -481,6 +481,7 @@ import Navbar from "../components/Navbar.astro";
   </main>
   <script type="module">
     import { marked } from "marked";
+    import DOMPurify from "dompurify";
     const projectList = document.querySelector("[data-project-list]");
     const blogList = document.querySelector("[data-blog-list]");
     const refreshButton = document.querySelector("[data-refresh]");
@@ -985,7 +986,8 @@ import Navbar from "../components/Navbar.astro";
 
       const render = () => {
         const value = textarea.value || "";
-        blogPreview.innerHTML = value ? marked.parse(value) : "Preview will appear here.";
+        const raw = value ? marked.parse(value, { mangle: false, headerIds: false }) : "";
+        blogPreview.innerHTML = value ? DOMPurify.sanitize(raw) : "Preview will appear here.";
       };
 
       renderBlogPreview = render;

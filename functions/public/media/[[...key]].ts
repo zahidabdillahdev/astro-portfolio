@@ -1,7 +1,8 @@
 import { getBucket } from "../../api/_utils";
 
 export const onRequestGet: PagesFunction = async (context) => {
-  const key = context.params?.key;
+  const keyParam = context.params?.key;
+  const key = Array.isArray(keyParam) ? keyParam.join("/") : keyParam;
   if (!key) {
     return new Response("Not found", { status: 404 });
   }

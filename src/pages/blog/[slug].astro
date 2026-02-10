@@ -24,6 +24,7 @@ import Footer from "../../components/Footer.astro";
 
   <script type="module">
     import { marked } from "marked";
+    import DOMPurify from "dompurify";
 
     const titleEl = document.querySelector("[data-post-title]");
     const dateEl = document.querySelector("[data-post-date]");
@@ -74,7 +75,8 @@ import Footer from "../../components/Footer.astro";
 
         if (contentEl) {
           const markdown = post.content || "";
-          contentEl.innerHTML = marked.parse(markdown);
+          const raw = marked.parse(markdown, { mangle: false, headerIds: false });
+          contentEl.innerHTML = DOMPurify.sanitize(raw);
         }
       } catch (error) {
         if (titleEl) titleEl.textContent = "Unable to load post";
