@@ -6,8 +6,8 @@
   </div>
 
   <div class="mx-auto w-full max-w-6xl px-6 pb-16 pt-20">
-    <div class="mx-auto mb-8 flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-slate-800 bg-slate-900/60">
-      <span class="text-xs text-slate-500">Avatar</span>
+    <div class="mx-auto mb-8 flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border border-slate-800 bg-slate-900/60">
+      <span class="text-xs text-slate-500" data-hero-avatar>Avatar</span>
     </div>
     <div class="space-y-8 text-center">
       <div class="space-y-5 animate-fade-up animate-delay-100">
@@ -19,7 +19,7 @@
           sensible automation, and strong documentation.
         </p>
       </div>
-      <div class="flex flex-wrap gap-4 animate-fade-up animate-delay-300">
+      <div class="flex flex-wrap justify-center gap-4 animate-fade-up animate-delay-300">
         <a
           href="#projects"
           class="rounded-full bg-slate-100 px-6 py-3 text-sm font-semibold text-slate-900 transition hover:-translate-y-0.5 hover:bg-white"
@@ -40,6 +40,7 @@
 
 <script>
   const resumeLink = document.querySelector("[data-resume-link]");
+  const heroAvatar = document.querySelector("[data-hero-avatar]");
   const loadProfile = async () => {
     try {
       const response = await fetch("/data/profile-assets");
@@ -48,12 +49,22 @@
       if (!json.data) return;
 
       const resumeKey = json.data.resume_key;
+      const avatarKey = json.data.avatar_key;
       const resumeUrl = resumeKey ? `/media/${resumeKey}` : null;
+      const avatarUrl = avatarKey ? `/media/${avatarKey}` : null;
 
       if (resumeLink && resumeUrl) {
         resumeLink.href = resumeUrl;
         resumeLink.setAttribute("target", "_blank");
         resumeLink.setAttribute("rel", "noreferrer");
+      }
+
+      if (heroAvatar && avatarUrl) {
+        const img = document.createElement("img");
+        img.src = avatarUrl;
+        img.alt = "Profile avatar";
+        img.className = "h-full w-full object-cover";
+        heroAvatar.replaceWith(img);
       }
     } catch (error) {
       // Keep placeholder

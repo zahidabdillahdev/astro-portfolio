@@ -1,7 +1,9 @@
 ---
 const navItems = [
-  { label: "Projects", href: "/projects" },
-  { label: "Blog", href: "/blog" },
+  { label: "Profile", href: "/#profile" },
+  { label: "Projects", href: "/#projects" },
+  { label: "Blog", href: "/#blog" },
+  { label: "Certifications", href: "/#certifications" },
 ];
 ---
 
@@ -11,7 +13,7 @@ const navItems = [
       Zahid Abdillah | Cloud Engineer
     </a>
     <details class="group relative">
-      <summary class="list-none cursor-pointer rounded-full border border-slate-700 px-3 py-2 text-slate-200 transition hover:border-slate-500 hover:text-white">
+      <summary class="list-none cursor-pointer text-slate-200 transition hover:text-white">
         <span class="sr-only">Open menu</span>
         <iconify-icon icon="ph:list"></iconify-icon>
       </summary>
@@ -25,3 +27,13 @@ const navItems = [
     </details>
   </nav>
 </header>
+
+<script>
+  const menu = document.querySelector("header details");
+  const links = document.querySelectorAll("header details a");
+  links.forEach((link) => {
+    link.addEventListener("click", () => {
+      if (menu) menu.removeAttribute("open");
+    });
+  });
+</script>
