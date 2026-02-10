@@ -3,21 +3,21 @@ const projects = [
   {
     name: "Multi-Region Cloud Platform",
     summary:
-      "Built an active-active platform with automated failover, cutting recovery time to minutes.",
+      "Designed a multi-region foundation with automated failover and routine resilience testing.",
     tags: ["AWS", "Terraform", "ArgoCD"],
     href: "https://github.com/",
   },
   {
-    name: "FinOps Cost Optimizer",
+    name: "Cost Governance Program",
     summary:
-      "Automated cost anomaly detection and rightsizing recommendations for 40+ services.",
-    tags: ["Python", "BigQuery", "Cloud Run"],
+      "Implemented cost visibility and right-sizing workflows across core services.",
+    tags: ["FinOps", "BigQuery", "Cloud Run"],
     href: "https://github.com/",
   },
   {
-    name: "Edge Observability Suite",
+    name: "Observability Platform",
     summary:
-      "Unified metrics, logs, and traces into a single dashboard with alert routing.",
+      "Unified metrics, logs, and traces with clear alerting and escalation paths.",
     tags: ["Grafana", "Prometheus", "Loki"],
     href: "https://github.com/",
   },
@@ -30,13 +30,13 @@ const projects = [
       <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
         Projects
       </p>
-      <h2 class="font-display text-3xl font-semibold text-slate-900">
-        Recent builds focused on scale and reliability.
+      <h2 class="font-display text-3xl font-semibold text-white">
+        Recent work focused on reliability and clarity.
       </h2>
     </div>
     <a
       href="/projects"
-      class="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 transition hover:text-slate-900"
+      class="inline-flex items-center gap-2 text-sm font-semibold text-slate-300 transition hover:text-white"
     >
       See all projects
       <iconify-icon icon="ph:arrow-right-bold"></iconify-icon>
@@ -45,26 +45,26 @@ const projects = [
 
   <div class="mt-10 grid gap-6 md:grid-cols-3">
     {projects.map((project) => (
-      <article class="flex h-full flex-col rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <article class="flex h-full flex-col rounded-3xl border border-slate-800 bg-slate-900/60 p-6 shadow-sm">
         <div class="flex items-center justify-between">
-          <h3 class="font-display text-xl font-semibold text-slate-900">
+          <h3 class="font-display text-xl font-semibold text-white">
             {project.name}
           </h3>
-          <iconify-icon icon="ph:rocket-launch" class="text-xl text-slate-400"></iconify-icon>
+          <iconify-icon icon="ph:rocket-launch" class="text-xl text-slate-500"></iconify-icon>
         </div>
-        <p class="mt-4 text-sm text-slate-600">{project.summary}</p>
+        <p class="mt-4 text-sm text-slate-300">{project.summary}</p>
         <div class="mt-6 flex flex-wrap gap-2">
           {project.tags.map((tag) => (
-            <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+            <span class="rounded-full border border-slate-800 bg-slate-900 px-3 py-1 text-xs font-semibold text-slate-300">
               {tag}
             </span>
           ))}
         </div>
         <a
           href={project.href}
-          class="mt-auto inline-flex items-center gap-2 pt-6 text-sm font-semibold text-slate-700 transition hover:text-slate-900"
+          class="mt-auto inline-flex items-center gap-2 pt-6 text-sm font-semibold text-slate-300 transition hover:text-white"
         >
-          View on GitHub
+          View details
           <iconify-icon icon="ph:arrow-up-right-bold"></iconify-icon>
         </a>
       </article>

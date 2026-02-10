@@ -6,26 +6,23 @@ const navItems = [
 ];
 ---
 
-<header class="sticky top-0 z-40 w-full bg-white/80 backdrop-blur border-b border-slate-200">
+<header class="sticky top-0 z-40 w-full border-b border-slate-800 bg-slate-950/90 backdrop-blur">
   <nav class="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
-    <a href="/" class="flex items-center gap-3 font-display text-lg font-semibold tracking-tight">
-      <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-white">
-        ZA
-      </span>
-      Zahid Abdillah
+    <a href="/" class="font-display text-lg font-semibold tracking-tight text-slate-100">
+      Zahid Abdillah | Cloud Engineer
     </a>
-    <div class="hidden items-center gap-8 text-sm font-medium text-slate-700 md:flex">
+    <div class="hidden items-center gap-8 text-sm font-medium text-slate-300 md:flex">
       {navItems.map((item) => (
-        <a class="transition hover:text-slate-900" href={item.href}>
+        <a class="transition hover:text-white" href={item.href}>
           {item.label}
         </a>
       ))}
     </div>
     <a
       href="#contact"
-      class="inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+      class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-5 py-2 text-sm font-semibold text-slate-900 transition hover:bg-white"
     >
-      Let's Talk
+      Contact
       <iconify-icon icon="ph:arrow-up-right-bold"></iconify-icon>
     </a>
   </nav>

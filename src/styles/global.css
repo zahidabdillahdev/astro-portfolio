@@ -1,3 +1,8 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@source "../**/*.{astro,html,js,jsx,ts,tsx}";
+
+@theme {
+  --font-display: "Source Sans 3", ui-sans-serif, system-ui;
+  --font-body: "Merriweather", ui-serif, Georgia;
+}

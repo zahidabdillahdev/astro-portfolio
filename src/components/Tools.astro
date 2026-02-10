@@ -10,13 +10,6 @@ const tools = [
   { name: "Grafana", icon: "logos:grafana" },
   { name: "Linux", icon: "logos:linux-tux" },
 ];
-
-const focuses = [
-  "Infrastructure as Code",
-  "Observability and SRE",
-  "Cost governance",
-  "Zero-downtime releases",
-];
 ---
 
 <section class="mx-auto w-full max-w-6xl px-6 py-16" id="tools">
@@ -25,33 +18,21 @@ const focuses = [
       <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
         Tool Stack
       </p>
-      <h2 class="font-display text-3xl font-semibold text-slate-900">
-        Infrastructure tools I trust in production.
+      <h2 class="font-display text-3xl font-semibold text-white">
+        Trusted tooling for dependable delivery.
       </h2>
-      <p class="max-w-2xl text-slate-600">
-        I blend cloud-native services with open-source tooling to ship platforms that are
-        resilient, secure, and easy to operate.
+      <p class="max-w-2xl text-slate-300">
+        I select tools that are proven in production, easy to operate, and well-supported.
       </p>
-    </div>
-    <div class="flex flex-wrap gap-3">
-      {focuses.map((item) => (
-        <span class="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-600">
-          {item}
-        </span>
-      ))}
     </div>
   </div>
 
-  <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+  <div class="mt-10 grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
     {tools.map((tool) => (
-      <div class="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <span class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-3xl">
+      <div class="group aspect-square w-20 rounded-2xl border border-slate-800 bg-slate-900/60 p-3 shadow-sm transition hover:border-slate-500 hover:bg-slate-800/80">
+        <span class="flex h-full w-full items-center justify-center rounded-xl bg-slate-800 text-4xl transition group-hover:bg-slate-200 group-hover:text-slate-900">
           <iconify-icon icon={tool.icon}></iconify-icon>
         </span>
-        <div>
-          <p class="text-sm font-semibold text-slate-900">{tool.name}</p>
-          <p class="text-xs text-slate-500">Production ready</p>
-        </div>
       </div>
     ))}
   </div>
