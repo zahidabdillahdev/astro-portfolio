@@ -5,24 +5,23 @@ const navItems = [
 ];
 ---
 
-<header class="sticky top-0 z-40 w-full border-b border-slate-800 bg-slate-950/90 backdrop-blur">
+<header class="sticky top-0 z-40 w-full border-b border-slate-800/70 bg-slate-950/90 backdrop-blur">
   <nav class="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
     <a href="/" class="font-display text-lg font-semibold tracking-tight text-slate-100">
       Zahid Abdillah | Cloud Engineer
     </a>
-    <div class="hidden items-center gap-8 text-sm font-medium text-slate-300 md:flex">
-      {navItems.map((item) => (
-        <a class="transition hover:text-white" href={item.href}>
-          {item.label}
-        </a>
-      ))}
-    </div>
-    <a
-      href="#contact"
-      class="inline-flex items-center gap-2 rounded-full bg-slate-100 px-5 py-2 text-sm font-semibold text-slate-900 transition hover:bg-white"
-    >
-      Contact
-      <iconify-icon icon="ph:arrow-up-right-bold"></iconify-icon>
-    </a>
+    <details class="group relative">
+      <summary class="list-none cursor-pointer rounded-full border border-slate-700 px-3 py-2 text-slate-200 transition hover:border-slate-500 hover:text-white">
+        <span class="sr-only">Open menu</span>
+        <iconify-icon icon="ph:list"></iconify-icon>
+      </summary>
+      <div class="absolute right-0 mt-3 w-44 origin-top-right rounded-2xl border border-slate-800 bg-slate-950/95 p-3 shadow-xl transition group-open:animate-fade-down">
+        {navItems.map((item) => (
+          <a class="block rounded-lg px-3 py-2 text-sm font-medium text-slate-200 transition hover:bg-slate-800/80 hover:text-white" href={item.href}>
+            {item.label}
+          </a>
+        ))}
+      </div>
+    </details>
   </nav>
 </header>

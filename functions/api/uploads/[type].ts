@@ -20,6 +20,14 @@ const allowedTypes: Record<
     ],
     maxSize: 5 * 1024 * 1024,
   },
+  certificate: {
+    contentTypes: [
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ],
+    maxSize: 5 * 1024 * 1024,
+  },
 };
 
 const sanitizeFileName = (name: string) =>

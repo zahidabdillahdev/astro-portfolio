@@ -476,6 +476,157 @@ import Navbar from "../components/Navbar.astro";
             </div>
           </div>
         </div>
+
+        <div class="grid gap-6 lg:grid-cols-2">
+          <div class="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 shadow-sm">
+            <h2 class="font-display text-lg font-semibold text-white">Certifications</h2>
+            <p class="mt-2 text-sm text-slate-400">
+              Manage certifications and upload supporting files.
+            </p>
+            <form class="mt-6 grid gap-4" data-cert-form>
+              <input type="hidden" name="id" />
+              <input type="hidden" name="file_key" />
+              <div class="grid gap-2">
+                <label class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" for="cert-name">
+                  Name
+                  <span class="ml-1 text-rose-400">*</span>
+                </label>
+                <input
+                  class="rounded-xl border border-slate-700 bg-slate-950/80 px-4 py-2 text-sm text-slate-100 focus:border-slate-500 focus:outline-none"
+                  id="cert-name"
+                  name="name"
+                  required
+                  type="text"
+                />
+              </div>
+              <div class="grid gap-2">
+                <label class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" for="cert-year">
+                  Year
+                  <span class="ml-1 text-rose-400">*</span>
+                </label>
+                <input
+                  class="rounded-xl border border-slate-700 bg-slate-950/80 px-4 py-2 text-sm text-slate-100 focus:border-slate-500 focus:outline-none"
+                  id="cert-year"
+                  name="year"
+                  required
+                  type="text"
+                />
+              </div>
+              <div class="grid gap-2">
+                <label class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" for="cert-issued">
+                  Issued by
+                  <span class="ml-1 text-rose-400">*</span>
+                </label>
+                <input
+                  class="rounded-xl border border-slate-700 bg-slate-950/80 px-4 py-2 text-sm text-slate-100 focus:border-slate-500 focus:outline-none"
+                  id="cert-issued"
+                  name="issued_by"
+                  required
+                  type="text"
+                />
+              </div>
+              <div class="grid gap-2">
+                <label class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" for="cert-credential">
+                  Credential ID
+                </label>
+                <input
+                  class="rounded-xl border border-slate-700 bg-slate-950/80 px-4 py-2 text-sm text-slate-100 focus:border-slate-500 focus:outline-none"
+                  id="cert-credential"
+                  name="credential_id"
+                  type="text"
+                />
+              </div>
+              <div class="grid gap-2">
+                <label class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" for="cert-verify">
+                  Verify Link
+                </label>
+                <input
+                  class="rounded-xl border border-slate-700 bg-slate-950/80 px-4 py-2 text-sm text-slate-100 focus:border-slate-500 focus:outline-none"
+                  id="cert-verify"
+                  name="verify_link"
+                  type="url"
+                />
+              </div>
+              <div class="grid gap-2">
+                <label class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                  Certificate file
+                </label>
+                <input
+                  class="text-xs text-slate-300 file:mr-4 file:rounded-full file:border-0 file:bg-slate-100 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-slate-900"
+                  type="file"
+                  name="cert_file"
+                  accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                />
+                <button
+                  class="rounded-full border border-slate-700 px-4 py-2 text-xs font-semibold text-slate-200"
+                  type="button"
+                  data-cert-upload
+                >
+                  Upload certificate file
+                </button>
+                <p class="text-xs text-slate-500" data-cert-upload-status></p>
+              </div>
+              <div class="grid gap-2">
+                <label class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500" for="cert-status">
+                  Status
+                </label>
+                <select
+                  class="rounded-xl border border-slate-700 bg-slate-950/80 px-4 py-2 text-sm text-slate-100 focus:border-slate-500 focus:outline-none"
+                  id="cert-status"
+                  name="status"
+                >
+                  <option value="draft">Draft</option>
+                  <option value="published">Published</option>
+                </select>
+              </div>
+              <div class="flex flex-wrap gap-3">
+                <button
+                  class="inline-flex items-center justify-center gap-2 rounded-full bg-slate-100 px-5 py-2 text-sm font-semibold text-slate-900"
+                  type="submit"
+                  data-cert-submit
+                >
+                  Create Certification
+                  <iconify-icon icon="ph:plus-bold"></iconify-icon>
+                </button>
+                <button
+                  class="inline-flex items-center justify-center gap-2 rounded-full border border-slate-700 px-5 py-2 text-sm font-semibold text-slate-200"
+                  type="button"
+                  data-cert-reset
+                >
+                  Clear
+                </button>
+              </div>
+              <p class="text-xs text-slate-500" data-cert-status></p>
+              <p class="text-xs text-slate-500" data-cert-file-current></p>
+            </form>
+          </div>
+
+          <div class="rounded-3xl border border-slate-800 bg-slate-900/60 p-6 shadow-sm">
+            <h2 class="font-display text-lg font-semibold text-white">Certifications List</h2>
+            <div class="mt-3 flex items-center gap-3 text-xs text-slate-400">
+              <span>Status</span>
+              <select
+                class="rounded-full border border-slate-700 bg-slate-950/80 px-3 py-1 text-xs text-slate-200"
+                data-cert-filter
+              >
+                <option value="all">All</option>
+                <option value="draft">Draft</option>
+                <option value="published">Published</option>
+              </select>
+            </div>
+            <div class="mt-5 overflow-hidden rounded-2xl border border-slate-800">
+              <div class="grid grid-cols-[1.2fr_0.8fr_0.7fr_0.5fr] gap-4 bg-slate-900/80 px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                <span>Name</span>
+                <span>Issuer</span>
+                <span>Year</span>
+                <span>Actions</span>
+              </div>
+              <div class="divide-y divide-slate-800" data-cert-list>
+                <div class="px-4 py-4 text-sm text-slate-500">Loading...</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   </main>
@@ -502,6 +653,15 @@ import Navbar from "../components/Navbar.astro";
     const projectFilter = document.querySelector("[data-project-filter]");
     const blogFilter = document.querySelector("[data-blog-filter]");
     const toolFilter = document.querySelector("[data-tool-filter]");
+    const certForm = document.querySelector("[data-cert-form]");
+    const certList = document.querySelector("[data-cert-list]");
+    const certStatus = document.querySelector("[data-cert-status]");
+    const certReset = document.querySelector("[data-cert-reset]");
+    const certSubmit = document.querySelector("[data-cert-submit]");
+    const certFilter = document.querySelector("[data-cert-filter]");
+    const certUploadButton = document.querySelector("[data-cert-upload]");
+    const certUploadStatus = document.querySelector("[data-cert-upload-status]");
+    const certFileCurrent = document.querySelector("[data-cert-file-current]");
     const uploadForms = document.querySelectorAll("[data-upload-form]");
     const summaryForm = document.querySelector("[data-summary-form]");
     const summaryStatus = document.querySelector("[data-summary-status]");
@@ -579,6 +739,34 @@ import Navbar from "../components/Navbar.astro";
         .join("");
     };
 
+    const renderCertifications = (items) => {
+      if (!certList) return;
+      if (!items.length) {
+        certList.innerHTML = '<div class="px-4 py-4 text-sm text-slate-500">No entries yet.</div>';
+        return;
+      }
+
+      certList.innerHTML = items
+        .map((item) => {
+          return `
+            <div class="grid grid-cols-[1.2fr_0.8fr_0.7fr_0.5fr] gap-4 px-4 py-4 text-sm">
+              <span class="font-semibold text-white">${item.name}</span>
+              <span class="text-slate-300">${item.issued_by}</span>
+              <span class="text-slate-300">${item.year}</span>
+              <div class="flex flex-wrap gap-2">
+                <button class="rounded-full border border-slate-700 px-3 py-1 text-xs font-semibold text-slate-200" data-edit data-type="cert" data-id="${item.id}">
+                  Edit
+                </button>
+                <button class="rounded-full border border-rose-500/40 px-3 py-1 text-xs font-semibold text-rose-300" data-delete data-type="cert" data-id="${item.id}">
+                  Delete
+                </button>
+              </div>
+            </div>
+          `;
+        })
+        .join("");
+    };
+
     const filterItems = (items, filterValue) => {
       if (!filterValue || filterValue === "all") return items;
       return items.filter((item) => item.status === filterValue);
@@ -586,23 +774,27 @@ import Navbar from "../components/Navbar.astro";
 
     const fetchData = async () => {
       try {
-        const [projectsResponse, blogsResponse, toolsResponse] = await Promise.all([
+        const [projectsResponse, blogsResponse, toolsResponse, certResponse] = await Promise.all([
           fetch("/api/projects"),
           fetch("/api/blogs"),
           fetch("/api/tools"),
+          fetch("/api/certifications"),
         ]);
 
         const projectsJson = await projectsResponse.json();
         const blogsJson = await blogsResponse.json();
         const toolsJson = await toolsResponse.json();
+        const certJson = await certResponse.json();
 
         const projects = projectsJson.data ?? [];
         const blogs = blogsJson.data ?? [];
         const tools = toolsJson.data ?? [];
+        const certs = certJson.data ?? [];
 
         renderRows(filterItems(projects, projectFilter?.value), projectList, "project");
         renderRows(filterItems(blogs, blogFilter?.value), blogList, "blog");
         renderTools(filterItems(tools, toolFilter?.value));
+        renderCertifications(filterItems(certs, certFilter?.value));
       } catch (error) {
         if (projectList) {
           projectList.innerHTML = '<div class="px-4 py-4 text-sm text-rose-400">Failed to load.</div>';
@@ -612,6 +804,9 @@ import Navbar from "../components/Navbar.astro";
         }
         if (toolList) {
           toolList.innerHTML = '<div class="px-4 py-4 text-sm text-rose-400">Failed to load.</div>';
+        }
+        if (certList) {
+          certList.innerHTML = '<div class="px-4 py-4 text-sm text-rose-400">Failed to load.</div>';
         }
       }
     };
@@ -693,23 +888,44 @@ import Navbar from "../components/Navbar.astro";
             form.querySelector("#blog-content").value = item.content ?? "";
             form.querySelector("#blog-status").value = item.status ?? "draft";
             renderBlogPreview();
+          } else if (type === "cert") {
+            form.querySelector("#cert-name").value = item.name ?? "";
+            form.querySelector("#cert-year").value = item.year ?? "";
+            form.querySelector("#cert-issued").value = item.issued_by ?? "";
+            form.querySelector("#cert-credential").value = item.credential_id ?? "";
+            form.querySelector("#cert-verify").value = item.verify_link ?? "";
+            form.querySelector("#cert-status").value = item.status ?? "draft";
+            const fileKeyInput = form.querySelector("input[name='file_key']");
+            if (fileKeyInput) fileKeyInput.value = item.file_key ?? "";
+            if (certFileCurrent) {
+              certFileCurrent.textContent = item.file_key ? `File: ${item.file_key}` : "";
+            }
           } else {
             form.querySelector("#tool-name").value = item.name ?? "";
             form.querySelector("#tool-icon").value = item.icon ?? "logos:aws";
             form.querySelector("#tool-status").value = item.status ?? "draft";
           }
 
-          submitButton.innerHTML = `Update ${type === "project" ? "Project" : type === "blog" ? "Blog" : "Tool"} <iconify-icon icon=\"ph:check-bold\"></iconify-icon>`;
+          submitButton.innerHTML = `Update ${type === "project" ? "Project" : type === "blog" ? "Blog" : type === "cert" ? "Certification" : "Tool"} <iconify-icon icon=\"ph:check-bold\"></iconify-icon>`;
           setStatus(statusEl, "Editing mode.", false);
         }
       };
+    };
+
+    const resolveEndpoint = (type) => {
+      if (type === "project") return "projects";
+      if (type === "blog") return "blogs";
+      if (type === "tool") return "tools";
+      if (type === "cert") return "certifications";
+      return "";
     };
 
     const handleDelete = async (id, type) => {
       const confirmDelete = window.confirm("Delete this entry?");
       if (!confirmDelete) return;
       try {
-        const response = await fetch(`/api/${type}s/${id}`, { method: "DELETE" });
+        const endpoint = resolveEndpoint(type);
+        const response = await fetch(`/api/${endpoint}/${id}`, { method: "DELETE" });
         if (!response.ok) {
           throw new Error("Request failed");
         }
@@ -766,6 +982,23 @@ import Navbar from "../components/Navbar.astro";
       })
     );
 
+    handleSubmit(
+      certForm,
+      "/api/certifications",
+      certStatus,
+      certSubmit,
+      "Create Certification",
+      (formData) => ({
+        name: formData.get("name"),
+        year: formData.get("year"),
+        issued_by: formData.get("issued_by"),
+        credential_id: formData.get("credential_id") || null,
+        verify_link: formData.get("verify_link") || null,
+        file_key: formData.get("file_key") || null,
+        status: formData.get("status") || "draft",
+      })
+    );
+
     if (projectReset && projectForm && projectSubmit) {
       projectReset.addEventListener("click", () =>
         resetForm(projectForm, projectSubmit, projectStatus, "Create Project")
@@ -782,6 +1015,13 @@ import Navbar from "../components/Navbar.astro";
       toolReset.addEventListener("click", () =>
         resetForm(toolForm, toolSubmit, toolStatus, "Create Tool")
       );
+    }
+
+    if (certReset && certForm && certSubmit) {
+      certReset.addEventListener("click", () =>
+        resetForm(certForm, certSubmit, certStatus, "Create Certification")
+      );
+      if (certFileCurrent) certFileCurrent.textContent = "";
     }
 
     if (refreshButton) {
@@ -808,10 +1048,11 @@ import Navbar from "../components/Navbar.astro";
 
     const fetchAndBind = async () => {
       try {
-        const [projectsResponse, blogsResponse, toolsResponse] = await Promise.all([
+        const [projectsResponse, blogsResponse, toolsResponse, certResponse] = await Promise.all([
           fetch("/api/projects"),
           fetch("/api/blogs"),
           fetch("/api/tools"),
+          fetch("/api/certifications"),
         ]);
 
         const projectsJson = await projectsResponse.json();
@@ -820,10 +1061,12 @@ import Navbar from "../components/Navbar.astro";
         const projects = projectsJson.data ?? [];
         const blogs = blogsJson.data ?? [];
         const tools = toolsJson.data ?? [];
+        const certs = certResponse.ok ? (await certResponse.json()).data ?? [] : [];
 
         renderRows(filterItems(projects, projectFilter?.value), projectList, "project");
         renderRows(filterItems(blogs, blogFilter?.value), blogList, "blog");
         renderTools(filterItems(tools, toolFilter?.value));
+        renderCertifications(filterItems(certs, certFilter?.value));
 
         bindListHandlers(
           projectList,
@@ -852,6 +1095,15 @@ import Navbar from "../components/Navbar.astro";
           "Create Tool",
           tools
         );
+        bindListHandlers(
+          certList,
+          "cert",
+          certForm,
+          certSubmit,
+          certStatus,
+          "Create Certification",
+          certs
+        );
 
         if (projectFilter) {
           projectFilter.onchange = () =>
@@ -864,6 +1116,9 @@ import Navbar from "../components/Navbar.astro";
         if (toolFilter) {
           toolFilter.onchange = () => renderTools(filterItems(tools, toolFilter.value));
         }
+        if (certFilter) {
+          certFilter.onchange = () => renderCertifications(filterItems(certs, certFilter.value));
+        }
       } catch (error) {
         if (projectList) {
           projectList.innerHTML = '<div class="px-4 py-4 text-sm text-rose-400">Failed to load.</div>';
@@ -873,6 +1128,9 @@ import Navbar from "../components/Navbar.astro";
         }
         if (toolList) {
           toolList.innerHTML = '<div class="px-4 py-4 text-sm text-rose-400">Failed to load.</div>';
+        }
+        if (certList) {
+          certList.innerHTML = '<div class="px-4 py-4 text-sm text-rose-400">Failed to load.</div>';
         }
       }
     };
@@ -995,9 +1253,39 @@ import Navbar from "../components/Navbar.astro";
       render();
     };
 
+    const bindCertUpload = () => {
+      if (!certForm || !certUploadButton) return;
+      const fileInput = certForm.querySelector("input[name='cert_file']");
+      const fileKeyInput = certForm.querySelector("input[name='file_key']");
+      certUploadButton.addEventListener("click", async () => {
+        if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+          if (certUploadStatus) certUploadStatus.textContent = "Select a file first.";
+          return;
+        }
+        if (certUploadStatus) certUploadStatus.textContent = "Uploading...";
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+        try {
+          const response = await fetch("/api/uploads/certificate", {
+            method: "POST",
+            body: formData,
+          });
+          if (!response.ok) throw new Error("Upload failed");
+          const json = await response.json();
+          if (fileKeyInput) fileKeyInput.value = json.key ?? "";
+          if (certFileCurrent) certFileCurrent.textContent = json.key ? `File: ${json.key}` : "";
+          if (certUploadStatus) certUploadStatus.textContent = "Uploaded.";
+          fileInput.value = "";
+        } catch (error) {
+          if (certUploadStatus) certUploadStatus.textContent = "Upload failed.";
+        }
+      });
+    };
+
     bindUploads();
     bindSummary();
     bindMarkdownPreview();
+    bindCertUpload();
     fetchAndBind();
     fetchProfileAssets();
   </script>
