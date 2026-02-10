@@ -32,7 +32,7 @@
 
   const loadProfile = async () => {
     try {
-      const response = await fetch("/public/profile-assets");
+      const response = await fetch("/data/profile-assets");
       if (!response.ok) throw new Error("Failed");
       const json = await response.json();
       const data = json.data ?? {};
@@ -43,7 +43,7 @@
 
       if (photoEl && data.photo_key) {
         const img = document.createElement("img");
-        img.src = `/public/media/${data.photo_key}`;
+        img.src = `/media/${data.photo_key}`;
         img.alt = "Profile photo";
         img.className = "h-full w-full object-cover";
         photoEl.innerHTML = "";
@@ -51,7 +51,7 @@
       }
 
       if (resumeEl && data.resume_key) {
-        resumeEl.href = `/public/media/${data.resume_key}`;
+        resumeEl.href = `/media/${data.resume_key}`;
         resumeEl.setAttribute("target", "_blank");
         resumeEl.setAttribute("rel", "noreferrer");
       }

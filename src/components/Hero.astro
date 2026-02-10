@@ -39,13 +39,13 @@
   const resumeLink = document.querySelector("[data-resume-link]");
   const loadProfile = async () => {
     try {
-      const response = await fetch("/public/profile-assets");
+      const response = await fetch("/data/profile-assets");
       if (!response.ok) throw new Error("Failed");
       const json = await response.json();
       if (!json.data) return;
 
       const resumeKey = json.data.resume_key;
-      const resumeUrl = resumeKey ? `/public/media/${resumeKey}` : null;
+      const resumeUrl = resumeKey ? `/media/${resumeKey}` : null;
 
       if (resumeLink && resumeUrl) {
         resumeLink.href = resumeUrl;

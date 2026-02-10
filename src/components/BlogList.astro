@@ -76,7 +76,7 @@
   const loadPosts = async () => {
     if (!grid) return;
     try {
-      const response = await fetch("/public/blogs");
+      const response = await fetch("/data/blogs");
       if (!response.ok) throw new Error("Failed");
       const json = await response.json();
       const items = json.data ?? [];

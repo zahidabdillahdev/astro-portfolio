@@ -47,7 +47,7 @@ export const prerender = false;
 
     const loadPost = async () => {
       try {
-        const response = await fetch("/public/blogs");
+        const response = await fetch("/data/blogs");
         if (!response.ok) throw new Error("Failed");
         const json = await response.json();
         const post = (json.data ?? []).find((item) => item.slug === slug);
