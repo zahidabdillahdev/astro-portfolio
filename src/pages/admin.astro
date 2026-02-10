@@ -7,6 +7,7 @@ import Navbar from "../components/Navbar.astro";
   <Navbar />
   <main class="mx-auto w-full max-w-6xl px-6 py-16">
     <section class="space-y-12">
+      <div class="fixed right-6 top-6 z-50 space-y-3" data-toast-container></div>
       <div class="flex flex-wrap items-center justify-between gap-6">
         <div>
           <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
@@ -665,6 +666,7 @@ import Navbar from "../components/Navbar.astro";
     const certUploadButton = document.querySelector("[data-cert-upload]");
     const certUploadStatus = document.querySelector("[data-cert-upload-status]");
     const certFileCurrent = document.querySelector("[data-cert-file-current]");
+    const toastContainer = document.querySelector("[data-toast-container]");
     const uploadForms = document.querySelectorAll("[data-upload-form]");
     const summaryForm = document.querySelector("[data-summary-form]");
     const summaryStatus = document.querySelector("[data-summary-status]");
@@ -820,6 +822,18 @@ import Navbar from "../components/Navbar.astro";
       el.className = `text-xs ${isError ? "text-rose-400" : "text-slate-500"}`;
     };
 
+    const showToast = (message, type = "success") => {
+      if (!toastContainer) return;
+      const toast = document.createElement("div");
+      toast.className =
+        type === "success"
+          ? "rounded-2xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200 shadow-lg"
+          : "rounded-2xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200 shadow-lg";
+      toast.textContent = message;
+      toastContainer.append(toast);
+      setTimeout(() => toast.remove(), 3000);
+    };
+
     const resetForm = (form, submitButton, statusEl, defaultLabel) => {
       form.reset();
       form.querySelector("input[name='id']").value = "";
@@ -852,9 +866,11 @@ import Navbar from "../components/Navbar.astro";
 
           resetForm(form, submitButton, statusEl, defaultLabel);
           setStatus(statusEl, id ? "Updated." : "Created.", false);
+          showToast(id ? "Saved changes." : "Created successfully.", "success");
           await fetchData();
         } catch (error) {
           setStatus(statusEl, "Failed to save.", true);
+          showToast("Action failed. Please try again.", "error");
         }
       });
     };
@@ -933,8 +949,10 @@ import Navbar from "../components/Navbar.astro";
           throw new Error("Request failed");
         }
         await fetchData();
+        showToast("Deleted successfully.", "success");
       } catch (error) {
         window.alert("Failed to delete entry.");
+        showToast("Delete failed.", "error");
       }
     };
 
@@ -1206,8 +1224,10 @@ import Navbar from "../components/Navbar.astro";
               updateAssetText(type, json.key);
             }
             input.value = "";
+            showToast("Upload completed. Save changes.", "success");
           } catch (error) {
             if (statusEl) statusEl.textContent = "Upload failed.";
+            showToast("Upload failed.", "error");
           }
         });
       });
@@ -1236,8 +1256,10 @@ import Navbar from "../components/Navbar.astro";
           });
           if (!response.ok) throw new Error("Failed");
           if (summaryStatus) summaryStatus.textContent = "Saved.";
+          showToast("Profile updated.", "success");
         } catch (error) {
           if (summaryStatus) summaryStatus.textContent = "Failed to save.";
+          showToast("Profile update failed.", "error");
         }
       });
     };
@@ -1283,8 +1305,10 @@ import Navbar from "../components/Navbar.astro";
           if (certFileCurrent) certFileCurrent.textContent = json.key ? `File: ${json.key}` : "";
           if (certUploadStatus) certUploadStatus.textContent = "Uploaded.";
           fileInput.value = "";
+          showToast("Certificate uploaded.", "success");
         } catch (error) {
           if (certUploadStatus) certUploadStatus.textContent = "Upload failed.";
+          showToast("Certificate upload failed.", "error");
         }
       });
     };
