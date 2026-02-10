@@ -1,25 +1,19 @@
 <section class="mx-auto w-full max-w-6xl px-6 py-16" id="profile">
-  <div class="grid gap-8 lg:grid-cols-[0.6fr_1.4fr] lg:items-center">
-    <div class="rounded-3xl border border-slate-800 bg-slate-900/60 p-5 shadow-sm animate-fade-up">
-      <div class="aspect-square w-full max-w-[220px] overflow-hidden rounded-2xl border border-slate-800 bg-slate-950/70 animate-float" data-profile-photo></div>
-    </div>
-    <div class="space-y-4">
-      <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
-        Profile
-      </p>
-      <h2 class="font-display text-3xl font-semibold text-white">
-        About me
-      </h2>
-      <p class="text-sm text-slate-300" data-profile-summary>
-        Profile information will appear here after publishing.
-      </p>
-    </div>
+  <div class="space-y-4">
+    <p class="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
+      Profile
+    </p>
+    <h2 class="font-display text-3xl font-semibold text-white">
+      About me
+    </h2>
+    <p class="max-w-3xl text-sm text-slate-300" data-profile-summary>
+      Profile information will appear here after publishing.
+    </p>
   </div>
 </section>
 
 <script>
   const summaryEl = document.querySelector("[data-profile-summary]");
-  const photoEl = document.querySelector("[data-profile-photo]");
 
   const loadProfile = async () => {
     try {
@@ -31,17 +25,6 @@
       if (summaryEl && data.summary) {
         summaryEl.textContent = data.summary;
       }
-
-      if (photoEl && data.photo_key) {
-        const img = document.createElement("img");
-        img.src = `/media/${data.photo_key}`;
-        img.alt = "Profile photo";
-        img.className = "h-full w-full object-cover";
-        photoEl.innerHTML = "";
-        photoEl.append(img);
-      }
-
-      // Resume link lives in the hero section.
     } catch (error) {
       // Keep placeholders
     }
