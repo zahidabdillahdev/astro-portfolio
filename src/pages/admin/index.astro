@@ -22,11 +22,6 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       <h3 style="margin: 0 0 0.5rem 0; font-size: 1.25rem;">Education</h3>
       <p id="education-count" style="font-size: 2rem; font-weight: bold; margin: 0;">Loading...</p>
     </div>
-    
-    <div style="border: 1px solid #e5e7eb; padding: 1rem; border-radius: 0.5rem;">
-      <h3 style="margin: 0 0 0.5rem 0; font-size: 1.25rem;">Messages</h3>
-      <p id="messages-count" style="font-size: 2rem; font-weight: bold; margin: 0;">Loading...</p>
-    </div>
   </div>
   
   <div style="margin-top: 2rem;">
@@ -60,12 +55,6 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       const educationResponse = await api('GET', '/api/education');
       if (educationResponse.length !== undefined) {
         document.getElementById('education-count').textContent = educationResponse.length;
-      }
-      
-      // Get messages count
-      const messagesResponse = await api('GET', '/api/admin/messages');
-      if (messagesResponse.length !== undefined) {
-        document.getElementById('messages-count').textContent = messagesResponse.length;
       }
     } catch (error) {
       console.error('Error loading stats:', error);

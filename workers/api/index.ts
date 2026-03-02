@@ -114,28 +114,6 @@ app.get('/api/education', async (c) => {
   }
 });
 
-app.post('/api/contact', async (c) => {
-  try {
-    const { name, email, subject, message } = await c.req.json();
-    
-    // Basic validation
-    if (!name || !email || !message) {
-      return c.json({ error: 'Name, email, and message are required' }, 400);
-    }
-
-    // Insert into contact_submissions table
-    await c.env.DB.prepare(
-      `INSERT INTO contact_submissions (name, email, subject, message) VALUES (?, ?, ?, ?)`
-    )
-    .bind(name, email, subject || '', message)
-    .run();
-
-    return c.json({ success: true, message: 'Message received successfully' });
-  } catch (error) {
-    return c.json({ error: 'Failed to submit message' }, 500);
-  }
-});
-
 // Admin routes - protected by cfAccessMiddleware
 app.use('/api/admin/*', cfAccessMiddleware);
 
@@ -583,39 +561,6 @@ app.delete('/api/admin/education/:id', async (c) => {
     return c.json({ success: true, message: 'Education deleted successfully' });
   } catch (error) {
     return c.json({ error: 'Failed to delete education' }, 500);
-  }
-});
-
-// Messages admin routes
-app.get('/api/admin/messages', async (c) => {
-  try {
-    const result = await c.env.DB.prepare(
-      `SELECT * FROM contact_submissions ORDER BY submitted_at DESC`
-    ).all();
-
-    return c.json(result);
-  } catch (error) {
-    return c.json({ error: 'Failed to fetch messages' }, 500);
-  }
-});
-
-app.put('/api/admin/messages/:id/status', async (c) => {
-  try {
-    const id = c.req.param('id');
-    const { status } = await c.req.json();
-
-    // Validate status
-    if (!['unread', 'read', 'archived'].includes(status)) {
-      return c.json({ error: 'Invalid status' }, 400);
-    }
-
-    await c.env.DB.prepare(
-      `UPDATE contact_submissions SET status = ? WHERE id = ?`
-    ).bind(status, parseInt(id)).run();
-
-    return c.json({ success: true, message: 'Status updated successfully' });
-  } catch (error) {
-    return c.json({ error: 'Failed to update status' }, 500);
   }
 });
 

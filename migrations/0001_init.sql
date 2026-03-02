@@ -52,11 +52,3 @@ CREATE TABLE IF NOT EXISTS certifications (
   certificate_url TEXT DEFAULT '', thumbnail_url TEXT DEFAULT '',
   order_index INTEGER DEFAULT 0
 );
-
-CREATE TABLE IF NOT EXISTS contact_submissions (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT DEFAULT '', email TEXT DEFAULT '',
-  subject TEXT DEFAULT '', message TEXT NOT NULL,
-  status TEXT DEFAULT 'unread',
-  submitted_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
