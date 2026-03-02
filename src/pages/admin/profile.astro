@@ -110,13 +110,20 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       </div>
     </div>
     
-    <div>
-      <label for="resume-url" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Resume URL</label>
-      <input 
-        type="url" 
-        id="resume-url" 
-        style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
-      />
+    <div style="border: 1px solid #e5e7eb; padding: 1.5rem; border-radius: 0.5rem; background-color: #f9fafb;">
+      <label for="resume-file" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Resume / CV Document</label>
+      <div style="display: flex; gap: 1rem; align-items: center;">
+        <input 
+          type="file" 
+          id="resume-file" 
+          accept=".pdf,.doc,.docx"
+          style="flex-grow: 1; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none; background-color: #fff;" 
+        />
+        <div id="resume-status" style="font-size: 0.75rem; color: #10b981; display: none;">Document Uploaded</div>
+      </div>
+      <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem;">PDF, DOC, or DOCX. Max 5MB.</p>
+      <input type="hidden" id="resume-url" />
+      <div id="current-resume-link" style="margin-top: 0.5rem; font-size: 0.875rem;"></div>
     </div>
     
     <div>
@@ -182,9 +189,22 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
 
       // Update avatar preview
       updateAvatarPreview(profile.avatar_url);
+
+      // Update resume link
+      updateResumeDisplay(profile.resume_url);
     } catch (error) {
       console.error('Error loading profile:', error);
       showToast('Failed to load profile', 'error');
+    }
+  }
+
+  function updateResumeDisplay(url) {
+    const linkContainer = document.getElementById('current-resume-link');
+    if (url) {
+      const fileName = url.split('/').pop();
+      linkContainer.innerHTML = `Current: <a href="${url}" target="_blank" style="color: #3b82f6; text-decoration: underline;">${fileName}</a>`;
+    } else {
+      linkContainer.innerHTML = '<span style="color: #9ca3af;">No resume uploaded yet.</span>';
     }
   }
 
@@ -212,6 +232,18 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       reader.readAsDataURL(file);
     }
   });
+
+  // Handle resume file selection feedback
+  document.getElementById('resume-file').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const status = document.getElementById('resume-status');
+    if (file) {
+      status.textContent = `Selected: ${file.name}`;
+      status.style.display = 'block';
+    } else {
+      status.style.display = 'none';
+    }
+  });
   
   // Handle form submission
   document.getElementById('profile-form').addEventListener('submit', async (e) => {
@@ -225,8 +257,11 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
     try {
       let avatarUrl = document.getElementById('avatar-url').value;
       const avatarFile = document.getElementById('avatar-file').files[0];
+      
+      let resumeUrl = document.getElementById('resume-url').value;
+      const resumeFile = document.getElementById('resume-file').files[0];
 
-      // 1. If a new file is selected, upload it to R2 first
+      // 1. If a new photo is selected, upload it to R2 first
       if (avatarFile) {
         showToast('Uploading profile photo...');
         try {
@@ -236,8 +271,19 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
           throw new Error('Failed to upload photo: ' + uploadError.message);
         }
       }
+
+      // 2. If a new resume is selected, upload it to R2
+      if (resumeFile) {
+        showToast('Uploading resume...');
+        try {
+          resumeUrl = await uploadFile(resumeFile, 'documents');
+          document.getElementById('resume-url').value = resumeUrl;
+        } catch (uploadError) {
+          throw new Error('Failed to upload resume: ' + uploadError.message);
+        }
+      }
       
-      // 2. Save the rest of the profile data
+      // 3. Save the rest of the profile data
       const formData = {
         full_name: document.getElementById('full-name').value,
         title: document.getElementById('title').value,
@@ -248,7 +294,7 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
         location: document.getElementById('location').value,
         location_link: document.getElementById('location-link').value,
         avatar_url: avatarUrl,
-        resume_url: document.getElementById('resume-url').value,
+        resume_url: resumeUrl,
         linkedin_url: document.getElementById('linkedin-url').value,
         instagram_url: document.getElementById('instagram-url').value,
         website_url: document.getElementById('website-url').value
