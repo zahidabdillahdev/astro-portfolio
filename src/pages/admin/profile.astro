@@ -1,0 +1,213 @@
+---
+export const prerender = false;
+import AdminLayout from '../../components/admin/AdminLayout.astro';
+---
+
+<AdminLayout title="Admin - Profile">
+  <h1>Manage Profile</h1>
+  
+  <form id="profile-form" style="display: flex; flex-direction: column; gap: 1rem; max-width: 600px;">
+    <div>
+      <label for="full-name" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Full Name *</label>
+      <input 
+        type="text" 
+        id="full-name" 
+        required
+        style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
+      />
+    </div>
+    
+    <div>
+      <label for="title" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Title *</label>
+      <input 
+        type="text" 
+        id="title" 
+        required
+        style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
+      />
+    </div>
+    
+    <div>
+      <label for="about" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">About *</label>
+      <textarea 
+        id="about" 
+        required
+        rows="3"
+        style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
+      ></textarea>
+    </div>
+    
+    <div>
+      <label for="summary" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Summary *</label>
+      <textarea 
+        id="summary" 
+        required
+        rows="5"
+        style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
+      ></textarea>
+    </div>
+    
+    <div>
+      <label for="email" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Email *</label>
+      <input 
+        type="email" 
+        id="email" 
+        required
+        style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
+      />
+    </div>
+    
+    <div>
+      <label for="tel" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Phone</label>
+      <input 
+        type="tel" 
+        id="tel" 
+        style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
+      />
+    </div>
+    
+    <div>
+      <label for="location" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Location *</label>
+      <input 
+        type="text" 
+        id="location" 
+        required
+        style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
+      />
+    </div>
+    
+    <div>
+      <label for="location-link" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Location Link</label>
+      <input 
+        type="url" 
+        id="location-link" 
+        style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
+      />
+    </div>
+    
+    <div>
+      <label for="avatar-url" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Avatar URL</label>
+      <input 
+        type="url" 
+        id="avatar-url" 
+        style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
+      />
+    </div>
+    
+    <div>
+      <label for="resume-url" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Resume URL</label>
+      <input 
+        type="url" 
+        id="resume-url" 
+        style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
+      />
+    </div>
+    
+    <div>
+      <label for="linkedin-url" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">LinkedIn URL</label>
+      <input 
+        type="url" 
+        id="linkedin-url" 
+        style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
+      />
+    </div>
+    
+    <div>
+      <label for="instagram-url" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Instagram URL</label>
+      <input 
+        type="url" 
+        id="instagram-url" 
+        style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
+      />
+    </div>
+    
+    <div>
+      <label for="website-url" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Personal Website URL</label>
+      <input 
+        type="url" 
+        id="website-url" 
+        style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
+      />
+    </div>
+    
+    <button 
+      type="submit"
+      style="padding: 0.75rem 1.5rem; background-color: #000; color: #fff; border: none; border-radius: 0.375rem; cursor: pointer; margin-top: 1rem;"
+    >
+      Save Profile
+    </button>
+  </form>
+</AdminLayout>
+
+<script is:inline>
+  // Load profile on page load
+  document.addEventListener('DOMContentLoaded', async () => {
+    loadProfile();
+  });
+  
+  // Load profile from API
+  async function loadProfile() {
+    try {
+      const profile = await api('GET', '/api/profile');
+      
+      document.getElementById('full-name').value = profile.full_name || '';
+      document.getElementById('title').value = profile.title || '';
+      document.getElementById('about').value = profile.about || '';
+      document.getElementById('summary').value = profile.summary || '';
+      document.getElementById('email').value = profile.email || '';
+      document.getElementById('tel').value = profile.tel || '';
+      document.getElementById('location').value = profile.location || '';
+      document.getElementById('location-link').value = profile.location_link || '';
+      document.getElementById('avatar-url').value = profile.avatar_url || '';
+      document.getElementById('resume-url').value = profile.resume_url || '';
+      document.getElementById('linkedin-url').value = profile.linkedin_url || '';
+      document.getElementById('instagram-url').value = profile.instagram_url || '';
+      document.getElementById('website-url').value = profile.website_url || '';
+    } catch (error) {
+      console.error('Error loading profile:', error);
+      alert('Failed to load profile');
+    }
+  }
+  
+  // Handle form submission
+  document.getElementById('profile-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = {
+      full_name: document.getElementById('full-name').value,
+      title: document.getElementById('title').value,
+      about: document.getElementById('about').value,
+      summary: document.getElementById('summary').value,
+      email: document.getElementById('email').value,
+      tel: document.getElementById('tel').value,
+      location: document.getElementById('location').value,
+      location_link: document.getElementById('location-link').value,
+      avatar_url: document.getElementById('avatar-url').value,
+      resume_url: document.getElementById('resume-url').value,
+      linkedin_url: document.getElementById('linkedin-url').value,
+      instagram_url: document.getElementById('instagram-url').value,
+      website_url: document.getElementById('website-url').value
+    };
+    
+    try {
+      const response = await api('PUT', '/api/admin/profile', formData);
+      
+      if (response.success) {
+        alert('Profile updated successfully!');
+        
+        // Trigger deploy after saving
+        try {
+          await triggerDeploy();
+          console.log('Deploy triggered after saving profile');
+        } catch (deployError) {
+          console.error('Deploy failed after saving profile:', deployError);
+        }
+      } else {
+        alert(response.error || 'Failed to update profile');
+      }
+    } catch (error) {
+      console.error('Error saving profile:', error);
+      alert('Failed to update profile');
+    }
+  });
+</script>
