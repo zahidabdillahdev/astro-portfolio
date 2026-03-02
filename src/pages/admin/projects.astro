@@ -1,0 +1,347 @@
+---
+export const prerender = false;
+import AdminLayout from '../../components/admin/AdminLayout.astro';
+---
+
+<AdminLayout title="Admin - Projects">
+  <h1>Manage Projects</h1>
+  
+  <button 
+    onclick="openModal(null)"
+    style="background-color: #000; color: #fff; padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; cursor: pointer; margin-bottom: 1rem;"
+  >
+    + Add New Project
+  </button>
+  
+  <div class="table-container" style="overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb;">
+      <thead>
+        <tr style="background-color: #f9fafb;">
+          <th style="padding: 0.75rem; text-align: left; border: 1px solid #e5e7eb;">Title</th>
+          <th style="padding: 0.75rem; text-align: left; border: 1px solid #e5e7eb;">Category</th>
+          <th style="padding: 0.75rem; text-align: left; border: 1px solid #e5e7eb;">Featured</th>
+          <th style="padding: 0.75rem; text-align: left; border: 1px solid #e5e7eb;">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="projects-table-body">
+        <!-- Table rows will be populated by JavaScript -->
+      </tbody>
+    </table>
+  </div>
+  
+  <!-- Modal -->
+  <div id="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background-color: #fff; width: 90%; max-width: 600px; border-radius: 0.5rem; padding: 1.5rem; position: relative;">
+      <h2 id="modal-title">Add New Project</h2>
+      
+      <form id="project-form" style="display: flex; flex-direction: column; gap: 1rem;">
+        <input type="hidden" id="project-id" />
+        
+        <div>
+          <label for="title" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Title *</label>
+          <input 
+            type="text" 
+            id="title" 
+            required
+            style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
+          />
+        </div>
+        
+        <div>
+          <label for="slug" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Slug *</label>
+          <input 
+            type="text" 
+            id="slug" 
+            required
+            style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
+          />
+        </div>
+        
+        <div>
+          <label for="description" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Description</label>
+          <textarea 
+            id="description" 
+            rows="3"
+            style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
+          ></textarea>
+        </div>
+        
+        <div>
+          <label for="category" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Category</label>
+          <input 
+            type="text" 
+            id="category" 
+            style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
+          />
+        </div>
+        
+        <div>
+          <label for="client" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Client</label>
+          <input 
+            type="text" 
+            id="client" 
+            style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
+          />
+        </div>
+        
+        <div>
+          <label for="thumbnail-url" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Thumbnail URL</label>
+          <input 
+            type="text" 
+            id="thumbnail-url" 
+            style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
+          />
+        </div>
+        
+        <div>
+          <label for="link-type" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Link Type</label>
+          <select 
+            id="link-type" 
+            style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
+          >
+            <option value="url">URL</option>
+            <option value="notion">Notion</option>
+            <option value="gdrive">Google Drive</option>
+            <option value="pdf">PDF</option>
+          </select>
+        </div>
+        
+        <div>
+          <label for="link-url" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Link URL</label>
+          <input 
+            type="text" 
+            id="link-url" 
+            style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
+          />
+        </div>
+        
+        <div>
+          <label for="results" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Results (JSON format)</label>
+          <textarea 
+            id="results" 
+            rows="3"
+            placeholder='Example: {"Conversion Rate": "Increased by 35%", "Revenue": "Increased by $2.3M annually"}'
+            style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none; font-family: monospace;" 
+          ></textarea>
+        </div>
+        
+        <div>
+          <label for="tags" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Tags (comma-separated)</label>
+          <input 
+            type="text" 
+            id="tags" 
+            placeholder="tag1, tag2, tag3"
+            style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
+          />
+        </div>
+        
+        <div>
+          <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; font-weight: 500;">
+            <input type="checkbox" id="is-featured" />
+            Featured
+          </label>
+        </div>
+        
+        <div>
+          <label for="order-index" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Order Index</label>
+          <input 
+            type="number" 
+            id="order-index" 
+            value="0"
+            style="width: 100px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
+          />
+        </div>
+        
+        <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1rem;">
+          <button 
+            type="button" 
+            onclick="closeModal()"
+            style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; cursor: pointer; background-color: #f9fafb;"
+          >
+            Cancel
+          </button>
+          <button 
+            type="submit"
+            style="padding: 0.5rem 1rem; background-color: #000; color: #fff; border: none; border-radius: 0.375rem; cursor: pointer;"
+          >
+            Save Project
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</AdminLayout>
+
+<script is:inline>
+  // Load projects on page load
+  document.addEventListener('DOMContentLoaded', async () => {
+    loadProjects();
+  });
+  
+  // Load projects from API
+  async function loadProjects() {
+    try {
+      const projects = await api('GET', '/api/projects');
+      renderProjectsTable(projects);
+    } catch (error) {
+      console.error('Error loading projects:', error);
+      alert('Failed to load projects');
+    }
+  }
+  
+  // Render projects in the table
+  function renderProjectsTable(projects) {
+    const tbody = document.getElementById('projects-table-body');
+    tbody.innerHTML = '';
+    
+    projects.forEach(project => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">${project.title}</td>
+        <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">${project.category || ''}</td>
+        <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">${project.isFeatured ? 'Yes' : 'No'}</td>
+        <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">
+          <button onclick="openModal(${project.id})" style="margin-right: 0.5rem; padding: 0.25rem 0.5rem; background-color: #f3f4f6; border: 1px solid #d1d5db; border-radius: 0.25rem; cursor: pointer;">Edit</button>
+          <button onclick="deleteProject(${project.id})" style="padding: 0.25rem 0.5rem; background-color: #fee2e2; border: 1px solid #d1d5db; border-radius: 0.25rem; cursor: pointer;">Delete</button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+  
+  // Open modal for adding/editing a project
+  function openModal(projectId) {
+    const modal = document.getElementById('modal');
+    const modalTitle = document.getElementById('modal-title');
+    const form = document.getElementById('project-form');
+    
+    // Reset form
+    form.reset();
+    document.getElementById('project-id').value = '';
+    
+    if (projectId) {
+      // Editing existing project
+      modalTitle.textContent = 'Edit Project';
+      
+      // Find the project and populate the form
+      api('GET', '/api/projects').then(projects => {
+        const project = projects.find(p => p.id === projectId);
+        if (project) {
+          document.getElementById('project-id').value = project.id;
+          document.getElementById('title').value = project.title;
+          document.getElementById('slug').value = project.slug;
+          document.getElementById('description').value = project.description || '';
+          document.getElementById('category').value = project.category || '';
+          document.getElementById('client').value = project.client || '';
+          document.getElementById('thumbnail-url').value = project.thumbnail_url || '';
+          document.getElementById('link-type').value = project.link_type;
+          document.getElementById('link-url').value = project.link_url;
+          document.getElementById('results').value = JSON.stringify(project.results || {}, null, 2);
+          document.getElementById('tags').value = (project.tags || []).join(', ');
+          document.getElementById('is-featured').checked = project.isFeatured || false;
+          document.getElementById('order-index').value = project.order_index || 0;
+        }
+      });
+    } else {
+      // Adding new project
+      modalTitle.textContent = 'Add New Project';
+    }
+    
+    modal.style.display = 'flex';
+  }
+  
+  // Close modal
+  function closeModal() {
+    document.getElementById('modal').style.display = 'none';
+  }
+  
+  // Handle form submission
+  document.getElementById('project-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const projectId = document.getElementById('project-id').value;
+    const formData = {
+      id: projectId ? parseInt(projectId) : undefined,
+      title: document.getElementById('title').value,
+      slug: document.getElementById('slug').value,
+      description: document.getElementById('description').value,
+      category: document.getElementById('category').value,
+      client: document.getElementById('client').value,
+      thumbnail_url: document.getElementById('thumbnail-url').value,
+      link_type: document.getElementById('link-type').value,
+      link_url: document.getElementById('link-url').value,
+      results: parseJsonField(document.getElementById('results').value),
+      tags: document.getElementById('tags').value.split(',').map(tag => tag.trim()).filter(tag => tag),
+      is_featured: document.getElementById('is-featured').checked,
+      order_index: parseInt(document.getElementById('order-index').value) || 0
+    };
+    
+    try {
+      let response;
+      if (projectId) {
+        // Update existing project
+        response = await api('PUT', `/api/admin/projects/${projectId}`, formData);
+      } else {
+        // Create new project
+        response = await api('POST', '/api/admin/projects', formData);
+      }
+      
+      if (response.success || response.id) {
+        closeModal();
+        loadProjects(); // Reload the table
+        
+        // Trigger deploy after saving
+        try {
+          await triggerDeploy();
+          console.log('Deploy triggered after saving project');
+        } catch (deployError) {
+          console.error('Deploy failed after saving project:', deployError);
+        }
+      } else {
+        alert(response.error || 'Failed to save project');
+      }
+    } catch (error) {
+      console.error('Error saving project:', error);
+      alert('Failed to save project');
+    }
+  });
+  
+  // Delete a project
+  async function deleteProject(projectId) {
+    if (!confirm('Are you sure you want to delete this project?')) {
+      return;
+    }
+    
+    try {
+      const response = await api('DELETE', `/api/admin/projects/${projectId}`);
+      
+      if (response.success) {
+        loadProjects(); // Reload the table
+        
+        // Trigger deploy after deletion
+        try {
+          await triggerDeploy();
+          console.log('Deploy triggered after deleting project');
+        } catch (deployError) {
+          console.error('Deploy failed after deleting project:', deployError);
+        }
+      } else {
+        alert(response.error || 'Failed to delete project');
+      }
+    } catch (error) {
+      console.error('Error deleting project:', error);
+      alert('Failed to delete project');
+    }
+  }
+  
+  // Helper function to parse JSON field safely
+  function parseJsonField(value) {
+    if (!value.trim()) return {};
+    try {
+      return JSON.parse(value);
+    } catch (e) {
+      alert('Invalid JSON format in Results field');
+      return {};
+    }
+  }
+</script>
