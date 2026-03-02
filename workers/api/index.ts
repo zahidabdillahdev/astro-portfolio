@@ -47,11 +47,28 @@ app.get('/api/projects', async (c) => {
     ).all();
 
     // Parse JSON fields
-    const projects = result.results.map((project: any) => ({
-      ...project,
-      results: project.results ? JSON.parse(project.results as string) : {},
-      tags: project.tags ? JSON.parse(project.tags as string) : []
-    }));
+    const projects = result.results.map((project: any) => {
+      let parsedResults = {};
+      let parsedTags = [];
+      
+      try {
+        if (project.results) parsedResults = JSON.parse(project.results as string);
+      } catch (e) {
+        console.error('Error parsing project results:', e);
+      }
+      
+      try {
+        if (project.tags) parsedTags = JSON.parse(project.tags as string);
+      } catch (e) {
+        console.error('Error parsing project tags:', e);
+      }
+
+      return {
+        ...project,
+        results: parsedResults,
+        tags: parsedTags
+      };
+    });
 
     return c.json(projects);
   } catch (error) {
@@ -78,11 +95,28 @@ app.get('/api/experience', async (c) => {
     ).all();
 
     // Parse JSON fields
-    const experiences = result.results.map((exp: any) => ({
-      ...exp,
-      achievements: exp.achievements ? JSON.parse(exp.achievements as string) : [],
-      badges: exp.badges ? JSON.parse(exp.badges as string) : []
-    }));
+    const experiences = result.results.map((exp: any) => {
+      let parsedAchievements = [];
+      let parsedBadges = [];
+      
+      try {
+        if (exp.achievements) parsedAchievements = JSON.parse(exp.achievements as string);
+      } catch (e) {
+        console.error('Error parsing achievements:', e);
+      }
+      
+      try {
+        if (exp.badges) parsedBadges = JSON.parse(exp.badges as string);
+      } catch (e) {
+        console.error('Error parsing badges:', e);
+      }
+
+      return {
+        ...exp,
+        achievements: parsedAchievements,
+        badges: parsedBadges
+      };
+    });
 
     return c.json(experiences);
   } catch (error) {

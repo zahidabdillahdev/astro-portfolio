@@ -185,7 +185,7 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       renderProjectsTable(projects);
     } catch (error) {
       console.error('Error loading projects:', error);
-      alert('Failed to load projects');
+      showToast('Failed to load projects', 'error');
     }
   }
   
@@ -194,12 +194,17 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
     const tbody = document.getElementById('projects-table-body');
     tbody.innerHTML = '';
     
+    if (!projects || projects.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" style="padding: 1rem; text-align: center; color: #6b7280;">No projects found. Click "+ Add New Project" to get started.</td></tr>';
+      return;
+    }
+    
     projects.forEach(project => {
       const row = document.createElement('tr');
       row.innerHTML = `
         <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">${project.title}</td>
         <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">${project.category || ''}</td>
-        <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">${project.isFeatured ? 'Yes' : 'No'}</td>
+        <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">${project.is_featured ? 'Yes' : 'No'}</td>
         <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">
           <button onclick="openModal(${project.id})" style="margin-right: 0.5rem; padding: 0.25rem 0.5rem; background-color: #f3f4f6; border: 1px solid #d1d5db; border-radius: 0.25rem; cursor: pointer;">Edit</button>
           <button onclick="deleteProject(${project.id})" style="padding: 0.25rem 0.5rem; background-color: #fee2e2; border: 1px solid #d1d5db; border-radius: 0.25rem; cursor: pointer;">Delete</button>
@@ -238,9 +243,12 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
           document.getElementById('link-url').value = project.link_url;
           document.getElementById('results').value = JSON.stringify(project.results || {}, null, 2);
           document.getElementById('tags').value = (project.tags || []).join(', ');
-          document.getElementById('is-featured').checked = project.isFeatured || false;
+          document.getElementById('is-featured').checked = !!project.is_featured;
           document.getElementById('order-index').value = project.order_index || 0;
         }
+      }).catch(err => {
+        console.error('Error fetching project details:', err);
+        showToast('Error loading project details', 'error');
       });
     } else {
       // Adding new project
