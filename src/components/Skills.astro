@@ -4,15 +4,17 @@ import Badge from './common/Badge.astro';
 
 const {skills} = CV_DATA;
 ---
-{skills && skills.length > 0 && (
 <section class="flex min-h-0 flex-col gap-y-3 print:gap-y-1">
     <h2 class="text-xl font-bold" id="skills-section">Skills</h2>
-    <ul class="flex list-none flex-wrap gap-1 p-0" aria-label="List of skills">
-        {skills.map((skill) => (
-                <li>
-                    <Badge variant="primary">{skill}</Badge>
-                </li>
-        ))}
-    </ul>
+    {skills && skills.length > 0 ? (
+        <ul class="flex list-none flex-wrap gap-1 p-0" aria-label="List of skills">
+            {skills.map((skill) => (
+                    <li>
+                        <Badge variant="primary">{skill}</Badge>
+                    </li>
+            ))}
+        </ul>
+    ) : (
+        <p class="text-sm text-muted-foreground italic">Core competencies and technical expertise will be showcased here.</p>
+    )}
 </section>
-)}

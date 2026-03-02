@@ -38,7 +38,7 @@
 
 ### 3. Admin Panel
 - [x] Created `AdminLayout` with sidebar navigation.
-- [x] Implemented CRUD pages for all sections (Profile, Projects, Experience, etc.).
+- [x] Implemented CRUD pages for all sections (Profile, Projects, Experience, Education, Skills, etc.).
 - [x] Fixed Vanilla JS integration in Admin using `is:inline` scripts.
 - [x] Added global Toast notification system for success/error feedback.
 - [x] Fixed "Failed to load profile" bug by returning default values for new databases.

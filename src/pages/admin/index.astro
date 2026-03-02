@@ -17,6 +17,11 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       <h3 style="margin: 0 0 0.5rem 0; font-size: 1.25rem;">Certifications</h3>
       <p id="certifications-count" style="font-size: 2rem; font-weight: bold; margin: 0;">Loading...</p>
     </div>
+
+    <div style="border: 1px solid #e5e7eb; padding: 1rem; border-radius: 0.5rem;">
+      <h3 style="margin: 0 0 0.5rem 0; font-size: 1.25rem;">Education</h3>
+      <p id="education-count" style="font-size: 2rem; font-weight: bold; margin: 0;">Loading...</p>
+    </div>
     
     <div style="border: 1px solid #e5e7eb; padding: 1rem; border-radius: 0.5rem;">
       <h3 style="margin: 0 0 0.5rem 0; font-size: 1.25rem;">Messages</h3>
@@ -49,6 +54,12 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       const certificationsResponse = await api('GET', '/api/certifications');
       if (certificationsResponse.length !== undefined) {
         document.getElementById('certifications-count').textContent = certificationsResponse.length;
+      }
+
+      // Get education count
+      const educationResponse = await api('GET', '/api/education');
+      if (educationResponse.length !== undefined) {
+        document.getElementById('education-count').textContent = educationResponse.length;
       }
       
       // Get messages count

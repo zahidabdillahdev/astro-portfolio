@@ -7,21 +7,18 @@ import Email from "./icons/Email.astro";
 import Phone from "./icons/Phone.astro";
 import Globe from "./icons/Globe.astro";
 
-import {Image} from 'astro:assets'
-import avatarImage from '../assets/avatar.jpeg';
-
 const {name, about, personalWebsiteUrl, contact, location, locationLink, avatarUrl} = CV_DATA;
 ---
 <header class="flex items-center justify-between">
     <div class="flex-1 space-y-1.5">
         <h1 class="text-2xl font-bold" id="cv-name">
-            {name}
+            {name || "Your Name"}
         </h1>
         <p class="max-w-md text-pretty font-mono text-sm text-foreground/80 print:text-[12px]">
-            {about}
+            {about || "Digital Marketing Professional | Specialist"}
         </p>
         <p class="max-w-md items-center text-pretty font-mono text-xs text-foreground">
-            {location && (
+            {location ? (
                 <a class="inline-flex gap-x-1.5 align-baseline leading-none hover:underline"
                    href={locationLink}
                    target="_blank"
@@ -30,6 +27,11 @@ const {name, about, personalWebsiteUrl, contact, location, locationLink, avatarU
                     <Globe class="size-3"/>
                     {location}
                 </a>
+            ) : (
+                <span class="inline-flex gap-x-1.5 align-baseline leading-none text-muted-foreground italic">
+                    <Globe class="size-3"/>
+                    Location information pending
+                </span>
             )}
         </p>
         <div class="flex list-none gap-x-1 pt-1 font-mono text-sm text-foreground/80 print:hidden"
@@ -90,12 +92,16 @@ const {name, about, personalWebsiteUrl, contact, location, locationLink, avatarU
             ))}
         </div>
     </div>
-    <span class="relative flex shrink-0 overflow-hidden rounded-xl size-28"
+    <span class="relative flex shrink-0 overflow-hidden rounded-xl size-28 bg-gray-100 items-center justify-center border border-gray-200"
           aria-hidden="true">
         {avatarUrl ? (
-            <img class="aspect-square h-full w-full object-cover" alt={`${name}'s profile picture`} src={avatarUrl}/>
+            <img class="aspect-square h-full w-full object-cover" alt={`${name || 'User'}'s profile picture`} src={avatarUrl}/>
         ) : (
-            <Image class="aspect-square h-full w-full" alt={`${name}'s profile picture`} src={avatarImage}/>
+            <div class="text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-12">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                </svg>
+            </div>
         )}
     </span>
 </header>

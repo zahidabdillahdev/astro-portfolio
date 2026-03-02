@@ -96,9 +96,21 @@ app.get('/api/skills', async (c) => {
       `SELECT * FROM skills ORDER BY order_index ASC`
     ).all();
 
-    return c.json(result);
+    return c.json(result.results);
   } catch (error) {
     return c.json({ error: 'Failed to fetch skills' }, 500);
+  }
+});
+
+app.get('/api/education', async (c) => {
+  try {
+    const result = await c.env.DB.prepare(
+      `SELECT * FROM education ORDER BY order_index ASC`
+    ).all();
+
+    return c.json(result.results);
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch education' }, 500);
   }
 });
 
@@ -504,6 +516,73 @@ app.delete('/api/admin/skills/:id', async (c) => {
     return c.json({ success: true, message: 'Skill deleted successfully' });
   } catch (error) {
     return c.json({ error: 'Failed to delete skill' }, 500);
+  }
+});
+
+// Education admin routes
+app.post('/api/admin/education', async (c) => {
+  try {
+    const edu = await c.req.json();
+    
+    if (!edu.school || !edu.degree) {
+      return c.json({ error: 'School and degree are required' }, 400);
+    }
+
+    const stmt = c.env.DB.prepare(
+      `INSERT INTO education (school, degree, start_year, end_year, order_index) 
+       VALUES (?, ?, ?, ?, ?)`
+    );
+
+    await stmt.bind(
+      edu.school,
+      edu.degree,
+      edu.startYear || '',
+      edu.endYear || '',
+      edu.orderIndex || 0
+    ).run();
+
+    return c.json({ success: true, message: 'Education created successfully' });
+  } catch (error) {
+    return c.json({ error: 'Failed to create education' }, 500);
+  }
+});
+
+app.put('/api/admin/education/:id', async (c) => {
+  try {
+    const id = c.req.param('id');
+    const edu = await c.req.json();
+
+    const stmt = c.env.DB.prepare(
+      `UPDATE education SET school = ?, degree = ?, start_year = ?, end_year = ?, order_index = ?
+       WHERE id = ?`
+    );
+
+    await stmt.bind(
+      edu.school,
+      edu.degree,
+      edu.startYear || '',
+      edu.endYear || '',
+      edu.orderIndex || 0,
+      parseInt(id)
+    ).run();
+
+    return c.json({ success: true, message: 'Education updated successfully' });
+  } catch (error) {
+    return c.json({ error: 'Failed to update education' }, 500);
+  }
+});
+
+app.delete('/api/admin/education/:id', async (c) => {
+  try {
+    const id = c.req.param('id');
+
+    await c.env.DB.prepare(
+      `DELETE FROM education WHERE id = ?`
+    ).bind(parseInt(id)).run();
+
+    return c.json({ success: true, message: 'Education deleted successfully' });
+  } catch (error) {
+    return c.json({ error: 'Failed to delete education' }, 500);
   }
 });
 
