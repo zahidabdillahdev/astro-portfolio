@@ -173,7 +173,7 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       renderExperienceTable(experience);
     } catch (error) {
       console.error('Error loading experience:', error);
-      alert('Failed to load experience');
+      showToast('Failed to load experience');
     }
   }
   
@@ -288,11 +288,11 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
           console.error('Deploy failed after saving experience:', deployError);
         }
       } else {
-        alert(response.error || 'Failed to save experience');
+        showToast(response.error || 'Failed to save experience');
       }
     } catch (error) {
       console.error('Error saving experience:', error);
-      alert('Failed to save experience');
+      showToast('Failed to save experience');
     }
   });
   
@@ -316,11 +316,11 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
           console.error('Deploy failed after deleting experience:', deployError);
         }
       } else {
-        alert(response.error || 'Failed to delete experience');
+        showToast(response.error || 'Failed to delete experience');
       }
     } catch (error) {
       console.error('Error deleting experience:', error);
-      alert('Failed to delete experience');
+      showToast('Failed to delete experience');
     }
   }
 </script>

@@ -154,7 +154,7 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       renderCertificationsTable(certifications);
     } catch (error) {
       console.error('Error loading certifications:', error);
-      alert('Failed to load certifications');
+      showToast('Failed to load certifications');
     }
   }
   
@@ -250,6 +250,7 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       }
       
       if (response.success || response.id) {
+        showToast(certId ? 'Certification updated!' : 'Certification created!', 'success');
         closeModal();
         loadCertifications(); // Reload the table
         
@@ -261,11 +262,11 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
           console.error('Deploy failed after saving certification:', deployError);
         }
       } else {
-        alert(response.error || 'Failed to save certification');
+        showToast(response.error || 'Failed to save certification');
       }
     } catch (error) {
       console.error('Error saving certification:', error);
-      alert('Failed to save certification');
+      showToast('Failed to save certification');
     }
   });
   
@@ -279,6 +280,7 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       const response = await api('DELETE', `/api/admin/certifications/${certId}`);
       
       if (response.success) {
+        showToast('Certification deleted!', 'success');
         loadCertifications(); // Reload the table
         
         // Trigger deploy after deletion
@@ -289,11 +291,11 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
           console.error('Deploy failed after deleting certification:', deployError);
         }
       } else {
-        alert(response.error || 'Failed to delete certification');
+        showToast(response.error || 'Failed to delete certification');
       }
     } catch (error) {
       console.error('Error deleting certification:', error);
-      alert('Failed to delete certification');
+      showToast('Failed to delete certification');
     }
   }
 </script>

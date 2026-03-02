@@ -26,7 +26,12 @@ app.get('/api/profile', async (c) => {
     ).first();
 
     if (!result) {
-      return c.json({ error: 'Profile not found' }, 404);
+      return c.json({
+        full_name: '', title: '', about: '', summary: '',
+        email: '', tel: '', location: '', location_link: '',
+        avatar_url: '', resume_url: '', linkedin_url: '',
+        instagram_url: '', website_url: ''
+      });
     }
 
     return c.json(result);

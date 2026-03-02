@@ -165,7 +165,7 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       document.getElementById('website-url').value = profile.website_url || '';
     } catch (error) {
       console.error('Error loading profile:', error);
-      alert('Failed to load profile');
+      showToast('Failed to load profile');
     }
   }
   
@@ -193,7 +193,7 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       const response = await api('PUT', '/api/admin/profile', formData);
       
       if (response.success) {
-        alert('Profile updated successfully!');
+        showToast('Profile updated successfully!', 'success');
         
         // Trigger deploy after saving
         try {
@@ -203,11 +203,11 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
           console.error('Deploy failed after saving profile:', deployError);
         }
       } else {
-        alert(response.error || 'Failed to update profile');
+        showToast(response.error || 'Failed to update profile');
       }
     } catch (error) {
       console.error('Error saving profile:', error);
-      alert('Failed to update profile');
+      showToast('Failed to update profile');
     }
   });
 </script>

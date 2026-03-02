@@ -83,12 +83,10 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
     
     try {
       const result = await triggerDeploy();
-      statusEl.textContent = 'Deploy triggered successfully!';
-      statusEl.style.color = '#10b981';
+      showToast('Deploy triggered successfully!', 'success');
     } catch (error) {
       console.error('Deploy error:', error);
-      statusEl.textContent = `Deploy failed: ${error.message}`;
-      statusEl.style.color = '#ef4444';
+      showToast(`Deploy failed: ${error.message}`);
     } finally {
       deployBtn.disabled = false;
       deployBtn.textContent = 'Trigger Rebuild';

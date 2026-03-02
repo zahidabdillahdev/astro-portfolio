@@ -99,7 +99,7 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       renderSkillsTable(skills);
     } catch (error) {
       console.error('Error loading skills:', error);
-      alert('Failed to load skills');
+      showToast('Failed to load skills');
     }
   }
   
@@ -183,6 +183,7 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       }
       
       if (response.success || response.id) {
+        showToast(skillId ? 'Skill updated!' : 'Skill created!', 'success');
         closeModal();
         loadSkills(); // Reload the table
         
@@ -194,11 +195,11 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
           console.error('Deploy failed after saving skill:', deployError);
         }
       } else {
-        alert(response.error || 'Failed to save skill');
+        showToast(response.error || 'Failed to save skill', 'error');
       }
     } catch (error) {
       console.error('Error saving skill:', error);
-      alert('Failed to save skill');
+      showToast('Failed to save skill', 'error');
     }
   });
   
@@ -212,6 +213,7 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       const response = await api('DELETE', `/api/admin/skills/${skillId}`);
       
       if (response.success) {
+        showToast('Skill deleted!', 'success');
         loadSkills(); // Reload the table
         
         // Trigger deploy after deletion
@@ -222,11 +224,11 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
           console.error('Deploy failed after deleting skill:', deployError);
         }
       } else {
-        alert(response.error || 'Failed to delete skill');
+        showToast(response.error || 'Failed to delete skill', 'error');
       }
     } catch (error) {
       console.error('Error deleting skill:', error);
-      alert('Failed to delete skill');
+      showToast('Failed to delete skill', 'error');
     }
   }
 </script>

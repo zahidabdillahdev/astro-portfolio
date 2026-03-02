@@ -98,7 +98,7 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       renderMessagesTable(messages);
     } catch (error) {
       console.error('Error loading messages:', error);
-      alert('Failed to load messages');
+      showToast('Failed to load messages');
     }
   }
   
@@ -159,11 +159,11 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
         closeViewModal();
         loadMessages(); // Reload the table
       } else {
-        alert(response.error || 'Failed to update status');
+        showToast(response.error || 'Failed to update status');
       }
     } catch (error) {
       console.error('Error updating status:', error);
-      alert('Failed to update status');
+      showToast('Failed to update status');
     }
   }
 </script>

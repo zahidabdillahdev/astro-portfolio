@@ -287,6 +287,7 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       }
       
       if (response.success || response.id) {
+        showToast(projectId ? 'Project updated successfully!' : 'Project created successfully!', 'success');
         closeModal();
         loadProjects(); // Reload the table
         
@@ -298,11 +299,11 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
           console.error('Deploy failed after saving project:', deployError);
         }
       } else {
-        alert(response.error || 'Failed to save project');
+        showToast(response.error || 'Failed to save project');
       }
     } catch (error) {
       console.error('Error saving project:', error);
-      alert('Failed to save project');
+      showToast('Failed to save project');
     }
   });
   
@@ -316,6 +317,7 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       const response = await api('DELETE', `/api/admin/projects/${projectId}`);
       
       if (response.success) {
+        showToast('Project deleted successfully!', 'success');
         loadProjects(); // Reload the table
         
         // Trigger deploy after deletion
@@ -326,11 +328,11 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
           console.error('Deploy failed after deleting project:', deployError);
         }
       } else {
-        alert(response.error || 'Failed to delete project');
+        showToast(response.error || 'Failed to delete project');
       }
     } catch (error) {
       console.error('Error deleting project:', error);
-      alert('Failed to delete project');
+      showToast('Failed to delete project');
     }
   }
   
@@ -340,7 +342,7 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
     try {
       return JSON.parse(value);
     } catch (e) {
-      alert('Invalid JSON format in Results field');
+      showToast('Invalid JSON format in Results field');
       return {};
     }
   }

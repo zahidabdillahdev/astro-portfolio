@@ -146,7 +146,7 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       renderTestimonialsTable(testimonials);
     } catch (error) {
       console.error('Error loading testimonials:', error);
-      alert('Failed to load testimonials');
+      showToast('Failed to load testimonials');
     }
   }
   
@@ -252,11 +252,11 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
           console.error('Deploy failed after saving testimonial:', deployError);
         }
       } else {
-        alert(response.error || 'Failed to save testimonial');
+        showToast(response.error || 'Failed to save testimonial');
       }
     } catch (error) {
       console.error('Error saving testimonial:', error);
-      alert('Failed to save testimonial');
+      showToast('Failed to save testimonial');
     }
   });
   
@@ -280,11 +280,11 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
           console.error('Deploy failed after deleting testimonial:', deployError);
         }
       } else {
-        alert(response.error || 'Failed to delete testimonial');
+        showToast(response.error || 'Failed to delete testimonial');
       }
     } catch (error) {
       console.error('Error deleting testimonial:', error);
-      alert('Failed to delete testimonial');
+      showToast('Failed to delete testimonial');
     }
   }
 </script>
