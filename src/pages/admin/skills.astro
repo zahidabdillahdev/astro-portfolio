@@ -1,0 +1,232 @@
+---
+export const prerender = false;
+import AdminLayout from '../../components/admin/AdminLayout.astro';
+---
+
+<AdminLayout title="Admin - Skills">
+  <h1>Manage Skills</h1>
+  
+  <button 
+    onclick="openModal(null)"
+    style="background-color: #000; color: #fff; padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; cursor: pointer; margin-bottom: 1rem;"
+  >
+    + Add New Skill
+  </button>
+  
+  <div class="table-container" style="overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb;">
+      <thead>
+        <tr style="background-color: #f9fafb;">
+          <th style="padding: 0.75rem; text-align: left; border: 1px solid #e5e7eb;">Skill</th>
+          <th style="padding: 0.75rem; text-align: left; border: 1px solid #e5e7eb;">Category</th>
+          <th style="padding: 0.75rem; text-align: left; border: 1px solid #e5e7eb;">Order</th>
+          <th style="padding: 0.75rem; text-align: left; border: 1px solid #e5e7eb;">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="skills-table-body">
+        <!-- Table rows will be populated by JavaScript -->
+      </tbody>
+    </table>
+  </div>
+  
+  <!-- Modal -->
+  <div id="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background-color: #fff; width: 90%; max-width: 600px; border-radius: 0.5rem; padding: 1.5rem; position: relative;">
+      <h2 id="modal-title">Add New Skill</h2>
+      
+      <form id="skill-form" style="display: flex; flex-direction: column; gap: 1rem;">
+        <input type="hidden" id="skill-id" />
+        
+        <div>
+          <label for="name" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Skill Name *</label>
+          <input 
+            type="text" 
+            id="name" 
+            required
+            style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
+          />
+        </div>
+        
+        <div>
+          <label for="category" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Category</label>
+          <input 
+            type="text" 
+            id="category" 
+            style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
+          />
+        </div>
+        
+        <div>
+          <label for="order-index" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Order Index</label>
+          <input 
+            type="number" 
+            id="order-index" 
+            value="0"
+            style="width: 100px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
+          />
+        </div>
+        
+        <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1rem;">
+          <button 
+            type="button" 
+            onclick="closeModal()"
+            style="padding: 0.5rem 1rem; border: 1px solid #d1d5db; border-radius: 0.375rem; cursor: pointer; background-color: #f9fafb;"
+          >
+            Cancel
+          </button>
+          <button 
+            type="submit"
+            style="padding: 0.5rem 1rem; background-color: #000; color: #fff; border: none; border-radius: 0.375rem; cursor: pointer;"
+          >
+            Save Skill
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</AdminLayout>
+
+<script is:inline>
+  // Load skills on page load
+  document.addEventListener('DOMContentLoaded', async () => {
+    loadSkills();
+  });
+  
+  // Load skills from API
+  async function loadSkills() {
+    try {
+      const skills = await api('GET', '/api/skills');
+      renderSkillsTable(skills);
+    } catch (error) {
+      console.error('Error loading skills:', error);
+      alert('Failed to load skills');
+    }
+  }
+  
+  // Render skills in the table
+  function renderSkillsTable(skills) {
+    const tbody = document.getElementById('skills-table-body');
+    tbody.innerHTML = '';
+    
+    skills.forEach(skill => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">${skill.name}</td>
+        <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">${skill.category || ''}</td>
+        <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">${skill.order_index || 0}</td>
+        <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">
+          <button onclick="openModal(${skill.id})" style="margin-right: 0.5rem; padding: 0.25rem 0.5rem; background-color: #f3f4f6; border: 1px solid #d1d5db; border-radius: 0.25rem; cursor: pointer;">Edit</button>
+          <button onclick="deleteSkill(${skill.id})" style="padding: 0.25rem 0.5rem; background-color: #fee2e2; border: 1px solid #d1d5db; border-radius: 0.25rem; cursor: pointer;">Delete</button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+  
+  // Open modal for adding/editing a skill
+  function openModal(skillId) {
+    const modal = document.getElementById('modal');
+    const modalTitle = document.getElementById('modal-title');
+    const form = document.getElementById('skill-form');
+    
+    // Reset form
+    form.reset();
+    document.getElementById('skill-id').value = '';
+    
+    if (skillId) {
+      // Editing existing skill
+      modalTitle.textContent = 'Edit Skill';
+      
+      // Find the skill and populate the form
+      api('GET', '/api/skills').then(skills => {
+        const skill = skills.find(s => s.id === skillId);
+        if (skill) {
+          document.getElementById('skill-id').value = skill.id;
+          document.getElementById('name').value = skill.name;
+          document.getElementById('category').value = skill.category || '';
+          document.getElementById('order-index').value = skill.order_index || 0;
+        }
+      });
+    } else {
+      // Adding new skill
+      modalTitle.textContent = 'Add New Skill';
+    }
+    
+    modal.style.display = 'flex';
+  }
+  
+  // Close modal
+  function closeModal() {
+    document.getElementById('modal').style.display = 'none';
+  }
+  
+  // Handle form submission
+  document.getElementById('skill-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const skillId = document.getElementById('skill-id').value;
+    const formData = {
+      id: skillId ? parseInt(skillId) : undefined,
+      name: document.getElementById('name').value,
+      category: document.getElementById('category').value,
+      orderIndex: parseInt(document.getElementById('order-index').value) || 0
+    };
+    
+    try {
+      let response;
+      if (skillId) {
+        // Update existing skill
+        response = await api('PUT', `/api/admin/skills/${skillId}`, formData);
+      } else {
+        // Create new skill
+        response = await api('POST', '/api/admin/skills', formData);
+      }
+      
+      if (response.success || response.id) {
+        closeModal();
+        loadSkills(); // Reload the table
+        
+        // Trigger deploy after saving
+        try {
+          await triggerDeploy();
+          console.log('Deploy triggered after saving skill');
+        } catch (deployError) {
+          console.error('Deploy failed after saving skill:', deployError);
+        }
+      } else {
+        alert(response.error || 'Failed to save skill');
+      }
+    } catch (error) {
+      console.error('Error saving skill:', error);
+      alert('Failed to save skill');
+    }
+  });
+  
+  // Delete a skill
+  async function deleteSkill(skillId) {
+    if (!confirm('Are you sure you want to delete this skill?')) {
+      return;
+    }
+    
+    try {
+      const response = await api('DELETE', `/api/admin/skills/${skillId}`);
+      
+      if (response.success) {
+        loadSkills(); // Reload the table
+        
+        // Trigger deploy after deletion
+        try {
+          await triggerDeploy();
+          console.log('Deploy triggered after deleting skill');
+        } catch (deployError) {
+          console.error('Deploy failed after deleting skill:', deployError);
+        }
+      } else {
+        alert(response.error || 'Failed to delete skill');
+      }
+    } catch (error) {
+      console.error('Error deleting skill:', error);
+      alert('Failed to delete skill');
+    }
+  }
+</script>
