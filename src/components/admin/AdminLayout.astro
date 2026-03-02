@@ -178,13 +178,27 @@ const { title = 'Admin Dashboard' } = Astro.props;
       
       try {
         const response = await fetch(url, options);
-        const data = await response.json();
+        const contentType = response.headers.get("content-type");
         
-        if (!response.ok) {
-          throw new Error(data.error || 'Request failed');
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+          const data = await response.json();
+          if (!response.ok) {
+            throw new Error(data.error || `Server error: ${response.status}`);
+          }
+          return data;
+        } else {
+          // If not JSON, it's likely an HTML error page (404 or Cloudflare Access)
+          const text = await response.text();
+          console.error('Non-JSON response received:', text.substring(0, 200));
+          
+          if (response.status === 404) {
+            throw new Error("API Route not found (404). Check Cloudflare Workers mapping.");
+          } else if (text.includes("Cloudflare Access")) {
+            throw new Error("Blocked by Cloudflare Access. Please log in.");
+          } else {
+            throw new Error(`Unexpected response format (HTTP ${response.status})`);
+          }
         }
-        
-        return data;
       } catch (error) {
         console.error('API Error:', error);
         throw error;
