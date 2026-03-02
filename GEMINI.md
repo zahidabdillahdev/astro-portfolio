@@ -1,5 +1,5 @@
 # zahidabdillah.dev - Digital Marketing Portfolio
-> Status: Core Framework & Infrastructure Ready 🚀
+> Status: Infrastructure & Admin Panel Ready (Enterprise Grade) 🚀
 > Stack: Astro 5 · TypeScript · Tailwind v4 · Cloudflare Pages · Workers · D1 · R2 · Hono
 
 ---
@@ -9,7 +9,7 @@
 ```
 [zahidabdillah.dev]           [zahidabdillah.dev/api/*]      [Cloudflare]
   Astro static pages  ◄────    Workers API (Hono)         ──►  D1 database
-  /admin/* pages               CRUD endpoints                   R2 storage
+  /admin/* pages               Official Status API        ──►  R2 storage
        │
        └── Protected by Cloudflare Access (Google OAuth)
 ```
@@ -25,64 +25,59 @@
 ### 1. Infrastructure & Backend
 - [x] Initialized project from ZhukDI/cv template.
 - [x] Configured `wrangler.toml` for D1 (`portfolio-db`) and R2 (`portfolio-assets`).
-- [x] Created `workers/api/wrangler.toml` and deployed Hono API to Cloudflare Workers.
+- [x] Created `workers/api/wrangler.toml` and deployed Hono API.
 - [x] Executed D1 Migration `0001_init.sql` (Local & Remote).
 - [x] Cleaned up unused legacy files (`Dockerfile`, `nginx/`, `renovate.json`).
+- [x] Implemented robust JSON parsing and error handling in API.
 
 ### 2. Frontend & Components
-- [x] Updated `astro.config.mjs` to Astro 5 (Static Output + Cloudflare Adapter).
-- [x] Extended `src/data/cv.ts` with new interfaces (Projects, Certs).
+- [x] Updated to Astro 5 (Static Output + Cloudflare Adapter).
 - [x] Implemented new UI components: `Projects`, `Certifications`, `Contact`.
-- [x] Integrated Contact Form with Client-side Fetch to `/api/contact`.
-- [x] Fixed 400+ TypeScript/Astro compilation errors from initial scaffolding.
+- [x] **Redesigned Contact:** Focused on direct links (WhatsApp, Email, Social) instead of a form.
+- [x] **Layout Update:** Projects and Certifications now use a consistent vertical list layout.
+- [x] **Professional Fallbacks:** Added elegant placeholder messages for all empty sections.
+- [x] Removed all hardcoded template data and legacy assets (`avatar.jpeg`).
 
 ### 3. Admin Panel
 - [x] Created `AdminLayout` with sidebar navigation.
-- [x] Implemented CRUD pages for all sections (Profile, Projects, Experience, Education, Skills, etc.).
-- [x] Fixed Vanilla JS integration in Admin using `is:inline` scripts.
-- [x] Added global Toast notification system for success/error feedback.
-- [x] Fixed "Failed to load profile" bug by returning default values for new databases.
+- [x] Implemented CRUD pages for Profile, Projects, Experience, Education, and Skills.
+- [x] **System Status Dashboard:** Integrated official Cloudflare Status API (Atlassian style).
+- [x] **Toast Notifications:** Added global success/error feedback system.
+- [x] Optimized Git tracking (ignored `.wrangler` state and kept assets folder via `.gitkeep`).
 
 ---
 
 ## 🚧 Next Steps & Pending Fixes
 
-### 1. Data Integrity & Content
-- [ ] **Verify `src/data/cv.ts`:** Ensure Zahid's actual data is fully populated.
-- [ ] **Asset Check:** Verify all images point to `https://assets.zahidabdillah.dev/`.
-- [ ] **Resume Link:** Ensure the resume PDF is uploaded to R2.
+### 1. Content Population
+- [ ] **Admin Input:** Populate actual professional data via the Admin Panel.
+- [ ] **Photo Upload:** Upload a professional profile photo to R2 via the Profile editor.
+- [ ] **Resume:** Ensure the resume PDF is uploaded and the link is correctly set.
 
-### 2. API & Database Refinement
-- [ ] **Test Admin CRUD:** Perform manual tests for Add/Edit/Delete on all admin pages.
-- [ ] **Deploy Hook:** Obtain `PAGES_DEPLOY_HOOK_URL` from Cloudflare Dashboard and set as secret:
+### 2. Final Configuration
+- [ ] **Deploy Hook:** Obtain `PAGES_DEPLOY_HOOK_URL` from Cloudflare and set as secret:
   ```bash
   npx wrangler secret put PAGES_DEPLOY_HOOK_URL
   ```
-
-### 3. Final Polish
-- [ ] **Mobile Responsiveness:** Audit the new sections (Projects/Certs) on mobile devices.
-- [ ] **SEO:** Update `robots.txt.ts` and `Layout.astro` metadata.
+- [ ] **Cloudflare Access:** Configure Zero Trust policy for `/admin*` in the dashboard.
 
 ---
 
 ## 📝 Commit Rules for this Project
 
-- **chore:** Infrastructure, config, cleanup (e.g., `chore: remove unused configs`).
-- **feat:** New features or components (e.g., `feat: add projects component`).
-- **fix:** Bug fixes or type corrections (e.g., `fix: resolve d1 mapping error`).
-- **docs:** Documentation updates (including `GEMINI.md`).
+- **chore:** Infrastructure, config, cleanup.
+- **feat:** New features or UI components.
+- **fix:** Bug fixes or data mapping corrections.
+- **docs:** Documentation updates.
 
 ---
 
 ## 🚀 Deployment Commands Reference
 
 ```bash
-# Database Migration
-npx wrangler d1 execute portfolio-db --remote --file=migrations/0001_init.sql
-
-# API Deploy
+# Update API
 cd workers/api && npx wrangler deploy
 
-# Pages Deploy (Manual)
+# Update Frontend (Manual)
 npm run build && npx wrangler pages deploy dist
 ```
