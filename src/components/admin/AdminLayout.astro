@@ -165,6 +165,17 @@ const { title = 'Admin Dashboard' } = Astro.props;
 
     // Global helper functions for API calls
     window.api = async function(method, url, body) {
+      // Determine base URL: if on pages.dev without custom route mapping, 
+      // we might need to point to the full worker URL.
+      let apiUrl = url;
+      const isPagesDev = window.location.hostname.includes('pages.dev');
+      
+      // If you are on pages.dev and haven't setup custom domain yet, 
+      // uncomment and update the line below with your Worker URL:
+      // if (isPagesDev && url.startsWith('/api/')) {
+      //   apiUrl = 'https://portfolio-api.muhammadzahidabdillah.workers.dev' + url;
+      // }
+
       const options = {
         method,
         headers: {
@@ -177,7 +188,7 @@ const { title = 'Admin Dashboard' } = Astro.props;
       }
       
       try {
-        const response = await fetch(url, options);
+        const response = await fetch(apiUrl, options);
         const contentType = response.headers.get("content-type");
         
         if (contentType && contentType.indexOf("application/json") !== -1) {
