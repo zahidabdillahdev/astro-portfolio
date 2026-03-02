@@ -3,87 +3,155 @@ export const prerender = false;
 import AdminLayout from '../../components/admin/AdminLayout.astro';
 ---
 
-<AdminLayout title="Admin Dashboard">
-  <h1>Admin Dashboard</h1>
-  <p>Welcome to the admin dashboard. Select an option from the sidebar to manage your portfolio content.</p>
-  
-  <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 2rem;">
-    <div style="border: 1px solid #e5e7eb; padding: 1rem; border-radius: 0.5rem;">
-      <h3 style="margin: 0 0 0.5rem 0; font-size: 1.25rem;">Projects</h3>
-      <p id="projects-count" style="font-size: 2rem; font-weight: bold; margin: 0;">Loading...</p>
-    </div>
+<AdminLayout title="Admin Dashboard - System Status">
+  <div style="max-width: 800px; margin: 0 auto;">
+    <h1 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 2rem; color: #111;">System Status</h1>
     
-    <div style="border: 1px solid #e5e7eb; padding: 1rem; border-radius: 0.5rem;">
-      <h3 style="margin: 0 0 0.5rem 0; font-size: 1.25rem;">Certifications</h3>
-      <p id="certifications-count" style="font-size: 2rem; font-weight: bold; margin: 0;">Loading...</p>
+    <!-- Overall Status Banner -->
+    <div id="overall-status" style="background-color: #f3f4f6; color: #374151; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 2.5rem; display: flex; align-items: center; gap: 1rem; transition: all 0.3s ease;">
+      <div id="overall-icon" style="width: 24px; height: 24px; border-radius: 50%; background-color: #9ca3af;"></div>
+      <span id="overall-text" style="font-size: 1.25rem; font-weight: bold;">Checking systems...</span>
     </div>
 
-    <div style="border: 1px solid #e5e7eb; padding: 1rem; border-radius: 0.5rem;">
-      <h3 style="margin: 0 0 0.5rem 0; font-size: 1.25rem;">Education</h3>
-      <p id="education-count" style="font-size: 2rem; font-weight: bold; margin: 0;">Loading...</p>
+    <!-- Components List -->
+    <div style="border: 1px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden; background-color: #fff;">
+      <div style="padding: 1rem 1.5rem; border-bottom: 1px solid #e5e7eb; background-color: #f9fafb; font-size: 0.875rem; font-weight: 600; color: #6b7280; display: flex; justify-content: space-between;">
+        <span>Components</span>
+        <span>Status</span>
+      </div>
+      
+      <!-- API Gateway -->
+      <div class="status-row" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <div style="font-weight: 500;">API Gateway (Workers)</div>
+          <div style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.25rem;">Global edge infrastructure</div>
+        </div>
+        <span class="status-badge" id="status-api" style="color: #9ca3af; font-weight: 600; font-size: 0.875rem;">Connecting...</span>
+      </div>
+
+      <!-- Database -->
+      <div class="status-row" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <div style="font-weight: 500;">Database Engine (D1)</div>
+          <div style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.25rem;">Serverless SQL storage</div>
+        </div>
+        <span class="status-badge" id="status-database" style="color: #9ca3af; font-weight: 600; font-size: 0.875rem;">Connecting...</span>
+      </div>
+
+      <!-- Storage -->
+      <div class="status-row" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <div style="font-weight: 500;">Asset Storage (R2)</div>
+          <div style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.25rem;">S3-compatible object storage</div>
+        </div>
+        <span class="status-badge" id="status-storage" style="color: #9ca3af; font-weight: 600; font-size: 0.875rem;">Connecting...</span>
+      </div>
+
+      <!-- Frontend -->
+      <div class="status-row" style="padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <div style="font-weight: 500;">Frontend Renderer (Pages)</div>
+          <div style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.25rem;">Static site hosting</div>
+        </div>
+        <span class="status-badge" style="color: #10b981; font-weight: 600; font-size: 0.875rem;">Operational</span>
+      </div>
     </div>
-  </div>
-  
-  <div style="margin-top: 2rem;">
-    <button 
-      onclick="handleDeploy()"
-      style="background-color: #000; color: #fff; padding: 0.75rem 1.5rem; border: none; border-radius: 0.375rem; cursor: pointer;"
-    >
-      Trigger Rebuild
-    </button>
-    <p id="deploy-status" style="margin-top: 0.5rem; display: none;"></p>
+
+    <!-- System Maintenance Tool -->
+    <div style="margin-top: 3rem; padding: 1.5rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; background-color: #f9fafb;">
+      <h2 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem;">Site Maintenance</h2>
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 1.5rem;">Trigger a full static site rebuild to synchronize all database changes to the production environment.</p>
+      
+      <button 
+        id="deploy-btn"
+        onclick="handleDeploy()"
+        style="background-color: #000; color: #fff; padding: 0.625rem 1.25rem; border: none; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem; font-weight: 500;"
+      >
+        Rebuild Production Site
+      </button>
+      <p id="deploy-status" style="margin-top: 1rem; font-size: 0.875rem; display: none;"></p>
+    </div>
   </div>
 </AdminLayout>
 
 <script is:inline>
-  // Load stats on page load
   document.addEventListener('DOMContentLoaded', async () => {
-    try {
-      // Get projects count
-      const projectsResponse = await api('GET', '/api/projects');
-      if (projectsResponse.length !== undefined) {
-        document.getElementById('projects-count').textContent = projectsResponse.length;
-      }
-      
-      // Get certifications count
-      const certificationsResponse = await api('GET', '/api/certifications');
-      if (certificationsResponse.length !== undefined) {
-        document.getElementById('certifications-count').textContent = certificationsResponse.length;
-      }
+    checkHealth();
+  });
 
-      // Get education count
-      const educationResponse = await api('GET', '/api/education');
-      if (educationResponse.length !== undefined) {
-        document.getElementById('education-count').textContent = educationResponse.length;
+  async function checkHealth() {
+    const overallBanner = document.getElementById('overall-status');
+    const overallIcon = document.getElementById('overall-icon');
+    const overallText = document.getElementById('overall-text');
+    
+    try {
+      const health = await api('GET', '/api/admin/health');
+      
+      // Update individual badges
+      updateComponentStatus('status-api', health.api);
+      updateComponentStatus('status-database', health.database);
+      updateComponentStatus('status-storage', health.storage);
+      
+      // Update overall banner
+      const isAllOk = health.api === 'operational' && 
+                      health.database === 'operational' && 
+                      health.storage === 'operational';
+      
+      if (isAllOk) {
+        overallBanner.style.backgroundColor = '#10b981';
+        overallBanner.style.color = '#fff';
+        overallIcon.style.backgroundColor = '#fff';
+        overallText.textContent = 'All Systems Operational';
+      } else {
+        overallBanner.style.backgroundColor = '#ef4444';
+        overallBanner.style.color = '#fff';
+        overallIcon.style.backgroundColor = '#fff';
+        overallText.textContent = 'Service Disruption Detected';
       }
     } catch (error) {
-      console.error('Error loading stats:', error);
+      console.error('Health check failed:', error);
+      overallBanner.style.backgroundColor = '#f59e0b';
+      overallBanner.style.color = '#fff';
+      overallText.textContent = 'Partial Connection Issue';
     }
-  });
-  
+  }
+
+  function updateComponentStatus(id, status) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    
+    if (status === 'operational') {
+      el.textContent = 'Operational';
+      el.style.color = '#10b981';
+    } else {
+      el.textContent = 'Degraded';
+      el.style.color = '#ef4444';
+    }
+  }
+
   async function handleDeploy() {
-    const deployBtn = document.querySelector('button');
+    const deployBtn = document.getElementById('deploy-btn');
     const statusEl = document.getElementById('deploy-status');
     
     deployBtn.disabled = true;
-    deployBtn.textContent = 'Deploying...';
+    deployBtn.textContent = 'Maintenance in progress...';
     statusEl.style.display = 'block';
-    statusEl.textContent = 'Triggering deploy...';
+    statusEl.textContent = 'Requesting Cloudflare build...';
+    statusEl.style.color = '#6b7280';
     
     try {
-      const result = await triggerDeploy();
-      showToast('Deploy triggered successfully!', 'success');
+      await triggerDeploy();
+      showToast('Build triggered successfully!', 'success');
+      statusEl.textContent = 'Success: Production build is now running.';
+      statusEl.style.color = '#10b981';
     } catch (error) {
       console.error('Deploy error:', error);
-      showToast(`Deploy failed: ${error.message}`);
+      showToast(`Build failed: ${error.message}`, 'error');
+      statusEl.textContent = `Error: ${error.message}`;
+      statusEl.style.color = '#ef4444';
     } finally {
       deployBtn.disabled = false;
-      deployBtn.textContent = 'Trigger Rebuild';
-      
-      // Hide status after 5 seconds
-      setTimeout(() => {
-        statusEl.style.display = 'none';
-      }, 5000);
+      deployBtn.textContent = 'Rebuild Production Site';
     }
   }
 </script>

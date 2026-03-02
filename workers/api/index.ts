@@ -632,6 +632,31 @@ app.post('/api/admin/upload', async (c) => {
   }
 });
 
+// Health check route for Status Page
+app.get('/api/admin/health', async (c) => {
+  const status = {
+    api: 'operational',
+    database: 'operational',
+    storage: 'operational'
+  };
+
+  try {
+    // Check D1
+    await c.env.DB.prepare('SELECT 1').first();
+  } catch (e) {
+    status.database = 'down';
+  }
+
+  try {
+    // Check R2 (just list a limited set)
+    await c.env.STORAGE.list({ limit: 1 });
+  } catch (e) {
+    status.storage = 'down';
+  }
+
+  return c.json(status);
+});
+
 // Deploy hook route
 app.post('/api/admin/deploy', async (c) => {
   try {
