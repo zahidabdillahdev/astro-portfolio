@@ -1,0 +1,21 @@
+name = "astro-portfolio"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "./dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "portfolio-db"
+database_id = "0a74d547-f67f-47d6-93a2-7820d72896fa"
+
+[[r2_buckets]]
+binding = "STORAGE"
+bucket_name = "portfolio-assets"
+preview_bucket_name = "portfolio-assets-preview"
+
+[vars]
+ENVIRONMENT = "production"
+ASSETS_URL = "https://assets.zahidabdillah.dev"
+
+# secrets (CLI only, never commit):
+# npx wrangler secret put PAGES_DEPLOY_HOOK_URL
