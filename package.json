@@ -1,5 +1,5 @@
 {
-  "name": "cv",
+  "name": "zahid-portfolio",
   "type": "module",
   "version": "0.0.1",
   "scripts": {
@@ -19,6 +19,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.6",
     "@cloudflare/workers-types": "^4.20260301.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "wrangler": "^4.69.0"
   }
 }
