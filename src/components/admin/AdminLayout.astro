@@ -211,32 +211,52 @@ const { title = 'Admin Dashboard' } = Astro.props;
       formData.append('file', file);
       formData.append('path', path);
       
-      const response = await fetch('/api/admin/upload', {
-        method: 'POST',
-        body: formData,
-      });
-      
-      const result = await response.json();
-      if (!response.ok) {
-        throw new Error(result.error || 'Upload failed');
+      try {
+        const response = await fetch('/api/admin/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+          const result = await response.json();
+          if (!response.ok) {
+            throw new Error(result.error || 'Upload failed');
+          }
+          return result.url;
+        } else {
+          throw new Error(`Upload failed with status ${response.status}`);
+        }
+      } catch (error) {
+        console.error('Upload Error:', error);
+        throw error;
       }
-      return result.url;
     };
     
     // Trigger deploy function
     window.triggerDeploy = async function() {
-      const response = await fetch('/api/admin/deploy', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      const result = await response.json();
-      if (!response.ok) {
-        throw new Error(result.error || 'Deploy failed');
+      try {
+        const response = await fetch('/api/admin/deploy', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+          const result = await response.json();
+          if (!response.ok) {
+            throw new Error(result.error || 'Deploy failed');
+          }
+          return result;
+        } else {
+          throw new Error(`Deploy request failed with status ${response.status}`);
+        }
+      } catch (error) {
+        console.error('Deploy Error:', error);
+        throw error;
       }
-      return result;
     };
   </script>
 </body>
