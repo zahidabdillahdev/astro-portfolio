@@ -9,9 +9,16 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/sitemap": "^3.6.0",
+    "@astrojs/cloudflare": "^12.6.12",
+    "@astrojs/sitemap": "^3.7.0",
     "@tailwindcss/vite": "^4.1.11",
-    "astro": "^5.16.6",
+    "astro": "^5.18.0",
+    "hono": "^4.12.3",
     "tailwindcss": "^4.1.11"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.6",
+    "@cloudflare/workers-types": "^4.20260301.1",
+    "typescript": "^5.9.3"
   }
 }
