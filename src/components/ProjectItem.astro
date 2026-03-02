@@ -15,13 +15,6 @@ const { project } = Astro.props;
       <h3 class="text-lg font-bold mb-1">{project.title}</h3>
       {project.client && <p class="text-sm text-gray-600 mb-2">Client: {project.client}</p>}
     </div>
-    {project.thumbnailUrl && (
-      <img 
-        src={project.thumbnailUrl} 
-        alt={`${project.title} thumbnail`}
-        class="w-12 h-12 object-cover rounded-md border border-gray-200"
-      />
-    )}
   </div>
   
   <p class="text-sm text-gray-700 mt-2 mb-4 flex-grow">{project.description}</p>

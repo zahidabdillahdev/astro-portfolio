@@ -14,13 +14,6 @@ const { certification } = Astro.props;
       <h3 class="text-lg font-bold mb-1">{certification.title}</h3>
       <p class="text-sm text-gray-600 mb-2">{certification.issuer}</p>
     </div>
-    {certification.thumbnailUrl && (
-      <img 
-        src={certification.thumbnailUrl} 
-        alt={`${certification.title} thumbnail`}
-        class="w-12 h-12 object-cover rounded-md border border-gray-200"
-      />
-    )}
   </div>
   
   <div class="mt-2 mb-4">

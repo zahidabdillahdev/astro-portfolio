@@ -12,8 +12,9 @@ import Certifications from "../components/Certifications.astro";
 import Contact from "../components/Contact.astro";
 
 const {name, about, projects, certifications} = CV_DATA;
+const pageTitle = name ? `${name} | CV` : "Digital Marketing Portfolio";
 ---
-<Layout title={`${name} | CV`} description={about}>
+<Layout title={pageTitle} description={about || "Digital Marketing Portfolio"}>
     <main class="container relative mx-auto scroll-my-12 overflow-auto p-4 print:p-11 md:p-16" id="main-content">
         <section class="mx-auto w-full max-w-2xl space-y-8 bg-white print:space-y-4" aria-label="CV Content">
             <Header/>

@@ -1,121 +1,133 @@
 ---
+import { CV_DATA } from '../data/cv';
+const { contact } = CV_DATA;
 ---
 
-<section id="contact" class="py-16 px-4 sm:px-6 lg:px-8">
-  <div class="max-w-4xl mx-auto">
-    <h2 class="text-3xl font-bold mb-2">Get In Touch</h2>
-    <p class="text-gray-600 mb-12">Have a project in mind or want to discuss potential opportunities?</p>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
-      <div>
-        <h3 class="text-xl font-semibold mb-6">Contact Information</h3>
+<section id="contact" class="flex min-h-0 flex-col gap-y-3 print:gap-y-1">
+  <h2 class="text-xl font-bold">Contact & Messages</h2>
+  
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 border border-gray-200 rounded-lg p-6">
+    <div>
+      <h3 class="text-base font-semibold mb-4">Contact Information</h3>
+      
+      <div class="space-y-3">
+        {contact.email && (
+          <div>
+            <h4 class="text-xs font-medium text-gray-500 uppercase tracking-wider">Email</h4>
+            <a href={`mailto:${contact.email}`} class="text-sm text-blue-600 hover:underline">
+              {contact.email}
+            </a>
+          </div>
+        )}
         
-        <div class="space-y-4">
+        {contact.tel && (
           <div>
-            <h4 class="font-medium text-gray-900">Email</h4>
-            <a href="mailto:muhammadzahidabdillah@gmail.com" class="text-blue-600 hover:underline">
-              muhammadzahidabdillah@gmail.com
+            <h4 class="text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</h4>
+            <a href={`tel:${contact.tel}`} class="text-sm text-blue-600 hover:underline">
+              {contact.tel}
             </a>
           </div>
-          
+        )}
+        
+        {CV_DATA.location && (
           <div>
-            <h4 class="font-medium text-gray-900">Phone</h4>
-            <a href="tel:+6281234567890" class="text-blue-600 hover:underline">
-              +62 812 3456 7890
-            </a>
+            <h4 class="text-xs font-medium text-gray-500 uppercase tracking-wider">Location</h4>
+            {CV_DATA.locationLink ? (
+              <a href={CV_DATA.locationLink} target="_blank" rel="noopener noreferrer" class="text-sm text-gray-700 hover:underline">
+                {CV_DATA.location}
+              </a>
+            ) : (
+              <p class="text-sm text-gray-700">{CV_DATA.location}</p>
+            )}
           </div>
-          
-          <div>
-            <h4 class="font-medium text-gray-900">Location</h4>
-            <p class="text-gray-700">Jakarta, Indonesia</p>
-          </div>
-          
-          <div class="pt-4">
-            <h4 class="font-medium text-gray-900 mb-2">Follow Me</h4>
-            <div class="flex space-x-4">
-              <a href="https://linkedin.com/in/zahidabdillah" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">
-                LinkedIn
-              </a>
-              <a href="https://github.com/zahidabdillah" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">
-                GitHub
-              </a>
-              <a href="https://instagram.com/zahidabdillah" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">
-                Instagram
-              </a>
+        )}
+        
+        {contact.social && contact.social.length > 0 && (
+          <div class="pt-2">
+            <h4 class="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Follow Me</h4>
+            <div class="flex flex-wrap gap-x-4 gap-y-1">
+              {contact.social.map(s => (
+                <a href={s.url} target="_blank" rel="noopener noreferrer" class="text-sm text-blue-600 hover:underline">
+                  {s.name}
+                </a>
+              ))}
             </div>
           </div>
-          
+        )}
+        
+        {contact.resumeUrl && (
           <div class="pt-4">
             <a 
-              href="https://assets.zahidabdillah.dev/documents/zahid-resume.pdf" 
+              href={contact.resumeUrl} 
               target="_blank" 
               rel="noopener noreferrer"
-              class="inline-block bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors"
+              class="inline-block bg-black text-white text-sm px-4 py-2 rounded-md hover:bg-gray-800 transition-colors"
             >
               Download Resume
             </a>
           </div>
-        </div>
+        )}
       </div>
+    </div>
+    
+    <div>
+      <h3 class="text-base font-semibold mb-4">Send a Message</h3>
       
-      <div>
-        <h3 class="text-xl font-semibold mb-6">Send a Message</h3>
-        
-        <form id="contact-form" class="space-y-4">
+      <form id="contact-form" class="space-y-3">
+        <div class="grid grid-cols-2 gap-3">
           <div>
-            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+            <label for="name" class="block text-xs font-medium text-gray-700 mb-1">Name</label>
             <input
               type="text"
               id="name"
               name="name"
               required
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+              class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-black focus:border-transparent outline-none"
             />
           </div>
-          
           <div>
-            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label for="email" class="block text-xs font-medium text-gray-700 mb-1">Email</label>
             <input
               type="email"
               id="email"
               name="email"
               required
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+              class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-black focus:border-transparent outline-none"
             />
           </div>
-          
-          <div>
-            <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
-            <input
-              type="text"
-              id="subject"
-              name="subject"
-              required
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-            />
-          </div>
-          
-          <div>
-            <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Message</label>
-            <textarea
-              id="message"
-              name="message"
-              rows="5"
-              required
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-            ></textarea>
-          </div>
-          
-          <button
-            type="submit"
-            class="w-full bg-black text-white py-3 px-6 rounded-lg transition-colors hover:bg-gray-800"
-          >
-            Send Message
-          </button>
-          
-          <div id="contact-form-message"></div>
-        </form>
-      </div>
+        </div>
+        
+        <div>
+          <label for="subject" class="block text-xs font-medium text-gray-700 mb-1">Subject</label>
+          <input
+            type="text"
+            id="subject"
+            name="subject"
+            required
+            class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-black focus:border-transparent outline-none"
+          />
+        </div>
+        
+        <div>
+          <label for="message" class="block text-xs font-medium text-gray-700 mb-1">Message</label>
+          <textarea
+            id="message"
+            name="message"
+            rows="3"
+            required
+            class="w-full px-3 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-black focus:border-transparent outline-none"
+          ></textarea>
+        </div>
+        
+        <button
+          type="submit"
+          class="w-full bg-black text-white text-sm py-2 px-4 rounded transition-colors hover:bg-gray-800"
+        >
+          Send Message
+        </button>
+        
+        <div id="contact-form-message"></div>
+      </form>
     </div>
   </div>
 </section>
