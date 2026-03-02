@@ -1,0 +1,690 @@
+/// <reference types="@cloudflare/workers-types" />
+
+import { Hono } from 'hono';
+import { cors } from 'hono/cors';
+import { cfAccessMiddleware } from './middleware/cloudflare-access';
+
+// Define the environment type
+interface Env {
+  DB: D1Database;
+  STORAGE: R2Bucket;
+  ENVIRONMENT: string;
+  ASSETS_URL: string;
+  PAGES_DEPLOY_HOOK_URL: string;
+}
+
+const app = new Hono<{ Bindings: Env }>();
+
+// Enable CORS for all routes
+app.use('*', cors());
+
+// Public routes
+app.get('/api/profile', async (c) => {
+  try {
+    const result = await c.env.DB.prepare(
+      `SELECT * FROM profile WHERE id = 1`
+    ).first();
+
+    if (!result) {
+      return c.json({ error: 'Profile not found' }, 404);
+    }
+
+    return c.json(result);
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch profile' }, 500);
+  }
+});
+
+app.get('/api/projects', async (c) => {
+  try {
+    const result = await c.env.DB.prepare(
+      `SELECT * FROM projects ORDER BY is_featured DESC, order_index ASC`
+    ).all();
+
+    // Parse JSON fields
+    const projects = result.results.map((project: any) => ({
+      ...project,
+      results: project.results ? JSON.parse(project.results as string) : {},
+      tags: project.tags ? JSON.parse(project.tags as string) : []
+    }));
+
+    return c.json(projects);
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch projects' }, 500);
+  }
+});
+
+app.get('/api/certifications', async (c) => {
+  try {
+    const result = await c.env.DB.prepare(
+      `SELECT * FROM certifications ORDER BY order_index ASC`
+    ).all();
+
+    return c.json(result);
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch certifications' }, 500);
+  }
+});
+
+app.get('/api/experience', async (c) => {
+  try {
+    const result = await c.env.DB.prepare(
+      `SELECT * FROM work_experience ORDER BY order_index ASC`
+    ).all();
+
+    // Parse JSON fields
+    const experiences = result.results.map((exp: any) => ({
+      ...exp,
+      achievements: exp.achievements ? JSON.parse(exp.achievements as string) : [],
+      badges: exp.badges ? JSON.parse(exp.badges as string) : []
+    }));
+
+    return c.json(experiences);
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch experience' }, 500);
+  }
+});
+
+app.get('/api/skills', async (c) => {
+  try {
+    const result = await c.env.DB.prepare(
+      `SELECT * FROM skills ORDER BY order_index ASC`
+    ).all();
+
+    return c.json(result);
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch skills' }, 500);
+  }
+});
+
+app.get('/api/testimonials', async (c) => {
+  try {
+    const result = await c.env.DB.prepare(
+      `SELECT * FROM testimonials ORDER BY is_featured DESC, order_index ASC`
+    ).all();
+
+    return c.json(result);
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch testimonials' }, 500);
+  }
+});
+
+app.post('/api/contact', async (c) => {
+  try {
+    const { name, email, subject, message } = await c.req.json();
+    
+    // Basic validation
+    if (!name || !email || !message) {
+      return c.json({ error: 'Name, email, and message are required' }, 400);
+    }
+
+    // Insert into contact_submissions table
+    await c.env.DB.prepare(
+      `INSERT INTO contact_submissions (name, email, subject, message) VALUES (?, ?, ?, ?)`
+    )
+    .bind(name, email, subject || '', message)
+    .run();
+
+    return c.json({ success: true, message: 'Message received successfully' });
+  } catch (error) {
+    return c.json({ error: 'Failed to submit message' }, 500);
+  }
+});
+
+// Admin routes - protected by cfAccessMiddleware
+app.use('/api/admin/*', cfAccessMiddleware);
+
+app.put('/api/admin/profile', async (c) => {
+  try {
+    const { 
+      full_name, title, about, summary, 
+      email, tel, location, location_link,
+      avatar_url, resume_url, linkedin_url, instagram_url, website_url
+    } = await c.req.json();
+
+    // Check if profile exists, if not create it
+    const profileCheck = await c.env.DB.prepare(
+      `SELECT id FROM profile WHERE id = 1`
+    ).first();
+
+    if (profileCheck) {
+      // Update existing profile
+      await c.env.DB.prepare(
+        `UPDATE profile SET 
+          full_name = ?, title = ?, about = ?, summary = ?, 
+          email = ?, tel = ?, location = ?, location_link = ?,
+          avatar_url = ?, resume_url = ?, linkedin_url = ?, instagram_url = ?, website_url = ?,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE id = 1`
+      ).bind(
+        full_name, title, about, summary,
+        email, tel, location, location_link,
+        avatar_url, resume_url, linkedin_url, instagram_url, website_url
+      ).run();
+    } else {
+      // Create new profile
+      await c.env.DB.prepare(
+        `INSERT INTO profile 
+          (id, full_name, title, about, summary, email, tel, location, location_link, 
+           avatar_url, resume_url, linkedin_url, instagram_url, website_url) 
+         VALUES 
+          (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      ).bind(
+        full_name, title, about, summary,
+        email, tel, location, location_link,
+        avatar_url, resume_url, linkedin_url, instagram_url, website_url
+      ).run();
+    }
+
+    return c.json({ success: true, message: 'Profile updated successfully' });
+  } catch (error) {
+    return c.json({ error: 'Failed to update profile' }, 500);
+  }
+});
+
+// Projects admin routes
+app.post('/api/admin/projects', async (c) => {
+  try {
+    const project = await c.req.json();
+    
+    // Validate required fields
+    if (!project.title || !project.slug) {
+      return c.json({ error: 'Title and slug are required' }, 400);
+    }
+
+    const resultsJson = JSON.stringify(project.results || {});
+    const tagsJson = JSON.stringify(project.tags || []);
+
+    const stmt = c.env.DB.prepare(
+      `INSERT INTO projects 
+        (title, slug, description, category, client, thumbnail_url, 
+         link_type, link_url, results, tags, is_featured, order_index) 
+       VALUES 
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    );
+
+    await stmt.bind(
+      project.title, 
+      project.slug, 
+      project.description || '', 
+      project.category || '', 
+      project.client || '', 
+      project.thumbnail_url || '', 
+      project.link_type || 'url', 
+      project.link_url || '', 
+      resultsJson, 
+      tagsJson, 
+      project.is_featured ? 1 : 0, 
+      project.order_index || 0
+    ).run();
+
+    return c.json({ success: true, message: 'Project created successfully' });
+  } catch (error) {
+    return c.json({ error: 'Failed to create project' }, 500);
+  }
+});
+
+app.put('/api/admin/projects/:id', async (c) => {
+  try {
+    const id = c.req.param('id');
+    const project = await c.req.json();
+    
+    const resultsJson = JSON.stringify(project.results || {});
+    const tagsJson = JSON.stringify(project.tags || []);
+
+    const stmt = c.env.DB.prepare(
+      `UPDATE projects SET 
+        title = ?, slug = ?, description = ?, category = ?, client = ?, thumbnail_url = ?, 
+        link_type = ?, link_url = ?, results = ?, tags = ?, is_featured = ?, order_index = ?
+       WHERE id = ?`
+    );
+
+    await stmt.bind(
+      project.title, 
+      project.slug, 
+      project.description || '', 
+      project.category || '', 
+      project.client || '', 
+      project.thumbnail_url || '', 
+      project.link_type || 'url', 
+      project.link_url || '', 
+      resultsJson, 
+      tagsJson, 
+      project.is_featured ? 1 : 0, 
+      project.order_index || 0,
+      parseInt(id)
+    ).run();
+
+    return c.json({ success: true, message: 'Project updated successfully' });
+  } catch (error) {
+    return c.json({ error: 'Failed to update project' }, 500);
+  }
+});
+
+app.delete('/api/admin/projects/:id', async (c) => {
+  try {
+    const id = c.req.param('id');
+
+    await c.env.DB.prepare(
+      `DELETE FROM projects WHERE id = ?`
+    ).bind(parseInt(id)).run();
+
+    return c.json({ success: true, message: 'Project deleted successfully' });
+  } catch (error) {
+    return c.json({ error: 'Failed to delete project' }, 500);
+  }
+});
+
+// Certifications admin routes
+app.post('/api/admin/certifications', async (c) => {
+  try {
+    const cert = await c.req.json();
+    
+    // Validate required fields
+    if (!cert.title || !cert.issuer) {
+      return c.json({ error: 'Title and issuer are required' }, 400);
+    }
+
+    const stmt = c.env.DB.prepare(
+      `INSERT INTO certifications 
+        (title, issuer, issue_date, expiry_date, credential_id, credential_url, 
+         certificate_url, thumbnail_url, order_index) 
+       VALUES 
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    );
+
+    await stmt.bind(
+      cert.title, 
+      cert.issuer, 
+      cert.issueDate || '', 
+      cert.expiryDate || '', 
+      cert.credentialId || '', 
+      cert.credentialUrl || '', 
+      cert.certificateUrl || '', 
+      cert.thumbnailUrl || '', 
+      cert.orderIndex || 0
+    ).run();
+
+    return c.json({ success: true, message: 'Certification created successfully' });
+  } catch (error) {
+    return c.json({ error: 'Failed to create certification' }, 500);
+  }
+});
+
+app.put('/api/admin/certifications/:id', async (c) => {
+  try {
+    const id = c.req.param('id');
+    const cert = await c.req.json();
+
+    const stmt = c.env.DB.prepare(
+      `UPDATE certifications SET 
+        title = ?, issuer = ?, issue_date = ?, expiry_date = ?, credential_id = ?, credential_url = ?, 
+        certificate_url = ?, thumbnail_url = ?, order_index = ?
+       WHERE id = ?`
+    );
+
+    await stmt.bind(
+      cert.title, 
+      cert.issuer, 
+      cert.issueDate || '', 
+      cert.expiryDate || '', 
+      cert.credentialId || '', 
+      cert.credentialUrl || '', 
+      cert.certificateUrl || '', 
+      cert.thumbnailUrl || '', 
+      cert.orderIndex || 0,
+      parseInt(id)
+    ).run();
+
+    return c.json({ success: true, message: 'Certification updated successfully' });
+  } catch (error) {
+    return c.json({ error: 'Failed to update certification' }, 500);
+  }
+});
+
+app.delete('/api/admin/certifications/:id', async (c) => {
+  try {
+    const id = c.req.param('id');
+
+    await c.env.DB.prepare(
+      `DELETE FROM certifications WHERE id = ?`
+    ).bind(parseInt(id)).run();
+
+    return c.json({ success: true, message: 'Certification deleted successfully' });
+  } catch (error) {
+    return c.json({ error: 'Failed to delete certification' }, 500);
+  }
+});
+
+// Experience admin routes
+app.post('/api/admin/experience', async (c) => {
+  try {
+    const exp = await c.req.json();
+    
+    // Validate required fields
+    if (!exp.company || !exp.role || !exp.startDate) {
+      return c.json({ error: 'Company, role, and start date are required' }, 400);
+    }
+
+    const achievementsJson = JSON.stringify(exp.achievements || []);
+    const badgesJson = JSON.stringify(exp.badges || []);
+
+    const stmt = c.env.DB.prepare(
+      `INSERT INTO work_experience 
+        (company, company_link, role, description, start_date, end_date, 
+         is_current, achievements, badges, logo_url, order_index) 
+       VALUES 
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    );
+
+    await stmt.bind(
+      exp.company, 
+      exp.companyLink || '', 
+      exp.role, 
+      exp.description || '', 
+      exp.startDate, 
+      exp.endDate || null, 
+      exp.isCurrent ? 1 : 0,
+      achievementsJson, 
+      badgesJson, 
+      exp.logoUrl || '', 
+      exp.orderIndex || 0
+    ).run();
+
+    return c.json({ success: true, message: 'Experience created successfully' });
+  } catch (error) {
+    return c.json({ error: 'Failed to create experience' }, 500);
+  }
+});
+
+app.put('/api/admin/experience/:id', async (c) => {
+  try {
+    const id = c.req.param('id');
+    const exp = await c.req.json();
+
+    const achievementsJson = JSON.stringify(exp.achievements || []);
+    const badgesJson = JSON.stringify(exp.badges || []);
+
+    const stmt = c.env.DB.prepare(
+      `UPDATE work_experience SET 
+        company = ?, company_link = ?, role = ?, description = ?, start_date = ?, end_date = ?, 
+        is_current = ?, achievements = ?, badges = ?, logo_url = ?, order_index = ?
+       WHERE id = ?`
+    );
+
+    await stmt.bind(
+      exp.company, 
+      exp.companyLink || '', 
+      exp.role, 
+      exp.description || '', 
+      exp.startDate, 
+      exp.endDate || null, 
+      exp.isCurrent ? 1 : 0,
+      achievementsJson, 
+      badgesJson, 
+      exp.logoUrl || '', 
+      exp.orderIndex || 0,
+      parseInt(id)
+    ).run();
+
+    return c.json({ success: true, message: 'Experience updated successfully' });
+  } catch (error) {
+    return c.json({ error: 'Failed to update experience' }, 500);
+  }
+});
+
+app.delete('/api/admin/experience/:id', async (c) => {
+  try {
+    const id = c.req.param('id');
+
+    await c.env.DB.prepare(
+      `DELETE FROM work_experience WHERE id = ?`
+    ).bind(parseInt(id)).run();
+
+    return c.json({ success: true, message: 'Experience deleted successfully' });
+  } catch (error) {
+    return c.json({ error: 'Failed to delete experience' }, 500);
+  }
+});
+
+// Skills admin routes
+app.post('/api/admin/skills', async (c) => {
+  try {
+    const skill = await c.req.json();
+    
+    // Validate required fields
+    if (!skill.name) {
+      return c.json({ error: 'Skill name is required' }, 400);
+    }
+
+    const stmt = c.env.DB.prepare(
+      `INSERT INTO skills 
+        (name, category, order_index) 
+       VALUES 
+        (?, ?, ?)`
+    );
+
+    await stmt.bind(
+      skill.name, 
+      skill.category || '', 
+      skill.orderIndex || 0
+    ).run();
+
+    return c.json({ success: true, message: 'Skill created successfully' });
+  } catch (error) {
+    return c.json({ error: 'Failed to create skill' }, 500);
+  }
+});
+
+app.put('/api/admin/skills/:id', async (c) => {
+  try {
+    const id = c.req.param('id');
+    const skill = await c.req.json();
+
+    const stmt = c.env.DB.prepare(
+      `UPDATE skills SET 
+        name = ?, category = ?, order_index = ?
+       WHERE id = ?`
+    );
+
+    await stmt.bind(
+      skill.name, 
+      skill.category || '', 
+      skill.orderIndex || 0,
+      parseInt(id)
+    ).run();
+
+    return c.json({ success: true, message: 'Skill updated successfully' });
+  } catch (error) {
+    return c.json({ error: 'Failed to update skill' }, 500);
+  }
+});
+
+app.delete('/api/admin/skills/:id', async (c) => {
+  try {
+    const id = c.req.param('id');
+
+    await c.env.DB.prepare(
+      `DELETE FROM skills WHERE id = ?`
+    ).bind(parseInt(id)).run();
+
+    return c.json({ success: true, message: 'Skill deleted successfully' });
+  } catch (error) {
+    return c.json({ error: 'Failed to delete skill' }, 500);
+  }
+});
+
+// Testimonials admin routes
+app.post('/api/admin/testimonials', async (c) => {
+  try {
+    const testimonial = await c.req.json();
+    
+    // Validate required fields
+    if (!testimonial.clientName || !testimonial.content) {
+      return c.json({ error: 'Client name and content are required' }, 400);
+    }
+
+    const stmt = c.env.DB.prepare(
+      `INSERT INTO testimonials 
+        (client_name, client_role, client_company, client_avatar_url, content, 
+         rating, is_featured, order_index) 
+       VALUES 
+        (?, ?, ?, ?, ?, ?, ?, ?)`
+    );
+
+    await stmt.bind(
+      testimonial.clientName, 
+      testimonial.clientRole || '', 
+      testimonial.clientCompany || '', 
+      testimonial.clientAvatarUrl || '', 
+      testimonial.content, 
+      testimonial.rating || 5, 
+      testimonial.isFeatured ? 1 : 0,
+      testimonial.orderIndex || 0
+    ).run();
+
+    return c.json({ success: true, message: 'Testimonial created successfully' });
+  } catch (error) {
+    return c.json({ error: 'Failed to create testimonial' }, 500);
+  }
+});
+
+app.put('/api/admin/testimonials/:id', async (c) => {
+  try {
+    const id = c.req.param('id');
+    const testimonial = await c.req.json();
+
+    const stmt = c.env.DB.prepare(
+      `UPDATE testimonials SET 
+        client_name = ?, client_role = ?, client_company = ?, client_avatar_url = ?, content = ?, 
+        rating = ?, is_featured = ?, order_index = ?
+       WHERE id = ?`
+    );
+
+    await stmt.bind(
+      testimonial.clientName, 
+      testimonial.clientRole || '', 
+      testimonial.clientCompany || '', 
+      testimonial.clientAvatarUrl || '', 
+      testimonial.content, 
+      testimonial.rating || 5, 
+      testimonial.isFeatured ? 1 : 0,
+      testimonial.orderIndex || 0,
+      parseInt(id)
+    ).run();
+
+    return c.json({ success: true, message: 'Testimonial updated successfully' });
+  } catch (error) {
+    return c.json({ error: 'Failed to update testimonial' }, 500);
+  }
+});
+
+app.delete('/api/admin/testimonials/:id', async (c) => {
+  try {
+    const id = c.req.param('id');
+
+    await c.env.DB.prepare(
+      `DELETE FROM testimonials WHERE id = ?`
+    ).bind(parseInt(id)).run();
+
+    return c.json({ success: true, message: 'Testimonial deleted successfully' });
+  } catch (error) {
+    return c.json({ error: 'Failed to delete testimonial' }, 500);
+  }
+});
+
+// Messages admin routes
+app.get('/api/admin/messages', async (c) => {
+  try {
+    const result = await c.env.DB.prepare(
+      `SELECT * FROM contact_submissions ORDER BY submitted_at DESC`
+    ).all();
+
+    return c.json(result);
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch messages' }, 500);
+  }
+});
+
+app.put('/api/admin/messages/:id/status', async (c) => {
+  try {
+    const id = c.req.param('id');
+    const { status } = await c.req.json();
+
+    // Validate status
+    if (!['unread', 'read', 'archived'].includes(status)) {
+      return c.json({ error: 'Invalid status' }, 400);
+    }
+
+    await c.env.DB.prepare(
+      `UPDATE contact_submissions SET status = ? WHERE id = ?`
+    ).bind(status, parseInt(id)).run();
+
+    return c.json({ success: true, message: 'Status updated successfully' });
+  } catch (error) {
+    return c.json({ error: 'Failed to update status' }, 500);
+  }
+});
+
+// Upload admin route
+app.post('/api/admin/upload', async (c) => {
+  try {
+    const formData = await c.req.formData();
+    const file = formData.get('file') as File | null;
+    const path = formData.get('path') as string | null;
+
+    if (!file) {
+      return c.json({ error: 'No file provided' }, 400);
+    }
+
+    if (!path) {
+      return c.json({ error: 'No path provided' }, 400);
+    }
+
+    // Generate a unique filename to prevent conflicts
+    const extension = file.name.split('.').pop()?.toLowerCase() || '';
+    const fileName = `${path}/${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${extension}`;
+    
+    // Upload to R2
+    await c.env.STORAGE.put(fileName, file.stream(), {
+      httpMetadata: {
+        contentType: file.type
+      }
+    });
+
+    // Return the public URL
+    const publicUrl = `${c.env.ASSETS_URL}/${fileName}`;
+    return c.json({ url: publicUrl });
+  } catch (error) {
+    return c.json({ error: 'Failed to upload file' }, 500);
+  }
+});
+
+// Deploy hook route
+app.post('/api/admin/deploy', async (c) => {
+  try {
+    const deployHookUrl = c.env.PAGES_DEPLOY_HOOK_URL;
+    
+    if (!deployHookUrl) {
+      return c.json({ error: 'Deploy hook URL not configured' }, 500);
+    }
+
+    // Trigger the deploy hook
+    const response = await fetch(deployHookUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Deploy hook failed with status ${response.status}`);
+    }
+
+    return c.json({ success: true, message: 'Deploy triggered successfully' });
+  } catch (error) {
+    return c.json({ error: 'Failed to trigger deploy' }, 500);
+  }
+});
+
+export default app;
