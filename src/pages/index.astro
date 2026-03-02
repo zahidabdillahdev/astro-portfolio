@@ -23,8 +23,8 @@ const pageTitle = name ? `${name} | CV` : "Digital Marketing Portfolio";
                 <WorkExperience/>
                 <Education/>
                 <Skills/>
-                {projects?.length && <Projects projects={projects} />}
-                {certifications?.length && <Certifications certifications={certifications} />}
+                <Projects projects={projects || []} />
+                <Certifications certifications={certifications || []} />
                 <Contact />
             </div>
         </section>
