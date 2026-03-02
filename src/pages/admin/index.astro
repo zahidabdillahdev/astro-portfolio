@@ -1,0 +1,102 @@
+---
+export const prerender = false;
+import AdminLayout from '../../components/admin/AdminLayout.astro';
+---
+
+<AdminLayout title="Admin Dashboard">
+  <h1>Admin Dashboard</h1>
+  <p>Welcome to the admin dashboard. Select an option from the sidebar to manage your portfolio content.</p>
+  
+  <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 2rem;">
+    <div style="border: 1px solid #e5e7eb; padding: 1rem; border-radius: 0.5rem;">
+      <h3 style="margin: 0 0 0.5rem 0; font-size: 1.25rem;">Projects</h3>
+      <p id="projects-count" style="font-size: 2rem; font-weight: bold; margin: 0;">Loading...</p>
+    </div>
+    
+    <div style="border: 1px solid #e5e7eb; padding: 1rem; border-radius: 0.5rem;">
+      <h3 style="margin: 0 0 0.5rem 0; font-size: 1.25rem;">Certifications</h3>
+      <p id="certifications-count" style="font-size: 2rem; font-weight: bold; margin: 0;">Loading...</p>
+    </div>
+    
+    <div style="border: 1px solid #e5e7eb; padding: 1rem; border-radius: 0.5rem;">
+      <h3 style="margin: 0 0 0.5rem 0; font-size: 1.25rem;">Testimonials</h3>
+      <p id="testimonials-count" style="font-size: 2rem; font-weight: bold; margin: 0;">Loading...</p>
+    </div>
+    
+    <div style="border: 1px solid #e5e7eb; padding: 1rem; border-radius: 0.5rem;">
+      <h3 style="margin: 0 0 0.5rem 0; font-size: 1.25rem;">Messages</h3>
+      <p id="messages-count" style="font-size: 2rem; font-weight: bold; margin: 0;">Loading...</p>
+    </div>
+  </div>
+  
+  <div style="margin-top: 2rem;">
+    <button 
+      onclick="handleDeploy()"
+      style="background-color: #000; color: #fff; padding: 0.75rem 1.5rem; border: none; border-radius: 0.375rem; cursor: pointer;"
+    >
+      Trigger Rebuild
+    </button>
+    <p id="deploy-status" style="margin-top: 0.5rem; display: none;"></p>
+  </div>
+</AdminLayout>
+
+<script is:inline>
+  // Load stats on page load
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      // Get projects count
+      const projectsResponse = await api('GET', '/api/projects');
+      if (projectsResponse.length !== undefined) {
+        document.getElementById('projects-count').textContent = projectsResponse.length;
+      }
+      
+      // Get certifications count
+      const certificationsResponse = await api('GET', '/api/certifications');
+      if (certificationsResponse.length !== undefined) {
+        document.getElementById('certifications-count').textContent = certificationsResponse.length;
+      }
+      
+      // Get testimonials count
+      const testimonialsResponse = await api('GET', '/api/testimonials');
+      if (testimonialsResponse.length !== undefined) {
+        document.getElementById('testimonials-count').textContent = testimonialsResponse.length;
+      }
+      
+      // Get messages count
+      const messagesResponse = await api('GET', '/api/admin/messages');
+      if (messagesResponse.length !== undefined) {
+        document.getElementById('messages-count').textContent = messagesResponse.length;
+      }
+    } catch (error) {
+      console.error('Error loading stats:', error);
+    }
+  });
+  
+  async function handleDeploy() {
+    const deployBtn = document.querySelector('button');
+    const statusEl = document.getElementById('deploy-status');
+    
+    deployBtn.disabled = true;
+    deployBtn.textContent = 'Deploying...';
+    statusEl.style.display = 'block';
+    statusEl.textContent = 'Triggering deploy...';
+    
+    try {
+      const result = await triggerDeploy();
+      statusEl.textContent = 'Deploy triggered successfully!';
+      statusEl.style.color = '#10b981';
+    } catch (error) {
+      console.error('Deploy error:', error);
+      statusEl.textContent = `Deploy failed: ${error.message}`;
+      statusEl.style.color = '#ef4444';
+    } finally {
+      deployBtn.disabled = false;
+      deployBtn.textContent = 'Trigger Rebuild';
+      
+      // Hide status after 5 seconds
+      setTimeout(() => {
+        statusEl.style.display = 'none';
+      }, 5000);
+    }
+  }
+</script>
