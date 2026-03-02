@@ -635,28 +635,52 @@ app.post('/api/admin/upload', async (c) => {
 // Health check route for Status Page (Official Cloudflare Data)
 app.get('/api/admin/health', async (c) => {
   try {
-    // Fetch official summary from Cloudflare Status Page
-    const cfStatusResponse = await fetch('https://www.cloudflarestatus.com/api/v2/summary.json');
+    // Fetch official summary from Cloudflare Status Page with User-Agent
+    const cfStatusResponse = await fetch('https://www.cloudflarestatus.com/api/v2/summary.json', {
+      headers: { 'User-Agent': 'Portfolio-Status-Page/1.0' }
+    });
+    
+    if (!cfStatusResponse.ok) {
+      throw new Error(`Cloudflare API responded with ${cfStatusResponse.status}`);
+    }
+
     const cfData = await cfStatusResponse.json() as any;
 
-    // Filter relevant components
-    const relevantServices = ['Workers', 'D1', 'R2', 'Pages'];
+    // Mapping relevant services to their official names or keywords
+    const mapping = {
+      'Workers': 'Workers',
+      'D1': 'D1',
+      'R2': 'R2',
+      'Pages': 'Pages'
+    };
+
     const componentStatus: Record<string, string> = {};
     
     cfData.components.forEach((comp: any) => {
-      if (relevantServices.some(service => comp.name.includes(service))) {
-        // Map official status to our simpler operational/degraded
-        componentStatus[comp.name] = comp.status === 'operational' ? 'operational' : 'degraded';
-      }
+      // Look for our keywords in the official component names
+      Object.entries(mapping).forEach(([key, keyword]) => {
+        if (comp.name.includes(keyword) && !comp.name.includes('Edge')) {
+          componentStatus[key] = comp.status === 'operational' ? 'operational' : 'degraded';
+        }
+      });
+    });
+
+    // If some components are missing, provide default
+    ['Workers', 'D1', 'R2', 'Pages'].forEach(key => {
+      if (!componentStatus[key]) componentStatus[key] = 'operational';
     });
 
     return c.json({
-      official: cfData.status.description, // e.g., "All Systems Operational"
-      indicator: cfData.status.indicator,   // e.g., "none", "minor", "critical"
+      official: cfData.status.description,
+      indicator: cfData.status.indicator,
       components: componentStatus
     });
-  } catch (error) {
-    return c.json({ error: 'Failed to fetch official status' }, 500);
+  } catch (error: any) {
+    console.error('CF Status Fetch Error:', error);
+    return c.json({ 
+      error: 'Failed to fetch official status', 
+      details: error.message 
+    }, 500);
   }
 });
 

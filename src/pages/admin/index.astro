@@ -102,8 +102,14 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       console.error('Health check failed:', error);
       overallBanner.style.backgroundColor = '#f59e0b';
       overallBanner.style.color = '#fff';
-      overallText.textContent = 'Connection to Status API Lost';
-      componentsContainer.innerHTML = '<div style="padding: 2rem; text-align: center; color: #ef4444;">Unable to load official status. Check your internet connection.</div>';
+      
+      const errorMsg = error.message || 'Unknown error';
+      overallText.textContent = 'Connection Issue';
+      componentsContainer.innerHTML = `<div style="padding: 2rem; text-align: center;">
+        <div style="color: #ef4444; font-weight: bold; margin-bottom: 0.5rem;">Unable to load official status</div>
+        <div style="color: #6b7280; font-size: 0.75rem;">Error: ${errorMsg}</div>
+        <div style="color: #6b7280; font-size: 0.75rem; margin-top: 1rem;">Make sure your API Worker is deployed and reachable.</div>
+      </div>`;
     }
   }
 
