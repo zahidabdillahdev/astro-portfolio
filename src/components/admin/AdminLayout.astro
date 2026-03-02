@@ -20,6 +20,30 @@ const { title = 'Admin Dashboard' } = Astro.props;
       background-color: #fff;
       color: #000;
       display: flex;
+      flex-direction: row;
+    }
+
+    /* Mobile Header */
+    .mobile-header {
+      display: none;
+      width: 100%;
+      padding: 1rem;
+      border-bottom: 1px solid #e5e7eb;
+      background-color: #fff;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1001;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .menu-toggle {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      padding: 0.5rem;
     }
     
     .sidebar {
@@ -29,6 +53,10 @@ const { title = 'Admin Dashboard' } = Astro.props;
       padding: 1.5rem;
       display: flex;
       flex-direction: column;
+      background-color: #fff;
+      position: sticky;
+      top: 0;
+      transition: transform 0.3s ease;
     }
     
     .sidebar-nav {
@@ -70,9 +98,19 @@ const { title = 'Admin Dashboard' } = Astro.props;
       border-top: 1px solid #e5e7eb;
     }
     
+    .logout-btn {
+      display: block;
+      padding: 0.75rem;
+      text-decoration: none;
+      color: #ef4444;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
     .main-content {
       flex: 1;
-      padding: 1.5rem;
+      padding: 2rem;
+      max-width: calc(100vw - 216px);
     }
     
     .back-to-site {
@@ -95,7 +133,7 @@ const { title = 'Admin Dashboard' } = Astro.props;
       position: fixed;
       top: 1.5rem;
       right: 1.5rem;
-      z-index: 1000;
+      z-index: 2000;
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
@@ -120,11 +158,65 @@ const { title = 'Admin Dashboard' } = Astro.props;
       from { transform: translateX(100%); opacity: 0; }
       to { transform: translateX(0); opacity: 1; }
     }
+
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      .mobile-header {
+        display: flex;
+      }
+
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        z-index: 1002;
+        transform: translateX(-100%);
+        box-shadow: 10px 0 15px -3px rgba(0, 0, 0, 0.1);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        padding: 1.5rem;
+        margin-top: 60px;
+        max-width: 100%;
+      }
+
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        z-index: 1001;
+      }
+
+      .sidebar-overlay.open {
+        display: block;
+      }
+    }
   </style>
 </head>
 <body>
   <div id="toast-container"></div>
-  <aside class="sidebar">
+  <div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
+  
+  <header class="mobile-header">
+    <div style="font-weight: bold;">Admin Panel</div>
+    <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+  </header>
+
+  <aside class="sidebar" id="sidebar">
+    <div style="margin-bottom: 2rem; font-weight: bold; font-size: 1.25rem;" class="hidden-mobile">Admin Panel</div>
     <nav class="sidebar-nav">
       <ul>
         <li><a href="/admin/" class={Astro.url.pathname === '/admin/' ? 'active' : ''}>Dashboard</a></li>
@@ -147,6 +239,14 @@ const { title = 'Admin Dashboard' } = Astro.props;
   </main>
   
   <script is:inline>
+    // Sidebar toggle for mobile
+    window.toggleSidebar = function() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('open');
+    };
+
     // Global toast function
     window.showToast = function(message, type = 'success') {
       const container = document.getElementById('toast-container');
