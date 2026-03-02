@@ -170,11 +170,11 @@ const { title = 'Admin Dashboard' } = Astro.props;
       let apiUrl = url;
       const isPagesDev = window.location.hostname.includes('pages.dev');
       
-      // If you are on pages.dev and haven't setup custom domain yet, 
-      // uncomment and update the line below with your Worker URL:
-      // if (isPagesDev && url.startsWith('/api/')) {
-      //   apiUrl = 'https://portfolio-api.muhammadzahidabdillah.workers.dev' + url;
-      // }
+      // If you are on pages.dev or localhost and haven't setup custom domain yet, 
+      // this ensures the frontend can find the backend worker.
+      if ((isPagesDev || window.location.hostname === 'localhost') && url.startsWith('/api/')) {
+        apiUrl = 'https://portfolio-api.muhammadzahidabdillah.workers.dev' + url;
+      }
 
       const options = {
         method,
