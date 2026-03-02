@@ -9,24 +9,24 @@ export interface Props {
 const { project } = Astro.props;
 ---
 
-<div class="group flex flex-col h-full border border-gray-200 rounded-lg p-6 hover:border-black transition-all duration-300">
+<div class="group flex flex-col h-full border border-gray-200 rounded-lg p-4 hover:border-black transition-all duration-300">
   <div class="flex justify-between items-start gap-4">
     <div>
-      <h3 class="text-xl font-bold mb-1">{project.title}</h3>
-      {project.client && <p class="text-gray-600 mb-2">Client: {project.client}</p>}
+      <h3 class="text-lg font-bold mb-1">{project.title}</h3>
+      {project.client && <p class="text-sm text-gray-600 mb-2">Client: {project.client}</p>}
     </div>
     {project.thumbnailUrl && (
       <img 
         src={project.thumbnailUrl} 
         alt={`${project.title} thumbnail`}
-        class="w-16 h-16 object-cover rounded-md border border-gray-200"
+        class="w-12 h-12 object-cover rounded-md border border-gray-200"
       />
     )}
   </div>
   
-  <p class="text-gray-700 mt-2 mb-4 flex-grow">{project.description}</p>
+  <p class="text-sm text-gray-700 mt-2 mb-4 flex-grow">{project.description}</p>
   
-  <div class="mt-auto pt-4">
+  <div class="mt-auto pt-2">
     {project.tags && project.tags.length > 0 && (
       <div class="flex flex-wrap gap-2 mb-4">
         {project.tags.map((tag: string) => (
@@ -37,10 +37,10 @@ const { project } = Astro.props;
     
     {project.results && Object.keys(project.results).length > 0 && (
       <div class="mb-4">
-        <h4 class="font-semibold mb-2">Results:</h4>
+        <h4 class="text-sm font-semibold mb-2">Results:</h4>
         <ul class="space-y-1">
           {Object.entries(project.results).map(([key, value]) => (
-            <li class="flex justify-between text-sm">
+            <li class="flex justify-between text-xs">
               <span class="text-gray-600">{key}:</span>
               <span class="font-medium">{value}</span>
             </li>
@@ -55,9 +55,11 @@ const { project } = Astro.props;
        project.linkType === 'pdf' ? 'Download PDF' :
        project.linkType === 'gdrive' ? 'Open Drive' : 'View Document'}
     >
+      <span class="px-2">
       {project.linkType === 'url' ? 'View Project' : 
        project.linkType === 'pdf' ? 'Download PDF' :
        project.linkType === 'gdrive' ? 'Open Drive' : 'View Document'}
+      </span>
     </LinkButton>
   </div>
 </div>
