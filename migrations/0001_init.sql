@@ -53,14 +53,6 @@ CREATE TABLE IF NOT EXISTS certifications (
   order_index INTEGER DEFAULT 0
 );
 
-CREATE TABLE IF NOT EXISTS testimonials (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  client_name TEXT NOT NULL, client_role TEXT DEFAULT '',
-  client_company TEXT DEFAULT '', client_avatar_url TEXT DEFAULT '',
-  content TEXT NOT NULL, rating INTEGER DEFAULT 5,
-  is_featured INTEGER DEFAULT 0, order_index INTEGER DEFAULT 0
-);
-
 CREATE TABLE IF NOT EXISTS contact_submissions (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT DEFAULT '', email TEXT DEFAULT '',

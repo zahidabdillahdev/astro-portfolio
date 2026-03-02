@@ -19,11 +19,6 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
     </div>
     
     <div style="border: 1px solid #e5e7eb; padding: 1rem; border-radius: 0.5rem;">
-      <h3 style="margin: 0 0 0.5rem 0; font-size: 1.25rem;">Testimonials</h3>
-      <p id="testimonials-count" style="font-size: 2rem; font-weight: bold; margin: 0;">Loading...</p>
-    </div>
-    
-    <div style="border: 1px solid #e5e7eb; padding: 1rem; border-radius: 0.5rem;">
       <h3 style="margin: 0 0 0.5rem 0; font-size: 1.25rem;">Messages</h3>
       <p id="messages-count" style="font-size: 2rem; font-weight: bold; margin: 0;">Loading...</p>
     </div>
@@ -54,12 +49,6 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       const certificationsResponse = await api('GET', '/api/certifications');
       if (certificationsResponse.length !== undefined) {
         document.getElementById('certifications-count').textContent = certificationsResponse.length;
-      }
-      
-      // Get testimonials count
-      const testimonialsResponse = await api('GET', '/api/testimonials');
-      if (testimonialsResponse.length !== undefined) {
-        document.getElementById('testimonials-count').textContent = testimonialsResponse.length;
       }
       
       // Get messages count

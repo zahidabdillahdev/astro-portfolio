@@ -31,8 +31,8 @@
 
 ### 2. Frontend & Components
 - [x] Updated `astro.config.mjs` to Astro 5 (Static Output + Cloudflare Adapter).
-- [x] Extended `src/data/cv.ts` with new interfaces (Projects, Certs, Testimonials).
-- [x] Implemented new UI components: `Projects`, `Certifications`, `Testimonials`, `Contact`.
+- [x] Extended `src/data/cv.ts` with new interfaces (Projects, Certs).
+- [x] Implemented new UI components: `Projects`, `Certifications`, `Contact`.
 - [x] Integrated Contact Form with Client-side Fetch to `/api/contact`.
 - [x] Fixed 400+ TypeScript/Astro compilation errors from initial scaffolding.
 

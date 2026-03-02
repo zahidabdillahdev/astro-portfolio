@@ -12,7 +12,6 @@ export interface CV {
     skills: string[];
     projects?: Project[];
     certifications?: Certification[];
-    testimonials?: Testimonial[];
 }
 
 export interface Contact {
@@ -71,17 +70,6 @@ export interface Certification {
     credentialUrl?: string;
     certificateUrl?: string; 
     thumbnailUrl?: string; 
-    orderIndex?: number;
-}
-
-export interface Testimonial {
-    clientName: string; 
-    clientRole?: string; 
-    clientCompany?: string;
-    clientAvatarUrl?: string; 
-    content: string;
-    rating?: number; 
-    isFeatured?: boolean; 
     orderIndex?: number;
 }
 
@@ -266,38 +254,6 @@ export const CV_DATA: CV = {
             credentialUrl: "https://certificate.google.com/analytics/456789123",
             certificateUrl: "https://assets.zahidabdillah.dev/certificates/google-analytics-cert.pdf",
             thumbnailUrl: "https://assets.zahidabdillah.dev/certificates/google-analytics-thumb.jpg",
-            orderIndex: 3
-        }
-    ],
-    testimonials: [
-        {
-            clientName: "Sarah Johnson",
-            clientRole: "CMO",
-            clientCompany: "Fashion Forward",
-            clientAvatarUrl: "https://assets.zahidabdillah.dev/avatars/sarah-johnson.jpg",
-            content: "Zahid transformed our digital marketing strategy. Our conversion rates increased by 35% and revenue grew significantly. His analytical approach and attention to detail are exceptional.",
-            rating: 5,
-            isFeatured: true,
-            orderIndex: 1
-        },
-        {
-            clientName: "Michael Chen",
-            clientRole: "CEO",
-            clientCompany: "TechStart Inc.",
-            clientAvatarUrl: "https://assets.zahidabdillah.dev/avatars/michael-chen.jpg",
-            content: "Working with Zahid was a game-changer for our social media presence. He helped us grow our audience from 10K to 100K followers in just 6 months. Highly recommended!",
-            rating: 5,
-            isFeatured: true,
-            orderIndex: 2
-        },
-        {
-            clientName: "Emma Rodriguez",
-            clientRole: "Marketing Director",
-            clientCompany: "CloudSoft Solutions",
-            clientAvatarUrl: "https://assets.zahidabdillah.dev/avatars/emma-rodriguez.jpg",
-            content: "Zahid's SEO expertise brought tremendous value to our company. Organic traffic increased by 200% and we're now ranking in the top 3 for 45 competitive keywords.",
-            rating: 4,
-            isFeatured: false,
             orderIndex: 3
         }
     ]

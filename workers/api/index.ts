@@ -102,18 +102,6 @@ app.get('/api/skills', async (c) => {
   }
 });
 
-app.get('/api/testimonials', async (c) => {
-  try {
-    const result = await c.env.DB.prepare(
-      `SELECT * FROM testimonials ORDER BY is_featured DESC, order_index ASC`
-    ).all();
-
-    return c.json(result);
-  } catch (error) {
-    return c.json({ error: 'Failed to fetch testimonials' }, 500);
-  }
-});
-
 app.post('/api/contact', async (c) => {
   try {
     const { name, email, subject, message } = await c.req.json();
@@ -516,85 +504,6 @@ app.delete('/api/admin/skills/:id', async (c) => {
     return c.json({ success: true, message: 'Skill deleted successfully' });
   } catch (error) {
     return c.json({ error: 'Failed to delete skill' }, 500);
-  }
-});
-
-// Testimonials admin routes
-app.post('/api/admin/testimonials', async (c) => {
-  try {
-    const testimonial = await c.req.json();
-    
-    // Validate required fields
-    if (!testimonial.clientName || !testimonial.content) {
-      return c.json({ error: 'Client name and content are required' }, 400);
-    }
-
-    const stmt = c.env.DB.prepare(
-      `INSERT INTO testimonials 
-        (client_name, client_role, client_company, client_avatar_url, content, 
-         rating, is_featured, order_index) 
-       VALUES 
-        (?, ?, ?, ?, ?, ?, ?, ?)`
-    );
-
-    await stmt.bind(
-      testimonial.clientName, 
-      testimonial.clientRole || '', 
-      testimonial.clientCompany || '', 
-      testimonial.clientAvatarUrl || '', 
-      testimonial.content, 
-      testimonial.rating || 5, 
-      testimonial.isFeatured ? 1 : 0,
-      testimonial.orderIndex || 0
-    ).run();
-
-    return c.json({ success: true, message: 'Testimonial created successfully' });
-  } catch (error) {
-    return c.json({ error: 'Failed to create testimonial' }, 500);
-  }
-});
-
-app.put('/api/admin/testimonials/:id', async (c) => {
-  try {
-    const id = c.req.param('id');
-    const testimonial = await c.req.json();
-
-    const stmt = c.env.DB.prepare(
-      `UPDATE testimonials SET 
-        client_name = ?, client_role = ?, client_company = ?, client_avatar_url = ?, content = ?, 
-        rating = ?, is_featured = ?, order_index = ?
-       WHERE id = ?`
-    );
-
-    await stmt.bind(
-      testimonial.clientName, 
-      testimonial.clientRole || '', 
-      testimonial.clientCompany || '', 
-      testimonial.clientAvatarUrl || '', 
-      testimonial.content, 
-      testimonial.rating || 5, 
-      testimonial.isFeatured ? 1 : 0,
-      testimonial.orderIndex || 0,
-      parseInt(id)
-    ).run();
-
-    return c.json({ success: true, message: 'Testimonial updated successfully' });
-  } catch (error) {
-    return c.json({ error: 'Failed to update testimonial' }, 500);
-  }
-});
-
-app.delete('/api/admin/testimonials/:id', async (c) => {
-  try {
-    const id = c.req.param('id');
-
-    await c.env.DB.prepare(
-      `DELETE FROM testimonials WHERE id = ?`
-    ).bind(parseInt(id)).run();
-
-    return c.json({ success: true, message: 'Testimonial deleted successfully' });
-  } catch (error) {
-    return c.json({ error: 'Failed to delete testimonial' }, 500);
   }
 });
 
