@@ -62,7 +62,11 @@ const mergedData = {
 const {name, projects, certifications} = mergedData;
 const pageTitle = name ? `${name} | CV` : "Digital Marketing Portfolio";
 ---
-<Layout title={pageTitle} description={mergedData.summary || "Digital Marketing Portfolio"}>
+<Layout 
+    title={pageTitle} 
+    description={mergedData.summary || "Digital Marketing Portfolio"}
+    image={mergedData.avatarUrl}
+>
     <main class="container relative mx-auto scroll-my-12 overflow-auto p-4 print:p-11 md:p-16" id="main-content">
         <section class="mx-auto w-full max-w-2xl space-y-8 bg-white print:space-y-4" aria-label="CV Content">
             <Header data={mergedData}/>
