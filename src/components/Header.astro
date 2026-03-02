@@ -7,7 +7,8 @@ import Email from "./icons/Email.astro";
 import Phone from "./icons/Phone.astro";
 import Globe from "./icons/Globe.astro";
 
-const {name, about, personalWebsiteUrl, contact, location, locationLink, avatarUrl} = CV_DATA;
+const { data = CV_DATA } = Astro.props;
+const {name, about, personalWebsiteUrl, contact, location, locationLink, avatarUrl} = data;
 ---
 <header class="flex items-center justify-between">
     <div class="flex-1 space-y-1.5">
@@ -51,7 +52,7 @@ const {name, about, personalWebsiteUrl, contact, location, locationLink, avatarU
                     <Phone class="size-4"/>
                 </LinkButton>
             )}
-            {contact.social?.map(social => (
+            {contact.social?.map((social: any) => (
                 <LinkButton href={social.url} ariaLabel={social.name}>
                     {social.name === 'GitHub' ? <GitHub class="size-4"/> : 
                      social.name === 'LinkedIn' ? <LinkedIn class="size-4"/> : 
@@ -81,7 +82,7 @@ const {name, about, personalWebsiteUrl, contact, location, locationLink, avatarU
                     {contact.tel}
                 </a>
             )}
-            {contact.social?.map((social, index) => (
+            {contact.social?.map((social: any, index: number) => (
                 <>
                     {index === 0 && <span aria-hidden="true">|</span>}
                     <a class="underline hover:text-foreground/70" href={social.url}>

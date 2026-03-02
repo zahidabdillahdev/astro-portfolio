@@ -2,12 +2,13 @@
 import {CV_DATA} from '../data/cv';
 import WorkItem from "./WorkItem.astro";
 
-const {work} = CV_DATA;
+const { data = CV_DATA } = Astro.props;
+const {work} = data;
 ---
 <section class="flex min-h-0 flex-col gap-y-3 print:gap-y-1">
     <h2 class="text-xl font-bold" id="work-experience">Work Experience</h2>
     {work && work.length > 0 ? (
-        work.map((item) => (
+        work.map((item: any) => (
             <WorkItem {...item}/>
         ))
     ) : (

@@ -11,21 +11,69 @@ import Projects from "../components/Projects.astro";
 import Certifications from "../components/Certifications.astro";
 import Contact from "../components/Contact.astro";
 
-const {name, about, projects, certifications} = CV_DATA;
+// Fetch data from API during build
+const workerUrl = 'https://portfolio-api.muhammadzahidabdillah.workers.dev';
+
+async function fetchData(endpoint: string): Promise<any> {
+    try {
+        const response = await fetch(`${workerUrl}${endpoint}`);
+        if (!response.ok) return null;
+        return await response.json();
+    } catch (e) {
+        console.error(`Failed to fetch ${endpoint}:`, e);
+        return null;
+    }
+}
+
+const profile: any = await fetchData('/api/profile');
+const projectsData: any = await fetchData('/api/projects');
+const certificationsData: any = await fetchData('/api/certifications');
+const experienceData: any = await fetchData('/api/experience');
+const skillsData: any = await fetchData('/api/skills');
+const educationData: any = await fetchData('/api/education');
+
+// Map API data to CV_DATA format
+const mergedData = {
+    ...CV_DATA,
+    name: profile?.full_name || CV_DATA.name,
+    about: profile?.title || CV_DATA.about, 
+    summary: profile?.summary || CV_DATA.summary,
+    avatarUrl: profile?.avatar_url || CV_DATA.avatarUrl,
+    location: profile?.location || CV_DATA.location,
+    locationLink: profile?.location_link || CV_DATA.locationLink,
+    personalWebsiteUrl: profile?.website_url || CV_DATA.personalWebsiteUrl,
+    contact: {
+        ...CV_DATA.contact,
+        email: profile?.email || CV_DATA.contact.email,
+        tel: profile?.tel || CV_DATA.contact.tel,
+        resumeUrl: profile?.resume_url || CV_DATA.contact.resumeUrl,
+        social: [
+            ...(profile?.linkedin_url ? [{ name: 'LinkedIn', url: profile.linkedin_url }] : []),
+            ...(profile?.instagram_url ? [{ name: 'Instagram', url: profile.instagram_url }] : [])
+        ]
+    },
+    work: (experienceData as any[]) || CV_DATA.work,
+    education: (educationData as any[]) || CV_DATA.education,
+    skills: (skillsData as any[])?.map((s: any) => s.name) || CV_DATA.skills,
+    projects: (projectsData as any[]) || CV_DATA.projects,
+    certifications: (certificationsData as any[]) || CV_DATA.certifications
+};
+
+const {name, projects, certifications} = mergedData;
 const pageTitle = name ? `${name} | CV` : "Digital Marketing Portfolio";
 ---
-<Layout title={pageTitle} description={about || "Digital Marketing Portfolio"}>
+<Layout title={pageTitle} description={mergedData.summary || "Digital Marketing Portfolio"}>
     <main class="container relative mx-auto scroll-my-12 overflow-auto p-4 print:p-11 md:p-16" id="main-content">
         <section class="mx-auto w-full max-w-2xl space-y-8 bg-white print:space-y-4" aria-label="CV Content">
-            <Header/>
+            <Header data={mergedData}/>
             <div class="space-y-8 print:space-y-4">
-                <Summary/>
-                <WorkExperience/>
-                <Education/>
-                <Skills/>
+                <Summary data={mergedData}/>
+                <WorkExperience data={mergedData}/>
+                <Education data={mergedData}/>
+                <Skills data={mergedData}/>
                 <Projects projects={projects || []} />
                 <Certifications certifications={certifications || []} />
-                <Contact />
+                <Contact data={mergedData}/>
             </div>
         </section>
         <PrintInstruction/>

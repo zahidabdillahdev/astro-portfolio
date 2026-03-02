@@ -2,13 +2,14 @@
 import {CV_DATA} from '../data/cv';
 import Badge from './common/Badge.astro';
 
-const {skills} = CV_DATA;
+const { data = CV_DATA } = Astro.props;
+const {skills} = data;
 ---
 <section class="flex min-h-0 flex-col gap-y-3 print:gap-y-1">
     <h2 class="text-xl font-bold" id="skills-section">Skills</h2>
     {skills && skills.length > 0 ? (
         <ul class="flex list-none flex-wrap gap-1 p-0" aria-label="List of skills">
-            {skills.map((skill) => (
+            {skills.map((skill: any) => (
                     <li>
                         <Badge variant="primary">{skill}</Badge>
                     </li>

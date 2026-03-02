@@ -2,13 +2,14 @@
 import {CV_DATA} from "../data/cv";
 import EducationItem from "./EducationItem.astro";
 
-const {education} = CV_DATA;
+const { data = CV_DATA } = Astro.props;
+const {education} = data;
 ---
 <section class="flex min-h-0 flex-col gap-y-3 print:gap-y-1">
     <h2 class="text-xl font-bold" id="education-section">Education</h2>
     <div class="space-y-4" role="feed" aria-labelledby="education-section">
         {education && education.length > 0 ? (
-            education.map((entry) => (
+            education.map((entry: any) => (
                 <EducationItem {...entry}/>
             ))
         ) : (

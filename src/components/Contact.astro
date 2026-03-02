@@ -1,6 +1,7 @@
 ---
 import { CV_DATA } from '../data/cv';
-const { contact } = CV_DATA;
+const { data = CV_DATA } = Astro.props;
+const { contact } = data;
 
 // Clean phone number for WhatsApp link
 const waNumber = contact.tel ? contact.tel.replace(/[^0-9]/g, '') : '';
@@ -38,7 +39,7 @@ const waNumber = contact.tel ? contact.tel.replace(/[^0-9]/g, '') : '';
       </a>
     )}
 
-    {contact.social?.map(s => (
+    {contact.social?.map((s: any) => (
       <a href={s.url} target="_blank" rel="noopener noreferrer" class="flex items-center gap-x-3 p-4 border border-gray-200 rounded-lg hover:border-black transition-all group">
         <div class="p-2 bg-gray-50 rounded-md group-hover:bg-gray-100">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">

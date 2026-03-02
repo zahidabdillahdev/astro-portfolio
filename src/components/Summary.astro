@@ -1,7 +1,8 @@
 ---
 import {CV_DATA} from '../data/cv';
 
-const {summary} = CV_DATA;
+const { data = CV_DATA } = Astro.props;
+const {summary} = data;
 ---
 <section class="flex min-h-0 flex-col gap-y-3 print:gap-y-1">
     <h2 class="text-xl font-bold" id="about-section">About</h2>
