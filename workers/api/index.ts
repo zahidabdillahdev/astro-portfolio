@@ -632,29 +632,32 @@ app.post('/api/admin/upload', async (c) => {
   }
 });
 
-// Health check route for Status Page
+// Health check route for Status Page (Official Cloudflare Data)
 app.get('/api/admin/health', async (c) => {
-  const status = {
-    api: 'operational',
-    database: 'operational',
-    storage: 'operational'
-  };
-
   try {
-    // Check D1
-    await c.env.DB.prepare('SELECT 1').first();
-  } catch (e) {
-    status.database = 'down';
-  }
+    // Fetch official summary from Cloudflare Status Page
+    const cfStatusResponse = await fetch('https://www.cloudflarestatus.com/api/v2/summary.json');
+    const cfData = await cfStatusResponse.json() as any;
 
-  try {
-    // Check R2 (just list a limited set)
-    await c.env.STORAGE.list({ limit: 1 });
-  } catch (e) {
-    status.storage = 'down';
-  }
+    // Filter relevant components
+    const relevantServices = ['Workers', 'D1', 'R2', 'Pages'];
+    const componentStatus: Record<string, string> = {};
+    
+    cfData.components.forEach((comp: any) => {
+      if (relevantServices.some(service => comp.name.includes(service))) {
+        // Map official status to our simpler operational/degraded
+        componentStatus[comp.name] = comp.status === 'operational' ? 'operational' : 'degraded';
+      }
+    });
 
-  return c.json(status);
+    return c.json({
+      official: cfData.status.description, // e.g., "All Systems Operational"
+      indicator: cfData.status.indicator,   // e.g., "none", "minor", "critical"
+      components: componentStatus
+    });
+  } catch (error) {
+    return c.json({ error: 'Failed to fetch official status' }, 500);
+  }
 });
 
 // Deploy hook route

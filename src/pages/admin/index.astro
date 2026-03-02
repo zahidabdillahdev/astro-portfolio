@@ -5,62 +5,34 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
 
 <AdminLayout title="Admin Dashboard - System Status">
   <div style="max-width: 800px; margin: 0 auto;">
-    <h1 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 2rem; color: #111;">System Status</h1>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+      <h1 style="font-size: 1.5rem; font-weight: 600; margin: 0; color: #111;">System Status</h1>
+      <span style="font-size: 0.75rem; color: #9ca3af; font-family: monospace;">Source: official cloudflarestatus.com</span>
+    </div>
     
     <!-- Overall Status Banner -->
     <div id="overall-status" style="background-color: #f3f4f6; color: #374151; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 2.5rem; display: flex; align-items: center; gap: 1rem; transition: all 0.3s ease;">
       <div id="overall-icon" style="width: 24px; height: 24px; border-radius: 50%; background-color: #9ca3af;"></div>
-      <span id="overall-text" style="font-size: 1.25rem; font-weight: bold;">Checking systems...</span>
+      <span id="overall-text" style="font-size: 1.25rem; font-weight: bold;">Connecting to Cloudflare...</span>
     </div>
 
     <!-- Components List -->
     <div style="border: 1px solid #e5e7eb; border-radius: 0.5rem; overflow: hidden; background-color: #fff;">
       <div style="padding: 1rem 1.5rem; border-bottom: 1px solid #e5e7eb; background-color: #f9fafb; font-size: 0.875rem; font-weight: 600; color: #6b7280; display: flex; justify-content: space-between;">
-        <span>Components</span>
-        <span>Status</span>
+        <span>Infrastructure Components</span>
+        <span>Official Status</span>
       </div>
       
-      <!-- API Gateway -->
-      <div class="status-row" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center;">
-        <div>
-          <div style="font-weight: 500;">API Gateway (Workers)</div>
-          <div style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.25rem;">Global edge infrastructure</div>
-        </div>
-        <span class="status-badge" id="status-api" style="color: #9ca3af; font-weight: 600; font-size: 0.875rem;">Connecting...</span>
-      </div>
-
-      <!-- Database -->
-      <div class="status-row" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center;">
-        <div>
-          <div style="font-weight: 500;">Database Engine (D1)</div>
-          <div style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.25rem;">Serverless SQL storage</div>
-        </div>
-        <span class="status-badge" id="status-database" style="color: #9ca3af; font-weight: 600; font-size: 0.875rem;">Connecting...</span>
-      </div>
-
-      <!-- Storage -->
-      <div class="status-row" style="padding: 1.25rem 1.5rem; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center;">
-        <div>
-          <div style="font-weight: 500;">Asset Storage (R2)</div>
-          <div style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.25rem;">S3-compatible object storage</div>
-        </div>
-        <span class="status-badge" id="status-storage" style="color: #9ca3af; font-weight: 600; font-size: 0.875rem;">Connecting...</span>
-      </div>
-
-      <!-- Frontend -->
-      <div class="status-row" style="padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center;">
-        <div>
-          <div style="font-weight: 500;">Frontend Renderer (Pages)</div>
-          <div style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.25rem;">Static site hosting</div>
-        </div>
-        <span class="status-badge" style="color: #10b981; font-weight: 600; font-size: 0.875rem;">Operational</span>
+      <div id="components-container">
+        <!-- Components will be populated dynamically -->
+        <div style="padding: 2rem; text-align: center; color: #9ca3af;">Loading official data...</div>
       </div>
     </div>
 
     <!-- System Maintenance Tool -->
     <div style="margin-top: 3rem; padding: 1.5rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; background-color: #f9fafb;">
       <h2 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem;">Site Maintenance</h2>
-      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 1.5rem;">Trigger a full static site rebuild to synchronize all database changes to the production environment.</p>
+      <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 1.5rem;">Trigger a manual static site rebuild to ensure production environment is perfectly synced with the database.</p>
       
       <button 
         id="deploy-btn"
@@ -83,49 +55,55 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
     const overallBanner = document.getElementById('overall-status');
     const overallIcon = document.getElementById('overall-icon');
     const overallText = document.getElementById('overall-text');
+    const componentsContainer = document.getElementById('components-container');
     
     try {
       const health = await api('GET', '/api/admin/health');
       
-      // Update individual badges
-      updateComponentStatus('status-api', health.api);
-      updateComponentStatus('status-database', health.database);
-      updateComponentStatus('status-storage', health.storage);
-      
-      // Update overall banner
-      const isAllOk = health.api === 'operational' && 
-                      health.database === 'operational' && 
-                      health.storage === 'operational';
+      // Update overall banner based on official data
+      const isAllOk = health.indicator === 'none';
       
       if (isAllOk) {
         overallBanner.style.backgroundColor = '#10b981';
         overallBanner.style.color = '#fff';
         overallIcon.style.backgroundColor = '#fff';
-        overallText.textContent = 'All Systems Operational';
+        overallText.textContent = health.official || 'All Systems Operational';
       } else {
-        overallBanner.style.backgroundColor = '#ef4444';
+        overallBanner.style.backgroundColor = health.indicator === 'critical' ? '#ef4444' : '#f59e0b';
         overallBanner.style.color = '#fff';
         overallIcon.style.backgroundColor = '#fff';
-        overallText.textContent = 'Service Disruption Detected';
+        overallText.textContent = health.official || 'Service Disruption Detected';
       }
+
+      // Render official components
+      componentsContainer.innerHTML = '';
+      Object.entries(health.components).forEach(([name, status], index, array) => {
+        const isLast = index === array.length - 1;
+        const row = document.createElement('div');
+        row.style.padding = '1.25rem 1.5rem';
+        if (!isLast) row.style.borderBottom = '1px solid #f3f4f6';
+        row.style.display = 'flex';
+        row.style.justifyContent = 'space-between';
+        row.style.alignItems = 'center';
+        
+        row.innerHTML = `
+          <div>
+            <div style="font-weight: 500;">${name}</div>
+            <div style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.25rem;">Official Cloudflare Infrastructure</div>
+          </div>
+          <span style="color: ${status === 'operational' ? '#10b981' : '#ef4444'}; font-weight: 600; font-size: 0.875rem;">
+            ${status.charAt(0).toUpperCase() + status.slice(1)}
+          </span>
+        `;
+        componentsContainer.appendChild(row);
+      });
+      
     } catch (error) {
       console.error('Health check failed:', error);
       overallBanner.style.backgroundColor = '#f59e0b';
       overallBanner.style.color = '#fff';
-      overallText.textContent = 'Partial Connection Issue';
-    }
-  }
-
-  function updateComponentStatus(id, status) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    
-    if (status === 'operational') {
-      el.textContent = 'Operational';
-      el.style.color = '#10b981';
-    } else {
-      el.textContent = 'Degraded';
-      el.style.color = '#ef4444';
+      overallText.textContent = 'Connection to Status API Lost';
+      componentsContainer.innerHTML = '<div style="padding: 2rem; text-align: center; color: #ef4444;">Unable to load official status. Check your internet connection.</div>';
     }
   }
 
