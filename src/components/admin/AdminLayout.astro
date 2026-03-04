@@ -418,7 +418,7 @@ const firstName = profile?.full_name?.split(' ')[1] || profile?.full_name?.split
         <div class="sidebar-clock-time" id="sidebar-clock-time">--:--:--</div>
         <div id="sidebar-clock-date">---, -- --- ----</div>
       </div>
-      <div class="sidebar-greeting" id="sidebar-greeting"></div>
+      <div class="sidebar-greeting" id="sidebar-greeting" data-name={firstName}></div>
     </div>
 
     <nav class="sidebar-nav">
@@ -477,7 +477,7 @@ const firstName = profile?.full_name?.split(' ')[1] || profile?.full_name?.split
 
   <script is:inline>
     // Clock & Greeting (Asia/Jakarta, GMT+7)
-    const _firstName = {JSON.stringify(firstName)};
+    const _firstName = document.getElementById('sidebar-greeting')?.dataset.name || 'Zahid';
 
     function getGreeting(hour) {
       if (hour >= 5  && hour < 12) return `Good Morning, ${_firstName} 👋`;
