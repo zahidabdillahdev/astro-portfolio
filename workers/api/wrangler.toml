@@ -3,6 +3,8 @@ main = "index.ts"
 compatibility_date = "2025-01-01"
 compatibility_flags = ["nodejs_compat"]
 
+workers_dev = true
+
 routes = [
   { pattern = "zahidabdillah.dev/api/*", zone_name = "zahidabdillah.dev" }
 ]
