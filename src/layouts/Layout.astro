@@ -10,6 +10,10 @@ export interface Props {
 
 const {title, description, image, favicon} = Astro.props;
 
+const faviconType = favicon
+    ? (favicon.endsWith('.webp') ? 'image/webp' : favicon.endsWith('.png') ? 'image/png' : 'image/jpeg')
+    : 'image/svg+xml';
+
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const socialImageURL = image ? (image.startsWith('http') ? image : new URL(image, Astro.site).href) : null;
 ---
@@ -17,7 +21,8 @@ const socialImageURL = image ? (image.startsWith('http') ? image : new URL(image
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width"/>
-    <link rel="icon" type={favicon ? 'image/webp' : 'image/svg+xml'} href={favicon || '/favicon.svg'}/>
+    <link rel="icon" type={faviconType} href={favicon || '/favicon.svg'}/>
+    {favicon && <link rel="preload" as="image" href={favicon} fetchpriority="high"/>}
     <link rel="sitemap" href="/sitemap-index.xml"/>
     <title>{title}</title>
     <meta name="description" content={description}/>

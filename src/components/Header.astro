@@ -20,14 +20,21 @@ const {name, about, personalWebsiteUrl, contact, location, locationLink, avatarU
         </p>
         <p class="max-w-md items-center text-pretty font-mono text-xs text-foreground">
             {location ? (
-                <a class="inline-flex gap-x-1.5 align-baseline leading-none hover:underline"
-                   href={locationLink}
-                   target="_blank"
-                   rel="noopener noreferrer"
-                   aria-label={`Location: ${location}`}>
-                    <Globe class="size-3"/>
-                    {location}
-                </a>
+                locationLink ? (
+                    <a class="inline-flex gap-x-1.5 align-baseline leading-none hover:underline"
+                       href={locationLink}
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       aria-label={`Location: ${location}`}>
+                        <Globe class="size-3"/>
+                        {location}
+                    </a>
+                ) : (
+                    <span class="inline-flex gap-x-1.5 align-baseline leading-none" aria-label={`Location: ${location}`}>
+                        <Globe class="size-3"/>
+                        {location}
+                    </span>
+                )
             ) : (
                 <span class="inline-flex gap-x-1.5 align-baseline leading-none text-muted-foreground italic">
                     <Globe class="size-3"/>
@@ -96,7 +103,7 @@ const {name, about, personalWebsiteUrl, contact, location, locationLink, avatarU
     <span class="relative flex shrink-0 overflow-hidden rounded-xl size-28 bg-gray-100 items-center justify-center border border-gray-200"
           aria-hidden="true">
         {avatarUrl ? (
-            <img class="aspect-square h-full w-full object-cover" alt={`${name || 'User'}'s profile picture`} src={avatarUrl}/>
+            <img class="aspect-square h-full w-full object-cover" alt={`${name || 'User'}'s profile picture`} src={avatarUrl} width="112" height="112" fetchpriority="high" decoding="async"/>
         ) : (
             <div class="text-gray-400">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-12">
