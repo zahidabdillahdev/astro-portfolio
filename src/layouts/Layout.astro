@@ -5,9 +5,10 @@ export interface Props {
     title: string;
     description: string;
     image?: string;
+    favicon?: string;
 }
 
-const {title, description, image} = Astro.props;
+const {title, description, image, favicon} = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const socialImageURL = image ? (image.startsWith('http') ? image : new URL(image, Astro.site).href) : null;
@@ -16,7 +17,7 @@ const socialImageURL = image ? (image.startsWith('http') ? image : new URL(image
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width"/>
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+    <link rel="icon" type={favicon ? 'image/webp' : 'image/svg+xml'} href={favicon || '/favicon.svg'}/>
     <link rel="sitemap" href="/sitemap-index.xml"/>
     <title>{title}</title>
     <meta name="description" content={description}/>
