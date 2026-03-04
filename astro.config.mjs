@@ -3,11 +3,12 @@ import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import sitemap from '@astrojs/sitemap';
 import cloudflare from '@astrojs/cloudflare';
+import icon from 'astro-icon';
 
 export default defineConfig({
   output: 'static',
   adapter: cloudflare(),
   vite: { plugins: [tailwindcss()] },
   site: 'https://zahidabdillah.dev',
-  integrations: [sitemap()]
+  integrations: [sitemap(), icon()]
 });
