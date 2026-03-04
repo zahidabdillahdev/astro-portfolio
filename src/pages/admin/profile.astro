@@ -85,45 +85,41 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       />
     </div>
     
-    <div style="display: flex; gap: 2rem; align-items: flex-start; border: 1px solid #e5e7eb; padding: 1.5rem; border-radius: 0.5rem; background-color: #f9fafb;">
+    <div style="display: flex; gap: 2rem; align-items: flex-start; border: 1px solid var(--color-border); padding: 1.25rem; border-radius: 0.5rem; background-color: var(--color-bg);">
       <div style="flex-shrink: 0;">
-        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Profile Photo</label>
-        <div id="avatar-preview-container" style="width: 120px; height: 120px; border-radius: 0.75rem; border: 2px dashed #d1d5db; display: flex; align-items: center; justify-content: center; overflow: hidden; background-color: #fff;">
-          <img id="avatar-preview" src="" style="width: 100%; height: 100%; object-cover: cover; display: none;" />
-          <div id="avatar-placeholder" style="color: #9ca3af;">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 40px; height: 40px;">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-            </svg>
+        <label style="margin-bottom: 0.5rem;">Profile Photo</label>
+        <div style="position: relative; width: 100px; height: 100px;">
+          <div id="avatar-preview-container" style="width: 100px; height: 100px; border-radius: 0.75rem; border: 2px dashed #d4d4d8; display: flex; align-items: center; justify-content: center; overflow: hidden; background-color: #fff;">
+            <img id="avatar-preview" src="" style="width: 100%; height: 100%; object-fit: cover; display: none;" />
+            <div id="avatar-placeholder" style="color: #a1a1aa;">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 36px; height: 36px;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+              </svg>
+            </div>
           </div>
+          <button
+            type="button"
+            id="avatar-remove-btn"
+            onclick="removeAvatar()"
+            style="display: none; position: absolute; top: -8px; right: -8px; width: 22px; height: 22px; border-radius: 50%; background-color: #ef4444; color: #fff; border: 2px solid #fff; cursor: pointer; font-size: 0.7rem; line-height: 1; align-items: center; justify-content: center;"
+            title="Remove photo"
+          >✕</button>
         </div>
       </div>
       <div style="flex-grow: 1;">
-        <label for="avatar-file" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Upload New Photo</label>
-        <input 
-          type="file" 
-          id="avatar-file" 
-          accept="image/*"
-          style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none; background-color: #fff;" 
-        />
-        <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem;">JPG, PNG or WebP. Max 10MB.</p>
+        <label for="avatar-file">Upload New Photo</label>
+        <input type="file" id="avatar-file" accept="image/*" />
+        <p style="font-size: 0.75rem; color: var(--color-muted); margin-top: 0.375rem;">JPG, PNG or WebP. Max 10MB. Auto-compressed.</p>
         <input type="hidden" id="avatar-url" />
       </div>
     </div>
     
-    <div style="border: 1px solid #e5e7eb; padding: 1.5rem; border-radius: 0.5rem; background-color: #f9fafb;">
-      <label for="resume-file" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Resume / CV Document</label>
-      <div style="display: flex; gap: 1rem; align-items: center;">
-        <input 
-          type="file" 
-          id="resume-file" 
-          accept=".pdf,.doc,.docx"
-          style="flex-grow: 1; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none; background-color: #fff;" 
-        />
-        <div id="resume-status" style="font-size: 0.75rem; color: #10b981; display: none;">Document Uploaded</div>
-      </div>
-      <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.5rem;">PDF, DOC, or DOCX. Max 5MB.</p>
+    <div style="border: 1px solid var(--color-border); padding: 1.25rem; border-radius: 0.5rem; background-color: var(--color-bg);">
+      <label for="resume-file">Resume / CV Document</label>
+      <input type="file" id="resume-file" accept=".pdf,.doc,.docx" style="margin-bottom: 0.375rem;" />
+      <p style="font-size: 0.75rem; color: var(--color-muted); margin: 0 0 0.5rem;">PDF, DOC, or DOCX. Max 5MB.</p>
       <input type="hidden" id="resume-url" />
-      <div id="current-resume-link" style="margin-top: 0.5rem; font-size: 0.875rem;"></div>
+      <div id="current-resume-link" style="font-size: 0.8125rem; display: flex; align-items: center; gap: 0.5rem;"></div>
     </div>
     
     <div>
@@ -181,23 +177,49 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
     const linkContainer = document.getElementById('current-resume-link');
     if (url) {
       const fileName = url.split('/').pop();
-      linkContainer.innerHTML = `Current: <a href="${url}" target="_blank" style="color: #3b82f6; text-decoration: underline;">${fileName}</a>`;
+      linkContainer.innerHTML = `
+        <a href="${url}" target="_blank" style="color: #3b82f6; text-decoration: underline; font-size: 0.8125rem;">${fileName}</a>
+        <button type="button" onclick="removeResume()" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 0.75rem; padding: 0.125rem 0.375rem; border-radius: 0.25rem; border: 1px solid #fecaca;">✕ Remove</button>
+      `;
     } else {
-      linkContainer.innerHTML = '<span style="color: #9ca3af;">No resume uploaded yet.</span>';
+      linkContainer.innerHTML = '<span style="color: var(--color-muted); font-size: 0.8125rem;">No resume uploaded yet.</span>';
     }
   }
 
   function updateAvatarPreview(url) {
     const preview = document.getElementById('avatar-preview');
     const placeholder = document.getElementById('avatar-placeholder');
+    const removeBtn = document.getElementById('avatar-remove-btn');
     if (url) {
       preview.src = url;
       preview.style.display = 'block';
       placeholder.style.display = 'none';
+      removeBtn.style.display = 'flex';
     } else {
       preview.style.display = 'none';
       placeholder.style.display = 'block';
+      removeBtn.style.display = 'none';
     }
+  }
+
+  async function removeAvatar() {
+    if (!confirm('Remove profile photo?')) return;
+    document.getElementById('avatar-url').value = '';
+    document.getElementById('avatar-file').value = '';
+    updateAvatarPreview('');
+    await api('PUT', '/api/admin/profile', { avatar_url: '' });
+    showToast('Photo removed', 'success');
+    try { await triggerDeploy(); } catch(e) {}
+  }
+
+  async function removeResume() {
+    if (!confirm('Remove resume file?')) return;
+    document.getElementById('resume-url').value = '';
+    document.getElementById('resume-file').value = '';
+    updateResumeDisplay('');
+    await api('PUT', '/api/admin/profile', { resume_url: '' });
+    showToast('Resume removed', 'success');
+    try { await triggerDeploy(); } catch(e) {}
   }
 
   // Handle avatar file selection preview
@@ -215,12 +237,9 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
   // Handle resume file selection feedback
   document.getElementById('resume-file').addEventListener('change', function(e) {
     const file = e.target.files[0];
-    const status = document.getElementById('resume-status');
+    const linkContainer = document.getElementById('current-resume-link');
     if (file) {
-      status.textContent = `Selected: ${file.name}`;
-      status.style.display = 'block';
-    } else {
-      status.style.display = 'none';
+      linkContainer.innerHTML = `<span style="color: var(--color-muted); font-size: 0.8125rem;">Selected: ${file.name}</span>`;
     }
   });
   

@@ -254,6 +254,29 @@ const { title = 'Admin Dashboard' } = Astro.props;
       to { transform: translateX(0); opacity: 1; }
     }
 
+    @media (max-width: 768px) {
+      #toast-container {
+        top: auto;
+        bottom: 1.5rem;
+        right: 50%;
+        transform: translateX(50%);
+        width: calc(100% - 2rem);
+        align-items: center;
+      }
+
+      .toast {
+        width: 100%;
+        max-width: 100%;
+        text-align: center;
+        animation: toast-in-mobile 0.25s ease-out;
+      }
+    }
+
+    @keyframes toast-in-mobile {
+      from { transform: translateY(1rem); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
     /* Global Form Styles */
     input[type="text"],
     input[type="email"],
@@ -538,8 +561,30 @@ const { title = 'Admin Dashboard' } = Astro.props;
       }
     };
 
+    // Compress image before upload (max 1200px, JPEG 82%)
+    window.compressImage = function(file, maxWidth = 1200, quality = 0.82) {
+      return new Promise((resolve) => {
+        if (!file.type.startsWith('image/')) { resolve(file); return; }
+        const img = new Image();
+        img.onload = () => {
+          let w = img.width, h = img.height;
+          if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          canvas.toBlob((blob) => {
+            resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' }));
+          }, 'image/jpeg', quality);
+        };
+        img.src = URL.createObjectURL(file);
+      });
+    };
+
     // Upload file function
     window.uploadFile = async function(file, path) {
+      if (file.type.startsWith('image/')) {
+        file = await compressImage(file);
+      }
       const formData = new FormData();
       formData.append('file', file);
       formData.append('path', path);
