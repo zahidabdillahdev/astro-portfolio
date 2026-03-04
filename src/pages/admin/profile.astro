@@ -135,24 +135,6 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       />
     </div>
     
-    <div>
-      <label for="instagram-url" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Instagram URL</label>
-      <input 
-        type="url" 
-        id="instagram-url" 
-        style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
-      />
-    </div>
-    
-    <div>
-      <label for="website-url" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Personal Website URL</label>
-      <input 
-        type="url" 
-        id="website-url" 
-        style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
-      />
-    </div>
-    
     <button 
       type="submit"
       style="padding: 0.75rem 1.5rem; background-color: #000; color: #fff; border: none; border-radius: 0.375rem; cursor: pointer; margin-top: 1rem;"
@@ -184,8 +166,6 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       document.getElementById('avatar-url').value = profile.avatar_url || '';
       document.getElementById('resume-url').value = profile.resume_url || '';
       document.getElementById('linkedin-url').value = profile.linkedin_url || '';
-      document.getElementById('instagram-url').value = profile.instagram_url || '';
-      document.getElementById('website-url').value = profile.website_url || '';
 
       // Update avatar preview
       updateAvatarPreview(profile.avatar_url);
@@ -194,7 +174,6 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       updateResumeDisplay(profile.resume_url);
     } catch (error) {
       console.error('Error loading profile:', error);
-      showToast('Failed to load profile', 'error');
     }
   }
 
@@ -295,9 +274,7 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
         location_link: document.getElementById('location-link').value,
         avatar_url: avatarUrl,
         resume_url: resumeUrl,
-        linkedin_url: document.getElementById('linkedin-url').value,
-        instagram_url: document.getElementById('instagram-url').value,
-        website_url: document.getElementById('website-url').value
+        linkedin_url: document.getElementById('linkedin-url').value
       };
     
       const response = await api('PUT', '/api/admin/profile', formData);
