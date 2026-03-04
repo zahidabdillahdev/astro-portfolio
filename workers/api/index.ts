@@ -617,10 +617,12 @@ app.post('/api/admin/upload', async (c) => {
     const fileName = `${path}/${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${extension}`;
     
     // Upload to R2 with long cache (filenames are unique/immutable)
+    const isPdf = extension === 'pdf';
     await c.env.STORAGE.put(fileName, file.stream(), {
       httpMetadata: {
         contentType: file.type,
-        cacheControl: 'public, max-age=31536000, immutable'
+        cacheControl: 'public, max-age=31536000, immutable',
+        contentDisposition: isPdf ? 'inline' : undefined
       }
     });
 
