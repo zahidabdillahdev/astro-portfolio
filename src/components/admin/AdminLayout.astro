@@ -4,6 +4,13 @@ export interface Props {
 }
 
 const { title = 'Admin Dashboard' } = Astro.props;
+
+// Fetch avatar for favicon
+const profileRes = await fetch('https://portfolio-api.muhammadzahidabdillah.workers.dev/api/profile').catch(() => null);
+const profile = profileRes?.ok ? await profileRes.json() as any : null;
+const faviconUrl = profile?.avatar_url || '/favicon.svg';
+const faviconType = profile?.avatar_url ? 'image/webp' : 'image/svg+xml';
+const firstName = profile?.full_name?.split(' ')[1] || profile?.full_name?.split(' ')[0] || 'Zahid';
 ---
 
 <!DOCTYPE html>
@@ -12,6 +19,7 @@ const { title = 'Admin Dashboard' } = Astro.props;
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>{title}</title>
+  <link rel="icon" type={faviconType} href={faviconUrl} />
   <style>
     :root {
       --color-bg: #fafafa;
@@ -410,7 +418,7 @@ const { title = 'Admin Dashboard' } = Astro.props;
         <div class="sidebar-clock-time" id="sidebar-clock-time">--:--:--</div>
         <div id="sidebar-clock-date">---, -- --- ----</div>
       </div>
-      <div class="sidebar-greeting">Welcome back!</div>
+      <div class="sidebar-greeting" id="sidebar-greeting"></div>
     </div>
 
     <nav class="sidebar-nav">
@@ -468,7 +476,16 @@ const { title = 'Admin Dashboard' } = Astro.props;
   </main>
 
   <script is:inline>
-    // Clock (Asia/Jakarta, GMT+7)
+    // Clock & Greeting (Asia/Jakarta, GMT+7)
+    const _firstName = {JSON.stringify(firstName)};
+
+    function getGreeting(hour) {
+      if (hour >= 5  && hour < 12) return `Good Morning, ${_firstName} 👋`;
+      if (hour >= 12 && hour < 17) return `Good Afternoon, ${_firstName} 👋`;
+      if (hour >= 17 && hour < 21) return `Good Evening, ${_firstName} 👋`;
+      return `Good Night, ${_firstName} 🌙`;
+    }
+
     function updateClock() {
       const now = new Date();
       const opts = { timeZone: 'Asia/Jakarta' };
@@ -476,14 +493,17 @@ const { title = 'Admin Dashboard' } = Astro.props;
       const time = now.toLocaleTimeString('id-ID', { ...opts, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
       const timeShort = now.toLocaleTimeString('id-ID', { ...opts, hour: '2-digit', minute: '2-digit', hour12: false });
       const date = now.toLocaleDateString('id-ID', { ...opts, weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+      const hour = parseInt(now.toLocaleTimeString('en-US', { ...opts, hour: '2-digit', hour12: false }));
 
       const sidebarTime = document.getElementById('sidebar-clock-time');
       const sidebarDate = document.getElementById('sidebar-clock-date');
       const mobileClock = document.getElementById('mobile-clock');
+      const greeting = document.getElementById('sidebar-greeting');
 
       if (sidebarTime) sidebarTime.textContent = time;
       if (sidebarDate) sidebarDate.textContent = date;
       if (mobileClock) mobileClock.textContent = timeShort;
+      if (greeting) greeting.textContent = getGreeting(hour);
     }
     updateClock();
     setInterval(updateClock, 1000);
