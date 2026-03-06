@@ -11,10 +11,10 @@ const waNumber = contact.tel ? contact.tel.replace(/[^0-9]/g, '') : '';
 <section id="contact" class="flex min-h-0 flex-col gap-y-3 print:gap-y-1">
   <h2 class="text-xl font-bold">Connect</h2>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
     {contact.email && (
-      <a href={`mailto:${contact.email}`} class="flex items-center gap-x-4 p-4 border border-gray-200 rounded-lg hover:border-black transition-all group">
-        <Icon name="mdi:gmail" class="size-7 text-current" />
+      <a href={`mailto:${contact.email}`} class="flex items-center gap-x-3 py-2 hover:opacity-70 transition-opacity group">
+        <Icon name="mdi:gmail" class="size-6 shrink-0" style="color: #EA4335;" />
         <div>
           <p class="text-xs font-medium text-gray-500 uppercase">Email</p>
           <p class="text-sm font-semibold">{contact.email}</p>
@@ -23,20 +23,20 @@ const waNumber = contact.tel ? contact.tel.replace(/[^0-9]/g, '') : '';
     )}
 
     {contact.tel && (
-      <a href={`https://wa.me/${waNumber}`} target="_blank" rel="noopener noreferrer" class="flex items-center gap-x-4 p-4 border border-gray-200 rounded-lg hover:border-black transition-all group">
-        <Icon name="ic:baseline-whatsapp" class="size-7 text-current" />
+      <a href={`https://wa.me/${waNumber}`} target="_blank" rel="noopener noreferrer" class="flex items-center gap-x-3 py-2 hover:opacity-70 transition-opacity group">
+        <Icon name="ic:baseline-whatsapp" class="size-6 shrink-0" style="color: #25D366;" />
         <div>
-          <p class="text-xs font-medium text-gray-500 uppercase">Phone / WhatsApp</p>
+          <p class="text-xs font-medium text-gray-500 uppercase">WhatsApp</p>
           <p class="text-sm font-semibold">{contact.tel}</p>
         </div>
       </a>
     )}
 
     {contact.social?.map((s: any) => (
-      <a href={s.url} target="_blank" rel="noopener noreferrer" class="flex items-center gap-x-4 p-4 border border-gray-200 rounded-lg hover:border-black transition-all group">
+      <a href={s.url} target="_blank" rel="noopener noreferrer" class="flex items-center gap-x-3 py-2 hover:opacity-70 transition-opacity group">
         {s.name === 'LinkedIn'
-          ? <Icon name="mdi:linkedin" class="size-7 text-current" />
-          : <Icon name="mdi:web" class="size-7 text-current" />
+          ? <Icon name="mdi:linkedin" class="size-6 shrink-0" style="color: #0A66C2;" />
+          : <Icon name="mdi:web" class="size-6 shrink-0" />
         }
         <div>
           <p class="text-xs font-medium text-gray-500 uppercase">{s.name}</p>

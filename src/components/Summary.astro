@@ -3,11 +3,26 @@ import {CV_DATA} from '../data/cv';
 
 const { data = CV_DATA } = Astro.props;
 const {summary} = data;
+
+const paragraphs = summary ? summary.split('\n\n').filter((p: string) => p.trim()) : [];
 ---
 <section class="flex min-h-0 flex-col gap-y-3 print:gap-y-1">
     <h2 class="text-xl font-bold" id="about-section">About</h2>
-    <div class="text-pretty text-sm text-foreground/80 print:text-[12px]"
+    <div class="text-sm text-foreground/80 print:text-[12px] space-y-2"
          aria-labelledby="about-section">
-        {summary || <p class="italic">Professional summary and core background information will be provided here.</p>}
+        {paragraphs.length > 0 ? (
+            paragraphs.map((para: string) => (
+                <p class="text-justify">
+                    {para.split('\n').map((line: string, i: number, arr: string[]) => (
+                        <>
+                            {line}
+                            {i < arr.length - 1 && <br/>}
+                        </>
+                    ))}
+                </p>
+            ))
+        ) : (
+            <p class="italic">Professional summary and core background information will be provided here.</p>
+        )}
     </div>
 </section>

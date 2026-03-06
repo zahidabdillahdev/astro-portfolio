@@ -1,11 +1,10 @@
 ---
-import Badge from "./common/Badge.astro";
 import type {Work} from "../data/cv";
 
 interface Props extends Work {
 }
 
-const {company, link, title, start, end, description, achievements, badges} = Astro.props
+const {company, link, title, start, end, description, achievements} = Astro.props
 ---
 <article role="article">
     <div class="rounded-lg bg-card text-card-foreground py-1 print:py-0">
@@ -36,15 +35,6 @@ const {company, link, title, start, end, description, achievements, badges} = As
                 {achievements?.map((achievement) => (
                     <li>{achievement}</li>
                 ))}
-                </ul>
-            </div>
-            <div class="mt-2">
-                <ul class="flex list-none flex-wrap gap-1 p-0" aria-label="Technologies used">
-                    {badges?.map((badge) => (
-                            <li>
-                                <Badge variant="secondary">{badge}</Badge>
-                            </li>
-                    ))}
                 </ul>
             </div>
         </div>
