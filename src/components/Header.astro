@@ -9,6 +9,12 @@ import Globe from "./icons/Globe.astro";
 
 const { data = CV_DATA } = Astro.props;
 const {name, about, personalWebsiteUrl, contact, location, locationLink, avatarUrl} = data;
+
+// Auto-detect country code from "City, XX" format and convert to flag emoji
+const countryMatch = location?.match(/,\s*([A-Z]{2})$/);
+const flagEmoji = countryMatch
+    ? [...countryMatch[1]].map(c => String.fromCodePoint(0x1F1E6 - 65 + c.charCodeAt(0))).join('')
+    : null;
 ---
 <header class="flex items-center justify-between">
     <div class="flex-1 space-y-1.5">
@@ -26,12 +32,12 @@ const {name, about, personalWebsiteUrl, contact, location, locationLink, avatarU
                        target="_blank"
                        rel="noopener noreferrer"
                        aria-label={`Location: ${location}`}>
-                        <Globe class="size-3"/>
+                        {flagEmoji ? <span aria-hidden="true">{flagEmoji}</span> : <Globe class="size-3"/>}
                         {location}
                     </a>
                 ) : (
                     <span class="inline-flex gap-x-1.5 align-baseline leading-none" aria-label={`Location: ${location}`}>
-                        <Globe class="size-3"/>
+                        {flagEmoji ? <span aria-hidden="true">{flagEmoji}</span> : <Globe class="size-3"/>}
                         {location}
                     </span>
                 )
