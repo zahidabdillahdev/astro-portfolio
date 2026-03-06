@@ -10,11 +10,9 @@ import Globe from "./icons/Globe.astro";
 const { data = CV_DATA } = Astro.props;
 const {name, about, personalWebsiteUrl, contact, location, locationLink, avatarUrl} = data;
 
-// Auto-detect country code from "City, XX" format and convert to flag emoji
+// Auto-detect country code from "City, XX" format for flag image
 const countryMatch = location?.match(/,\s*([A-Z]{2})$/);
-const flagEmoji = countryMatch
-    ? [...countryMatch[1]].map(c => String.fromCodePoint(0x1F1E6 - 65 + c.charCodeAt(0))).join('')
-    : null;
+const countryCode = countryMatch ? countryMatch[1].toLowerCase() : null;
 ---
 <header class="flex items-center justify-between">
     <div class="flex-1 space-y-1.5">
@@ -32,12 +30,18 @@ const flagEmoji = countryMatch
                        target="_blank"
                        rel="noopener noreferrer"
                        aria-label={`Location: ${location}`}>
-                        {flagEmoji ? <span aria-hidden="true">{flagEmoji}</span> : <Globe class="size-3"/>}
+                        {countryCode
+    ? <img src={`https://flagcdn.com/w20/${countryCode}.png`} srcset={`https://flagcdn.com/w40/${countryCode}.png 2x`} width="16" height="12" alt="" aria-hidden="true" loading="eager" style="display:inline-block;vertical-align:middle;border-radius:2px;"/>
+    : <Globe class="size-3"/>
+}
                         {location}
                     </a>
                 ) : (
                     <span class="inline-flex gap-x-1.5 align-baseline leading-none" aria-label={`Location: ${location}`}>
-                        {flagEmoji ? <span aria-hidden="true">{flagEmoji}</span> : <Globe class="size-3"/>}
+                        {countryCode
+    ? <img src={`https://flagcdn.com/w20/${countryCode}.png`} srcset={`https://flagcdn.com/w40/${countryCode}.png 2x`} width="16" height="12" alt="" aria-hidden="true" loading="eager" style="display:inline-block;vertical-align:middle;border-radius:2px;"/>
+    : <Globe class="size-3"/>
+}
                         {location}
                     </span>
                 )
