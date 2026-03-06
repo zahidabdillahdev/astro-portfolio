@@ -268,7 +268,7 @@ app.put('/api/admin/projects/:id', async (c) => {
       tagsJson, 
       project.is_featured ? 1 : 0, 
       project.order_index || 0,
-      parseInt(id)
+      parseInt(id, 10)
     ).run();
 
     return c.json({ success: true, message: 'Project updated successfully' });
@@ -283,7 +283,7 @@ app.delete('/api/admin/projects/:id', async (c) => {
 
     await c.env.DB.prepare(
       `DELETE FROM projects WHERE id = ?`
-    ).bind(parseInt(id)).run();
+    ).bind(parseInt(id, 10)).run();
 
     return c.json({ success: true, message: 'Project deleted successfully' });
   } catch (error) {
@@ -349,7 +349,7 @@ app.put('/api/admin/certifications/:id', async (c) => {
       cert.certificateUrl || '', 
       cert.thumbnailUrl || '', 
       cert.orderIndex || 0,
-      parseInt(id)
+      parseInt(id, 10)
     ).run();
 
     return c.json({ success: true, message: 'Certification updated successfully' });
@@ -364,7 +364,7 @@ app.delete('/api/admin/certifications/:id', async (c) => {
 
     await c.env.DB.prepare(
       `DELETE FROM certifications WHERE id = ?`
-    ).bind(parseInt(id)).run();
+    ).bind(parseInt(id, 10)).run();
 
     return c.json({ success: true, message: 'Certification deleted successfully' });
   } catch (error) {
@@ -440,7 +440,7 @@ app.put('/api/admin/experience/:id', async (c) => {
       badgesJson, 
       exp.logoUrl || '', 
       exp.orderIndex || 0,
-      parseInt(id)
+      parseInt(id, 10)
     ).run();
 
     return c.json({ success: true, message: 'Experience updated successfully' });
@@ -455,7 +455,7 @@ app.delete('/api/admin/experience/:id', async (c) => {
 
     await c.env.DB.prepare(
       `DELETE FROM work_experience WHERE id = ?`
-    ).bind(parseInt(id)).run();
+    ).bind(parseInt(id, 10)).run();
 
     return c.json({ success: true, message: 'Experience deleted successfully' });
   } catch (error) {
@@ -507,7 +507,7 @@ app.put('/api/admin/skills/:id', async (c) => {
       skill.name, 
       skill.category || '', 
       skill.orderIndex || 0,
-      parseInt(id)
+      parseInt(id, 10)
     ).run();
 
     return c.json({ success: true, message: 'Skill updated successfully' });
@@ -522,7 +522,7 @@ app.delete('/api/admin/skills/:id', async (c) => {
 
     await c.env.DB.prepare(
       `DELETE FROM skills WHERE id = ?`
-    ).bind(parseInt(id)).run();
+    ).bind(parseInt(id, 10)).run();
 
     return c.json({ success: true, message: 'Skill deleted successfully' });
   } catch (error) {
@@ -574,7 +574,7 @@ app.put('/api/admin/education/:id', async (c) => {
       edu.startYear || '',
       edu.endYear || '',
       edu.orderIndex || 0,
-      parseInt(id)
+      parseInt(id, 10)
     ).run();
 
     return c.json({ success: true, message: 'Education updated successfully' });
@@ -589,7 +589,7 @@ app.delete('/api/admin/education/:id', async (c) => {
 
     await c.env.DB.prepare(
       `DELETE FROM education WHERE id = ?`
-    ).bind(parseInt(id)).run();
+    ).bind(parseInt(id, 10)).run();
 
     return c.json({ success: true, message: 'Education deleted successfully' });
   } catch (error) {

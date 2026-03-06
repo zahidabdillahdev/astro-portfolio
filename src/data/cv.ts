@@ -2,7 +2,7 @@ export interface CV {
     name: string,
     title: string,
     location: string,
-    locationLink: string,
+    locationLink: string | null,
     about: string,
     summary: string,
     avatarUrl?: string,
@@ -20,7 +20,6 @@ export interface Contact {
     tel: string,
     social: Social[];
     resumeUrl?: string;
-    instagramUrl?: string;
 }
 
 export interface Social {
@@ -87,7 +86,6 @@ export const CV_DATA: CV = {
         email: "",
         tel: "",
         resumeUrl: "",
-        instagramUrl: "",
         social: [],
     },
     work: [],
