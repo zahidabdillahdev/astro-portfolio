@@ -32,16 +32,6 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       <textarea 
         id="about" 
         required
-        rows="3"
-        style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
-      ></textarea>
-    </div>
-    
-    <div>
-      <label for="summary" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Summary *</label>
-      <textarea 
-        id="summary" 
-        required
         rows="5"
         style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
       ></textarea>
@@ -153,8 +143,7 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       
       document.getElementById('full-name').value = profile.full_name || '';
       document.getElementById('title').value = profile.title || '';
-      document.getElementById('about').value = profile.about || '';
-      document.getElementById('summary').value = profile.summary || '';
+      document.getElementById('about').value = profile.about || profile.summary || '';
       document.getElementById('email').value = profile.email || '';
       document.getElementById('tel').value = profile.tel || '';
       document.getElementById('location').value = profile.location || '';
@@ -282,11 +271,13 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       }
       
       // 3. Save the rest of the profile data
+      const aboutValue = document.getElementById('about').value;
+
       const formData = {
         full_name: document.getElementById('full-name').value,
         title: document.getElementById('title').value,
-        about: document.getElementById('about').value,
-        summary: document.getElementById('summary').value,
+        about: aboutValue,
+        summary: aboutValue,
         email: document.getElementById('email').value,
         tel: document.getElementById('tel').value,
         location: document.getElementById('location').value,
