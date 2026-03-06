@@ -40,7 +40,7 @@ const mergedData = {
     summary: profile?.about || profile?.summary || CV_DATA.summary,
     avatarUrl: profile?.avatar_url || CV_DATA.avatarUrl,
     location: profile?.location || CV_DATA.location,
-    locationLink: profile?.location_link || CV_DATA.locationLink,
+    locationLink: null,
     personalWebsiteUrl: profile?.website_url || CV_DATA.personalWebsiteUrl,
     contact: {
         ...CV_DATA.contact,

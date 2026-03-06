@@ -28,7 +28,7 @@ app.get('/api/profile', async (c) => {
     if (!result) {
       return c.json({
         full_name: '', title: '', about: '', summary: '',
-        email: '', tel: '', location: '', location_link: '',
+        email: '', tel: '', location: '',
         avatar_url: '', resume_url: '', linkedin_url: ''
       });
     }
@@ -154,7 +154,7 @@ app.put('/api/admin/profile', async (c) => {
   try {
     const {
       full_name, title, about, summary,
-      email, tel, location, location_link,
+      email, tel, location,
       avatar_url, resume_url, linkedin_url
     } = await c.req.json();
 
@@ -168,26 +168,26 @@ app.put('/api/admin/profile', async (c) => {
       await c.env.DB.prepare(
         `UPDATE profile SET
           full_name = ?, title = ?, about = ?, summary = ?,
-          email = ?, tel = ?, location = ?, location_link = ?,
+          email = ?, tel = ?, location = ?,
           avatar_url = ?, resume_url = ?, linkedin_url = ?,
           updated_at = CURRENT_TIMESTAMP
         WHERE id = 1`
       ).bind(
         full_name, title, about, summary,
-        email, tel, location, location_link,
+        email, tel, location,
         avatar_url, resume_url, linkedin_url
       ).run();
     } else {
       // Create new profile
       await c.env.DB.prepare(
         `INSERT INTO profile
-          (id, full_name, title, about, summary, email, tel, location, location_link,
+          (id, full_name, title, about, summary, email, tel, location,
            avatar_url, resume_url, linkedin_url)
          VALUES
-          (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+          (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       ).bind(
         full_name, title, about, summary,
-        email, tel, location, location_link,
+        email, tel, location,
         avatar_url, resume_url, linkedin_url
       ).run();
     }

@@ -262,8 +262,8 @@ const firstName = profile?.full_name?.split(' ')[1] || profile?.full_name?.split
 
     @media (max-width: 768px) {
       #toast-container {
-        top: auto;
-        bottom: 1.5rem;
+        top: 1rem;
+        bottom: auto;
         right: 50%;
         transform: translateX(50%);
         width: calc(100% - 2rem);
@@ -279,7 +279,7 @@ const firstName = profile?.full_name?.split(' ')[1] || profile?.full_name?.split
     }
 
     @keyframes toast-in-mobile {
-      from { transform: translateY(1rem); opacity: 0; }
+      from { transform: translateY(-0.5rem); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
 
