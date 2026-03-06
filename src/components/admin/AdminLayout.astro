@@ -379,9 +379,30 @@ const firstName = profile?.full_name?.split(' ')[1] || profile?.full_name?.split
       }
 
       .main-content {
-        padding: 1.25rem;
+        padding: 1rem;
         margin-top: 56px;
+        width: 100%;
         max-width: 100%;
+        overflow-x: hidden;
+      }
+
+      /* Prevent form overflow on mobile */
+      form {
+        max-width: 100% !important;
+        width: 100%;
+      }
+
+      /* Modal inner padding reduced on small screens */
+      [id="modal"] > div {
+        padding: 1.25rem !important;
+        margin-top: 1rem !important;
+        margin-bottom: 1rem !important;
+      }
+
+      /* Table cells smaller on mobile */
+      th, td {
+        padding: 0.5rem !important;
+        font-size: 0.8125rem;
       }
 
       .sidebar-overlay {
