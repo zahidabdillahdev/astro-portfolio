@@ -61,12 +61,31 @@ const mergedData = {
 
 const {name, projects, certifications} = mergedData;
 const pageTitle = name ? `${name} | CV` : "Digital Marketing Portfolio";
+
+const siteUrl = 'https://zahidabdillah.dev';
+const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": mergedData.name || undefined,
+    "jobTitle": mergedData.about || undefined,
+    "description": mergedData.summary || undefined,
+    "url": siteUrl,
+    "image": mergedData.avatarUrl || undefined,
+    "email": mergedData.contact.email || undefined,
+    "telephone": mergedData.contact.tel || undefined,
+    "address": mergedData.location ? {
+        "@type": "PostalAddress",
+        "addressLocality": mergedData.location
+    } : undefined,
+    "sameAs": mergedData.contact.social?.map((s: any) => s.url).filter(Boolean) || []
+};
 ---
 <Layout
     title={pageTitle}
     description={mergedData.summary || "Digital Marketing Portfolio"}
     image={mergedData.avatarUrl}
     favicon={mergedData.avatarUrl}
+    jsonLd={jsonLd}
 >
     <main class="container relative mx-auto scroll-my-12 overflow-auto p-4 print:p-11 md:p-16" id="main-content">
         <section class="mx-auto w-full max-w-2xl space-y-8 bg-white print:space-y-4" aria-label="CV Content">

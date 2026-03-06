@@ -6,9 +6,10 @@ export interface Props {
     description: string;
     image?: string;
     favicon?: string;
+    jsonLd?: object;
 }
 
-const {title, description, image, favicon} = Astro.props;
+const {title, description, image, favicon, jsonLd} = Astro.props;
 
 const faviconType = favicon
     ? (favicon.endsWith('.webp') ? 'image/webp' : favicon.endsWith('.png') ? 'image/png' : 'image/jpeg')
@@ -38,6 +39,8 @@ const socialImageURL = image ? (image.startsWith('http') ? image : new URL(image
     <meta name="twitter:title" content={title}/>
     <meta name="twitter:description" content={description}/>
     {socialImageURL && <meta name="twitter:image" content={socialImageURL}/>}
+
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)}/>}
 </head>
 <body>
 <slot/>
