@@ -14,6 +14,21 @@ import Contact from "../components/Contact.astro";
 // Fetch data from API during build
 const workerUrl = 'https://portfolio-api.muhammadzahidabdillah.workers.dev';
 
+function getOptimizedAssetUrl(url: string | undefined, options: string): string | undefined {
+    if (!url) return undefined;
+
+    try {
+        const parsed = new URL(url);
+        if (parsed.hostname !== 'assets.zahidabdillah.dev') {
+            return url;
+        }
+
+        return `${parsed.origin}/cdn-cgi/image/${options}${parsed.pathname}${parsed.search}`;
+    } catch {
+        return url;
+    }
+}
+
 async function fetchData(endpoint: string): Promise<any> {
     try {
         const response = await fetch(`${workerUrl}${endpoint}`);
@@ -61,6 +76,8 @@ const mergedData = {
 
 const {name, projects, certifications} = mergedData;
 const pageTitle = name ? `${name} | CV` : "Digital Marketing Portfolio";
+const optimizedAvatarUrl = getOptimizedAssetUrl(mergedData.avatarUrl, 'width=224,quality=85,format=auto');
+const optimizedFaviconUrl = getOptimizedAssetUrl(mergedData.avatarUrl, 'width=64,quality=85,format=auto');
 
 const siteUrl = 'https://zahidabdillah.dev';
 const jsonLd = {
@@ -84,12 +101,12 @@ const jsonLd = {
     title={pageTitle}
     description={mergedData.summary || "Digital Marketing Portfolio"}
     image={mergedData.avatarUrl}
-    favicon={mergedData.avatarUrl}
+    favicon={optimizedFaviconUrl}
     jsonLd={jsonLd}
 >
     <main class="container relative mx-auto scroll-my-12 overflow-auto p-4 print:p-11 md:p-16" id="main-content">
         <section class="mx-auto w-full max-w-2xl space-y-8 bg-white print:space-y-4" aria-label="CV Content">
-            <Header data={mergedData}/>
+            <Header data={{ ...mergedData, avatarUrl: optimizedAvatarUrl || mergedData.avatarUrl }}/>
             <div class="space-y-8 print:space-y-4">
                 <Summary data={mergedData}/>
                 <WorkExperience data={mergedData}/>

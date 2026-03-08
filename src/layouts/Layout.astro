@@ -42,7 +42,6 @@ const socialImageURL = image ? (image.startsWith('http') ? image : new URL(image
         />
     </noscript>
     <link rel="icon" type={faviconType} href={favicon || '/favicon.svg'}/>
-    {favicon && <link rel="preload" as="image" href={favicon} fetchpriority="high"/>}
     <link rel="sitemap" href="/sitemap-index.xml"/>
     <title>{title}</title>
     <meta name="description" content={description}/>
