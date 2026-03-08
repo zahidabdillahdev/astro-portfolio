@@ -6,6 +6,12 @@ export interface Props {
 }
 
 const { certification } = Astro.props;
+const issueDate = certification.issueDate || certification.issue_date;
+const expiryDate = certification.expiryDate || certification.expiry_date;
+const certificateUrl = certification.certificateUrl || certification.certificate_url;
+const credentialUrl = certification.credentialUrl || certification.credential_url;
+const actionUrl = certificateUrl || credentialUrl;
+const actionLabel = certificateUrl ? 'Open PDF Certificate' : 'View Credential';
 ---
 
 <div class="flex flex-col h-full border border-gray-200 rounded-lg p-4">
@@ -18,17 +24,17 @@ const { certification } = Astro.props;
   
   <div class="mt-2 mb-4">
     <p class="text-sm text-gray-700">
-      Issued: <time>{new Date(certification.issueDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}</time>
-      {certification.expiryDate && (
-        <> · Expires: <time>{new Date(certification.expiryDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}</time></>
+      Issued: <time>{new Date(issueDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}</time>
+      {expiryDate && (
+        <> · Expires: <time>{new Date(expiryDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}</time></>
       )}
     </p>
   </div>
   
   <div class="mt-auto flex gap-2">
-    {certification.credentialUrl && (
-      <LinkButton href={certification.credentialUrl} ariaLabel="View Credential">
-        <span class="px-2 text-xs">View</span>
+    {actionUrl && (
+      <LinkButton href={actionUrl} ariaLabel={actionLabel}>
+        <span class="px-2 text-xs">{certificateUrl ? 'Open PDF' : 'View'}</span>
       </LinkButton>
     )}
   </div>

@@ -95,6 +95,18 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
             style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
           />
         </div>
+
+        <div>
+          <label for="certificate-file" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Certificate PDF</label>
+          <input
+            type="file"
+            id="certificate-file"
+            accept=".pdf,application/pdf"
+            style="display: block; margin-bottom: 0.375rem;"
+          />
+          <input type="hidden" id="certificate-url" />
+          <div id="certificate-file-status" style="color: #71717a; font-size: 0.8125rem;">No PDF uploaded yet.</div>
+        </div>
         
         <div>
           <label for="thumbnail-url" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Icon/Logo URL (Optional)</label>
@@ -158,6 +170,9 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
     tbody.innerHTML = '';
     
     certifications.forEach(cert => {
+      const certificateAction = cert.certificate_url
+        ? `<a href="${cert.certificate_url}" target="_blank" rel="noopener noreferrer" style="margin-left: 0.5rem; color: #18181b;">PDF</a>`
+        : '';
       const row = document.createElement('tr');
       row.innerHTML = `
         <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">${cert.title}</td>
@@ -165,6 +180,7 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
         <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">${cert.issue_date || ''}</td>
         <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">
           <button onclick="openModal(${cert.id})" style="margin-right: 0.5rem; padding: 0.25rem 0.5rem; background-color: #f3f4f6; border: 1px solid #d1d5db; border-radius: 0.25rem; cursor: pointer;">Edit</button>
+          ${certificateAction}
           <button onclick="deleteCertification(${cert.id})" style="padding: 0.25rem 0.5rem; background-color: #fee2e2; border: 1px solid #d1d5db; border-radius: 0.25rem; cursor: pointer;">Delete</button>
         </td>
       `;
@@ -181,6 +197,8 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
     // Reset form
     form.reset();
     document.getElementById('certification-id').value = '';
+    document.getElementById('certificate-url').value = '';
+    updateCertificateFileStatus('');
     
     if (certId) {
       // Editing existing certification
@@ -197,6 +215,8 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
           document.getElementById('expiry-date').value = cert.expiry_date || '';
           document.getElementById('credential-id').value = cert.credential_id || '';
           document.getElementById('credential-url').value = cert.credential_url || '';
+          document.getElementById('certificate-url').value = cert.certificate_url || '';
+          updateCertificateFileStatus(cert.certificate_url || '');
           document.getElementById('thumbnail-url').value = cert.thumbnail_url || '';
           document.getElementById('order-index').value = cert.order_index || 0;
         }
@@ -213,6 +233,41 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
   function closeModal() {
     document.getElementById('modal').style.display = 'none';
   }
+
+  function updateCertificateFileStatus(url, fileName = '') {
+    const status = document.getElementById('certificate-file-status');
+
+    if (fileName) {
+      status.textContent = `Selected: ${fileName}`;
+      return;
+    }
+
+    if (url) {
+      status.innerHTML = `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #18181b;">Current PDF</a>`;
+      return;
+    }
+
+    status.textContent = 'No PDF uploaded yet.';
+  }
+
+  document.getElementById('certificate-file').addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+
+    if (!file) {
+      updateCertificateFileStatus(document.getElementById('certificate-url').value);
+      return;
+    }
+
+    const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+    if (!isPdf) {
+      e.target.value = '';
+      showToast('Only PDF files are allowed', 'error');
+      updateCertificateFileStatus(document.getElementById('certificate-url').value);
+      return;
+    }
+
+    updateCertificateFileStatus('', file.name);
+  });
   
   // Handle form submission
   document.getElementById('certification-form').addEventListener('submit', async (e) => {
@@ -226,6 +281,24 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
     const certId = document.getElementById('certification-id').value;
     
     try {
+      let certificateUrl = document.getElementById('certificate-url').value;
+      const certificateFile = document.getElementById('certificate-file').files[0];
+
+      if (certificateFile) {
+        const isPdf = certificateFile.type === 'application/pdf' || certificateFile.name.toLowerCase().endsWith('.pdf');
+        if (!isPdf) {
+          throw new Error('Only PDF files are allowed');
+        }
+
+        showToast('Uploading certificate PDF...');
+        try {
+          certificateUrl = await uploadFile(certificateFile, 'certifications');
+          document.getElementById('certificate-url').value = certificateUrl;
+        } catch (uploadError) {
+          throw new Error('Failed to upload certificate PDF: ' + uploadError.message);
+        }
+      }
+
       const formData = {
         id: certId ? parseInt(certId) : undefined,
         title: document.getElementById('title').value,
@@ -234,6 +307,7 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
         expiryDate: document.getElementById('expiry-date').value,
         credentialId: document.getElementById('credential-id').value,
         credentialUrl: document.getElementById('credential-url').value,
+        certificateUrl,
         thumbnailUrl: document.getElementById('thumbnail-url').value,
         orderIndex: parseInt(document.getElementById('order-index').value) || 0
       };

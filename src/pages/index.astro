@@ -268,8 +268,13 @@ const jsonLd = {
       card.appendChild(meta);
 
       const footer = createElement('div', 'mt-auto flex gap-2');
-      if (certification.credential_url) {
-        footer.appendChild(createRawLinkButton(certification.credential_url, 'View Credential', 'View', 'px-2 text-xs'));
+      const certificateUrl = certification.certificate_url || certification.certificateUrl;
+      const credentialUrl = certification.credential_url || certification.credentialUrl;
+
+      if (certificateUrl) {
+        footer.appendChild(createRawLinkButton(certificateUrl, 'Open PDF Certificate', 'Open PDF', 'px-2 text-xs'));
+      } else if (credentialUrl) {
+        footer.appendChild(createRawLinkButton(credentialUrl, 'View Credential', 'View', 'px-2 text-xs'));
       }
       card.appendChild(footer);
       container.appendChild(card);

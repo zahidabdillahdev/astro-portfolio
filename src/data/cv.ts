@@ -65,11 +65,19 @@ export interface Certification {
     title: string; 
     issuer: string; 
     issueDate: string; 
+    issue_date?: string;
     expiryDate?: string;
+    expiry_date?: string;
     credentialId?: string; 
+    credential_id?: string;
     credentialUrl?: string;
+    credential_url?: string;
+    certificateUrl?: string;
+    certificate_url?: string;
     thumbnailUrl?: string; 
+    thumbnail_url?: string;
     orderIndex?: number;
+    order_index?: number;
 }
 
 export const CV_DATA: CV = {
