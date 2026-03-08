@@ -14,8 +14,8 @@ const {name, about, personalWebsiteUrl, contact, location, locationLink, avatarU
 const countryMatch = location?.match(/,\s*([A-Z]{2})$/);
 const countryCode = countryMatch ? countryMatch[1].toLowerCase() : null;
 ---
-<header class="flex items-center justify-between">
-    <div class="flex-1 space-y-1.5">
+<header class="flex items-start justify-between gap-4 sm:items-center">
+    <div class="min-w-0 flex-1 space-y-1.5 pt-1 sm:pt-0">
         <h1 class="text-2xl font-bold" id="cv-name">
             {name || "Your Name"}
         </h1>
@@ -110,10 +110,10 @@ const countryCode = countryMatch ? countryMatch[1].toLowerCase() : null;
             ))}
         </div>
     </div>
-    <span class="relative flex shrink-0 overflow-hidden rounded-xl size-28 bg-gray-100 items-center justify-center border border-gray-200"
+    <span class="relative flex h-32 w-32 shrink-0 overflow-hidden rounded-xl bg-gray-100 items-center justify-center border border-gray-200 sm:h-36 sm:w-36"
           aria-hidden="true">
         {avatarUrl ? (
-            <img class="aspect-square h-full w-full object-cover" alt={`${name || 'User'}'s profile picture`} src={avatarUrl} width="112" height="112" fetchpriority="high" decoding="async"/>
+            <img class="aspect-square h-full w-full object-cover" alt={`${name || 'User'}'s profile picture`} src={avatarUrl} width="128" height="128" fetchpriority="high" decoding="async"/>
         ) : (
             <div class="text-gray-400">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-12">
