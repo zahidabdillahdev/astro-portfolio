@@ -23,7 +23,8 @@ function getOptimizedAssetUrl(url: string | undefined, options: string): string 
             return url;
         }
 
-        return `${parsed.origin}/cdn-cgi/image/${options}${parsed.pathname.startsWith('/') ? '' : '/'}${parsed.pathname}${parsed.search}`;
+        const assetPath = parsed.pathname.replace(/^\/+/, '');
+        return `${parsed.origin}/cdn-cgi/image/${options}/${assetPath}${parsed.search}`;
     } catch {
         return url;
     }
@@ -264,6 +265,9 @@ const jsonLd = {
         metaText.appendChild(createTimeNode(certification.expiry_date));
       }
       meta.appendChild(metaText);
+      if (certification.credential_id || certification.credentialId) {
+        meta.appendChild(createTextElement('p', 'text-sm text-gray-600 mt-1', `Credential ID: ${certification.credential_id || certification.credentialId}`));
+      }
       card.appendChild(meta);
 
       const footer = createElement('div', 'mt-auto flex gap-2');

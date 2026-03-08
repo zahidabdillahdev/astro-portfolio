@@ -12,7 +12,11 @@ export interface Props {
 const {title, description, image, favicon, jsonLd} = Astro.props;
 
 const faviconType = favicon
-    ? (favicon.endsWith('.webp') ? 'image/webp' : favicon.endsWith('.png') ? 'image/png' : 'image/jpeg')
+    ? (favicon.includes('format=webp') || favicon.endsWith('.webp')
+        ? 'image/webp'
+        : favicon.includes('format=png') || favicon.endsWith('.png')
+            ? 'image/png'
+            : undefined)
     : 'image/svg+xml';
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
@@ -41,7 +45,7 @@ const socialImageURL = image ? (image.startsWith('http') ? image : new URL(image
             href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap"
         />
     </noscript>
-    <link rel="icon" type={faviconType} href={favicon || '/favicon.svg'}/>
+    <link rel="icon" href={favicon || '/favicon.svg'} type={faviconType}/>
     <link rel="sitemap" href="/sitemap-index.xml"/>
     <title>{title}</title>
     <meta name="description" content={description}/>

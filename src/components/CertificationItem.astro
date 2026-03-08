@@ -9,6 +9,7 @@ const { certification } = Astro.props;
 const issueDate = certification.issueDate || certification.issue_date;
 const expiryDate = certification.expiryDate || certification.expiry_date;
 const certificateUrl = certification.certificateUrl || certification.certificate_url;
+const credentialId = certification.credentialId || certification.credential_id;
 ---
 
 <div class="flex flex-col h-full border border-gray-200 rounded-lg p-4">
@@ -26,6 +27,7 @@ const certificateUrl = certification.certificateUrl || certification.certificate
         <> · Expires: <time>{new Date(expiryDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}</time></>
       )}
     </p>
+    {credentialId && <p class="mt-1 text-sm text-gray-600">Credential ID: {credentialId}</p>}
   </div>
   
   <div class="mt-auto flex gap-2">
