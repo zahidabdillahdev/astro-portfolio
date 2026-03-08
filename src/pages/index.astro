@@ -103,3 +103,220 @@ const jsonLd = {
         <PrintInstruction/>
     </main>
 </Layout>
+
+<script is:inline define:vars={{ workerUrl }}>
+  const liveSections = [
+    { endpoint: '/api/experience', render: renderExperience, containerId: 'experience-list' },
+    { endpoint: '/api/projects', render: renderProjects, containerId: 'projects-list' },
+    { endpoint: '/api/certifications', render: renderCertifications, containerId: 'certifications-list' }
+  ];
+
+  document.addEventListener('DOMContentLoaded', () => {
+    liveSections.forEach(({ endpoint, render, containerId }) => {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      fetch(`${workerUrl}${endpoint}`)
+        .then((response) => response.ok ? response.json() : Promise.reject(new Error(`Failed to fetch ${endpoint}`)))
+        .then((items) => {
+          if (!Array.isArray(items)) return;
+          render(container, items);
+        })
+        .catch((error) => {
+          console.error(`Live refresh failed for ${endpoint}:`, error);
+        });
+    });
+  });
+
+  function renderProjects(container, projects) {
+    container.replaceChildren();
+
+    if (!projects.length) {
+      container.appendChild(createEmptyState('Significant projects and case studies will be listed here shortly.'));
+      return;
+    }
+
+    projects.forEach((project) => {
+      const card = createElement('div', 'group flex flex-col h-full border border-gray-200 rounded-lg p-4 hover:border-black transition-colors duration-300');
+      const header = createElement('div', 'flex justify-between items-start gap-4');
+      const headingWrap = document.createElement('div');
+      headingWrap.appendChild(createTextElement('h3', 'text-lg font-bold mb-1', project.title || 'Untitled Project'));
+
+      if (project.client) {
+        headingWrap.appendChild(createTextElement('p', 'text-sm text-gray-600 mb-2', `Client: ${project.client}`));
+      }
+
+      header.appendChild(headingWrap);
+      card.appendChild(header);
+      card.appendChild(createTextElement('p', 'text-sm text-gray-700 mt-2 mb-4 flex-grow', project.description || ''));
+
+      const footer = createElement('div', 'mt-auto pt-2');
+      if (Array.isArray(project.tags) && project.tags.length) {
+        const tags = createElement('div', 'flex flex-wrap gap-2 mb-4');
+        project.tags.forEach((tag) => {
+          tags.appendChild(createTextElement('span', 'inline-flex items-center rounded-md border px-2 py-0.5 text-xs font-semibold transition-colors', tag));
+        });
+        footer.appendChild(tags);
+      }
+
+      if (project.results && Object.keys(project.results).length) {
+        const resultsWrap = createElement('div', 'mb-4');
+        resultsWrap.appendChild(createTextElement('h4', 'text-sm font-semibold mb-2', 'Results:'));
+        const list = createElement('ul', 'space-y-1');
+        Object.entries(project.results).forEach(([key, value]) => {
+          const item = createElement('li', 'flex justify-between text-xs');
+          item.appendChild(createTextElement('span', 'text-gray-600', `${key}:`));
+          item.appendChild(createTextElement('span', 'font-medium', String(value)));
+          list.appendChild(item);
+        });
+        resultsWrap.appendChild(list);
+        footer.appendChild(resultsWrap);
+      }
+
+      if (project.link_url) {
+        footer.appendChild(createLinkButton(project.link_url, project.link_type));
+      }
+
+      card.appendChild(footer);
+      container.appendChild(card);
+    });
+  }
+
+  function renderCertifications(container, certifications) {
+    container.replaceChildren();
+
+    if (!certifications.length) {
+      container.appendChild(createEmptyState('Professional credentials and active certifications will be updated soon.'));
+      return;
+    }
+
+    certifications.forEach((certification) => {
+      const card = createElement('div', 'flex flex-col h-full border border-gray-200 rounded-lg p-4');
+      const header = createElement('div', 'flex justify-between items-start gap-4');
+      const headingWrap = document.createElement('div');
+      headingWrap.appendChild(createTextElement('h3', 'text-lg font-bold mb-1', certification.title || 'Untitled Certification'));
+      headingWrap.appendChild(createTextElement('p', 'text-sm text-gray-600 mb-2', certification.issuer || ''));
+      header.appendChild(headingWrap);
+      card.appendChild(header);
+
+      const meta = createElement('div', 'mt-2 mb-4');
+      const metaText = createElement('p', 'text-sm text-gray-700');
+      metaText.append('Issued: ');
+      metaText.appendChild(createTimeNode(certification.issue_date));
+      if (certification.expiry_date) {
+        metaText.append(' · Expires: ');
+        metaText.appendChild(createTimeNode(certification.expiry_date));
+      }
+      meta.appendChild(metaText);
+      card.appendChild(meta);
+
+      const footer = createElement('div', 'mt-auto flex gap-2');
+      if (certification.credential_url) {
+        footer.appendChild(createRawLinkButton(certification.credential_url, 'View Credential', 'View', 'px-2 text-xs'));
+      }
+      card.appendChild(footer);
+      container.appendChild(card);
+    });
+  }
+
+  function renderExperience(container, experiences) {
+    container.replaceChildren();
+
+    if (!experiences.length) {
+      container.appendChild(createEmptyState('Professional work history and career milestones are currently being updated.'));
+      return;
+    }
+
+    experiences.forEach((item) => {
+      const article = document.createElement('article');
+      article.setAttribute('role', 'article');
+      const shell = createElement('div', 'rounded-lg bg-card text-card-foreground py-1 print:py-0');
+      const header = createElement('div', 'flex flex-col space-y-1.5 print:space-y-1');
+      const topRow = createElement('div', 'flex items-center justify-between gap-x-2 text-base');
+      const companyTitle = createElement('h3', 'inline-flex items-center justify-center gap-x-1 font-semibold leading-none print:text-sm');
+      const companyLink = document.createElement('a');
+      companyLink.className = 'hover:underline';
+      companyLink.href = item.company_link || '#';
+      companyLink.target = '_blank';
+      companyLink.rel = 'noopener noreferrer';
+      companyLink.setAttribute('aria-label', `${item.company || 'Company'} company link`);
+      companyLink.textContent = item.company || 'Company';
+      companyTitle.appendChild(companyLink);
+      topRow.appendChild(companyTitle);
+      topRow.appendChild(createTextElement('div', 'text-sm tabular-nums text-gray-500', `${item.start_date || ''} - ${item.end_date || 'Present'}`));
+      header.appendChild(topRow);
+      header.appendChild(createTextElement('h4', 'text-sm font-semibold leading-none flex flex-col space-y-1.5 print:text-[12px]', item.role || ''));
+      shell.appendChild(header);
+
+      const body = createElement('div', 'text-pretty text-sm text-muted-foreground');
+      const bodyInner = createElement('div', 'mt-2 text-xm text-foreground/80 print:mt-1 print:text-[12px] text-pretty');
+      if (item.description) {
+        bodyInner.append(document.createTextNode(item.description));
+      }
+
+      if (Array.isArray(item.achievements) && item.achievements.length) {
+        const list = createElement('ul', 'list-inside list-disc');
+        item.achievements.forEach((achievement) => {
+          list.appendChild(createTextElement('li', '', achievement));
+        });
+        bodyInner.appendChild(list);
+      }
+
+      body.appendChild(bodyInner);
+      shell.appendChild(body);
+      article.appendChild(shell);
+      container.appendChild(article);
+    });
+  }
+
+  function createLinkButton(href, linkType) {
+    const label = getProjectLinkLabel(linkType);
+    return createRawLinkButton(href, label, label, 'px-2');
+  }
+
+  function createRawLinkButton(href, ariaLabel, text, spanClassName) {
+    const link = createElement('a', 'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground size-8');
+    link.href = href;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.setAttribute('aria-label', ariaLabel);
+    link.appendChild(createTextElement('span', spanClassName, text));
+    return link;
+  }
+
+  function getProjectLinkLabel(linkType) {
+    if (linkType === 'pdf') return 'Download PDF';
+    if (linkType === 'gdrive') return 'Open Drive';
+    if (linkType === 'url') return 'View Project';
+    return 'View Document';
+  }
+
+  function createTimeNode(value) {
+    const time = document.createElement('time');
+    time.textContent = formatMonthYear(value);
+    return time;
+  }
+
+  function formatMonthYear(value) {
+    if (!value) return '';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+  }
+
+  function createEmptyState(text) {
+    return createTextElement('p', 'text-sm text-muted-foreground italic', text);
+  }
+
+  function createTextElement(tagName, className, text) {
+    const element = createElement(tagName, className);
+    element.textContent = text;
+    return element;
+  }
+
+  function createElement(tagName, className) {
+    const element = document.createElement(tagName);
+    if (className) element.className = className;
+    return element;
+  }
+</script>

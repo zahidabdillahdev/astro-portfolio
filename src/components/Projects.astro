@@ -10,7 +10,7 @@ const { projects }: Props = Astro.props;
 
 <section id="projects" class="flex min-h-0 flex-col gap-y-3 print:gap-y-1">
   <h2 class="text-xl font-bold">Projects</h2>
-  <div class="flex flex-col gap-y-4">
+  <div id="projects-list" class="flex flex-col gap-y-4">
     {projects && projects.length > 0 ? (
       projects.map((project) => (
         <ProjectItem project={project} />
