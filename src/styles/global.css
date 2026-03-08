@@ -98,6 +98,8 @@
         background-color: hsl(var(--background));
         color: hsl(var(--foreground));
         font-family: var(--font-family-base);
+        font-optical-sizing: auto;
+        font-style: normal;
     }
 
     button,
@@ -105,6 +107,16 @@
     textarea,
     select {
         font: inherit;
+    }
+
+    strong,
+    b {
+        font-weight: 700;
+    }
+
+    em,
+    i {
+        font-style: italic;
     }
 }
 
