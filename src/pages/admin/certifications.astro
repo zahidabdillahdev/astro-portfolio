@@ -149,7 +149,8 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
   async function loadCertifications() {
     try {
       const certifications = await api('GET', '/api/certifications');
-      renderCertificationsTable(certifications);
+      const rows = Array.isArray(certifications) ? certifications : certifications?.results || [];
+      renderCertificationsTable(rows);
     } catch (error) {
       console.error('Error loading certifications:', error);
     }
@@ -159,6 +160,11 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
   function renderCertificationsTable(certifications) {
     const tbody = document.getElementById('certifications-table-body');
     tbody.innerHTML = '';
+
+    if (!Array.isArray(certifications) || certifications.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" style="padding: 1rem; text-align: center; color: #6b7280;">No certifications found. Click "+ Add New Certification" to get started.</td></tr>';
+      return;
+    }
     
     certifications.forEach(cert => {
       const certificateAction = cert.certificate_url
@@ -197,7 +203,8 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       
       // Find the certification and populate the form
       api('GET', '/api/certifications').then(certs => {
-        const cert = certs.find(c => c.id === certId);
+        const rows = Array.isArray(certs) ? certs : certs?.results || [];
+        const cert = rows.find(c => Number(c.id) === Number(certId));
         if (cert) {
           document.getElementById('certification-id').value = cert.id;
           document.getElementById('title').value = cert.title;

@@ -15,6 +15,31 @@ interface Env {
 
 const app = new Hono<{ Bindings: Env }>();
 
+function getRows<T = Record<string, unknown>>(result: D1Result<T> | null | undefined): T[] {
+  return (result?.results as T[] | undefined) || [];
+}
+
+function getAssetKeyFromUrl(url: string | null | undefined, assetsBaseUrl: string): string | null {
+  if (!url) return null;
+
+  try {
+    const assetUrl = new URL(url);
+    const assetsBase = new URL(assetsBaseUrl);
+    if (assetUrl.origin !== assetsBase.origin) return null;
+
+    return assetUrl.pathname.replace(/^\/+/, '') || null;
+  } catch {
+    return null;
+  }
+}
+
+async function deleteManagedAsset(c: any, url: string | null | undefined) {
+  const key = getAssetKeyFromUrl(url, c.env.ASSETS_URL);
+  if (!key) return;
+
+  await c.env.STORAGE.delete(key);
+}
+
 // Enable CORS for all routes
 app.use('*', cors());
 
@@ -46,7 +71,7 @@ app.get('/api/projects', async (c) => {
     ).all();
 
     // Parse JSON fields
-    const projects = result.results.map((project: any) => {
+    const projects = getRows(result).map((project: any) => {
       let parsedResults = {};
       let parsedTags = [];
       
@@ -81,7 +106,7 @@ app.get('/api/certifications', async (c) => {
       `SELECT * FROM certifications ORDER BY order_index ASC`
     ).all();
 
-    return c.json(result);
+    return c.json(getRows(result));
   } catch (error) {
     return c.json({ error: 'Failed to fetch certifications' }, 500);
   }
@@ -94,7 +119,7 @@ app.get('/api/experience', async (c) => {
     ).all();
 
     // Parse JSON fields
-    const experiences = result.results.map((exp: any) => {
+    const experiences = getRows(result).map((exp: any) => {
       let parsedAchievements = [];
       let parsedBadges = [];
       
@@ -129,7 +154,7 @@ app.get('/api/skills', async (c) => {
       `SELECT * FROM skills ORDER BY order_index ASC`
     ).all();
 
-    return c.json(result.results);
+    return c.json(getRows(result));
   } catch (error) {
     return c.json({ error: 'Failed to fetch skills' }, 500);
   }
@@ -141,7 +166,7 @@ app.get('/api/education', async (c) => {
       `SELECT * FROM education ORDER BY order_index ASC`
     ).all();
 
-    return c.json(result.results);
+    return c.json(getRows(result));
   } catch (error) {
     return c.json({ error: 'Failed to fetch education' }, 500);
   }
@@ -152,18 +177,45 @@ app.use('/api/admin/*', cfAccessMiddleware);
 
 app.put('/api/admin/profile', async (c) => {
   try {
-    const {
-      full_name, title, about, summary,
-      email, tel, location,
-      avatar_url, resume_url, linkedin_url
-    } = await c.req.json();
+    const payload = await c.req.json();
 
     // Check if profile exists, if not create it
-    const profileCheck = await c.env.DB.prepare(
-      `SELECT id FROM profile WHERE id = 1`
+    const existingProfile = await c.env.DB.prepare(
+      `SELECT * FROM profile WHERE id = 1`
     ).first();
 
-    if (profileCheck) {
+    const mergedProfile = {
+      full_name: '',
+      title: '',
+      about: '',
+      summary: '',
+      email: '',
+      tel: '',
+      location: '',
+      avatar_url: '',
+      resume_url: '',
+      linkedin_url: '',
+      ...(existingProfile || {}),
+      ...payload
+    } as Record<string, string>;
+
+    if (
+      typeof payload.avatar_url !== 'undefined' &&
+      existingProfile &&
+      payload.avatar_url !== existingProfile.avatar_url
+    ) {
+      await deleteManagedAsset(c, existingProfile.avatar_url as string | undefined);
+    }
+
+    if (
+      typeof payload.resume_url !== 'undefined' &&
+      existingProfile &&
+      payload.resume_url !== existingProfile.resume_url
+    ) {
+      await deleteManagedAsset(c, existingProfile.resume_url as string | undefined);
+    }
+
+    if (existingProfile) {
       // Update existing profile
       await c.env.DB.prepare(
         `UPDATE profile SET
@@ -173,9 +225,16 @@ app.put('/api/admin/profile', async (c) => {
           updated_at = CURRENT_TIMESTAMP
         WHERE id = 1`
       ).bind(
-        full_name, title, about, summary,
-        email, tel, location,
-        avatar_url, resume_url, linkedin_url
+        mergedProfile.full_name,
+        mergedProfile.title,
+        mergedProfile.about,
+        mergedProfile.summary,
+        mergedProfile.email,
+        mergedProfile.tel,
+        mergedProfile.location,
+        mergedProfile.avatar_url,
+        mergedProfile.resume_url,
+        mergedProfile.linkedin_url
       ).run();
     } else {
       // Create new profile
@@ -186,9 +245,16 @@ app.put('/api/admin/profile', async (c) => {
          VALUES
           (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       ).bind(
-        full_name, title, about, summary,
-        email, tel, location,
-        avatar_url, resume_url, linkedin_url
+        mergedProfile.full_name,
+        mergedProfile.title,
+        mergedProfile.about,
+        mergedProfile.summary,
+        mergedProfile.email,
+        mergedProfile.tel,
+        mergedProfile.location,
+        mergedProfile.avatar_url,
+        mergedProfile.resume_url,
+        mergedProfile.linkedin_url
       ).run();
     }
 
@@ -330,6 +396,21 @@ app.put('/api/admin/certifications/:id', async (c) => {
   try {
     const id = c.req.param('id');
     const cert = await c.req.json();
+    const certId = parseInt(id, 10);
+    const existingCert = await c.env.DB.prepare(
+      `SELECT * FROM certifications WHERE id = ?`
+    ).bind(certId).first();
+
+    if (!existingCert) {
+      return c.json({ error: 'Certification not found' }, 404);
+    }
+
+    if (
+      typeof cert.certificateUrl !== 'undefined' &&
+      cert.certificateUrl !== existingCert.certificate_url
+    ) {
+      await deleteManagedAsset(c, existingCert.certificate_url as string | undefined);
+    }
 
     const stmt = c.env.DB.prepare(
       `UPDATE certifications SET 
@@ -347,7 +428,7 @@ app.put('/api/admin/certifications/:id', async (c) => {
       cert.certificateUrl || '', 
       cert.thumbnailUrl || '', 
       cert.orderIndex || 0,
-      parseInt(id, 10)
+      certId
     ).run();
 
     return c.json({ success: true, message: 'Certification updated successfully' });
@@ -359,10 +440,20 @@ app.put('/api/admin/certifications/:id', async (c) => {
 app.delete('/api/admin/certifications/:id', async (c) => {
   try {
     const id = c.req.param('id');
+    const certId = parseInt(id, 10);
+    const existingCert = await c.env.DB.prepare(
+      `SELECT * FROM certifications WHERE id = ?`
+    ).bind(certId).first();
+
+    if (!existingCert) {
+      return c.json({ error: 'Certification not found' }, 404);
+    }
 
     await c.env.DB.prepare(
       `DELETE FROM certifications WHERE id = ?`
-    ).bind(parseInt(id, 10)).run();
+    ).bind(certId).run();
+
+    await deleteManagedAsset(c, existingCert.certificate_url as string | undefined);
 
     return c.json({ success: true, message: 'Certification deleted successfully' });
   } catch (error) {
@@ -608,6 +699,13 @@ app.post('/api/admin/upload', async (c) => {
 
     if (!path) {
       return c.json({ error: 'No path provided' }, 400);
+    }
+
+    if (path === 'certifications') {
+      const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+      if (!isPdf) {
+        return c.json({ error: 'Only PDF files are allowed for certifications' }, 400);
+      }
     }
 
     // Generate a unique filename to prevent conflicts
