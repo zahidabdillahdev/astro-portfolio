@@ -111,7 +111,7 @@ const jsonLd = {
     { endpoint: '/api/certifications', render: renderCertifications, containerId: 'certifications-list' }
   ];
 
-  document.addEventListener('DOMContentLoaded', () => {
+  function refreshLiveSections() {
     liveSections.forEach(({ endpoint, render, containerId }) => {
       const container = document.getElementById(containerId);
       if (!container) return;
@@ -126,6 +126,15 @@ const jsonLd = {
           console.error(`Live refresh failed for ${endpoint}:`, error);
         });
     });
+  }
+
+  window.addEventListener('load', () => {
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(refreshLiveSections, { timeout: 2000 });
+      return;
+    }
+
+    window.setTimeout(refreshLiveSections, 250);
   });
 
   function renderProjects(container, projects) {
