@@ -88,15 +88,6 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
         </div>
         
         <div>
-          <label for="credential-url" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Credential URL</label>
-          <input 
-            type="text" 
-            id="credential-url" 
-            style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
-          />
-        </div>
-
-        <div>
           <label for="certificate-file" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Certificate PDF</label>
           <input
             type="file"
@@ -214,7 +205,6 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
           document.getElementById('issue-date').value = cert.issue_date || '';
           document.getElementById('expiry-date').value = cert.expiry_date || '';
           document.getElementById('credential-id').value = cert.credential_id || '';
-          document.getElementById('credential-url').value = cert.credential_url || '';
           document.getElementById('certificate-url').value = cert.certificate_url || '';
           updateCertificateFileStatus(cert.certificate_url || '');
           document.getElementById('thumbnail-url').value = cert.thumbnail_url || '';
@@ -306,7 +296,6 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
         issueDate: document.getElementById('issue-date').value,
         expiryDate: document.getElementById('expiry-date').value,
         credentialId: document.getElementById('credential-id').value,
-        credentialUrl: document.getElementById('credential-url').value,
         certificateUrl,
         thumbnailUrl: document.getElementById('thumbnail-url').value,
         orderIndex: parseInt(document.getElementById('order-index').value) || 0

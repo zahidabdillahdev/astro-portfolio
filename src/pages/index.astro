@@ -23,7 +23,7 @@ function getOptimizedAssetUrl(url: string | undefined, options: string): string 
             return url;
         }
 
-        return `${parsed.origin}/cdn-cgi/image/${options}${parsed.pathname}${parsed.search}`;
+        return `${parsed.origin}/cdn-cgi/image/${options}${parsed.pathname.startsWith('/') ? '' : '/'}${parsed.pathname}${parsed.search}`;
     } catch {
         return url;
     }
@@ -63,8 +63,7 @@ const mergedData = {
         tel: profile?.tel || CV_DATA.contact.tel,
         resumeUrl: profile?.resume_url || CV_DATA.contact.resumeUrl,
         social: [
-            ...(profile?.linkedin_url ? [{ name: 'LinkedIn', url: profile.linkedin_url }] : []),
-            ...(profile?.instagram_url ? [{ name: 'Instagram', url: profile.instagram_url }] : [])
+            ...(profile?.linkedin_url ? [{ name: 'LinkedIn', url: profile.linkedin_url }] : [])
         ]
     },
     work: (experienceData as any[]) || CV_DATA.work,
@@ -269,12 +268,9 @@ const jsonLd = {
 
       const footer = createElement('div', 'mt-auto flex gap-2');
       const certificateUrl = certification.certificate_url || certification.certificateUrl;
-      const credentialUrl = certification.credential_url || certification.credentialUrl;
 
       if (certificateUrl) {
         footer.appendChild(createRawLinkButton(certificateUrl, 'Open PDF Certificate', 'Open PDF', 'px-2 text-xs'));
-      } else if (credentialUrl) {
-        footer.appendChild(createRawLinkButton(credentialUrl, 'View Credential', 'View', 'px-2 text-xs'));
       }
       card.appendChild(footer);
       container.appendChild(card);

@@ -9,9 +9,6 @@ const { certification } = Astro.props;
 const issueDate = certification.issueDate || certification.issue_date;
 const expiryDate = certification.expiryDate || certification.expiry_date;
 const certificateUrl = certification.certificateUrl || certification.certificate_url;
-const credentialUrl = certification.credentialUrl || certification.credential_url;
-const actionUrl = certificateUrl || credentialUrl;
-const actionLabel = certificateUrl ? 'Open PDF Certificate' : 'View Credential';
 ---
 
 <div class="flex flex-col h-full border border-gray-200 rounded-lg p-4">
@@ -32,9 +29,9 @@ const actionLabel = certificateUrl ? 'Open PDF Certificate' : 'View Credential';
   </div>
   
   <div class="mt-auto flex gap-2">
-    {actionUrl && (
-      <LinkButton href={actionUrl} ariaLabel={actionLabel}>
-        <span class="px-2 text-xs">{certificateUrl ? 'Open PDF' : 'View'}</span>
+    {certificateUrl && (
+      <LinkButton href={certificateUrl} ariaLabel="Open PDF Certificate">
+        <span class="px-2 text-xs">Open PDF</span>
       </LinkButton>
     )}
   </div>

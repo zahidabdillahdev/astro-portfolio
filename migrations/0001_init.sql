@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS profile (
   email TEXT DEFAULT '', tel TEXT DEFAULT '',
   location TEXT DEFAULT '', location_link TEXT DEFAULT '',
   avatar_url TEXT DEFAULT '', resume_url TEXT DEFAULT '',
-  linkedin_url TEXT DEFAULT '', instagram_url TEXT DEFAULT '',
+  linkedin_url TEXT DEFAULT '',
   website_url TEXT DEFAULT '',
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS certifications (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   title TEXT NOT NULL, issuer TEXT DEFAULT '',
   issue_date TEXT DEFAULT '', expiry_date TEXT DEFAULT '',
-  credential_id TEXT DEFAULT '', credential_url TEXT DEFAULT '',
+  credential_id TEXT DEFAULT '',
   certificate_url TEXT DEFAULT '', thumbnail_url TEXT DEFAULT '',
   order_index INTEGER DEFAULT 0
 );

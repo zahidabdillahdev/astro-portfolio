@@ -70,8 +70,6 @@ export interface Certification {
     expiry_date?: string;
     credentialId?: string; 
     credential_id?: string;
-    credentialUrl?: string;
-    credential_url?: string;
     certificateUrl?: string;
     certificate_url?: string;
     thumbnailUrl?: string; 
