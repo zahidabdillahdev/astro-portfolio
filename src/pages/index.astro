@@ -128,30 +128,61 @@ const jsonLd = {
     { endpoint: '/api/certifications', render: renderCertifications, containerId: 'certifications-list' }
   ];
 
-  function refreshLiveSections() {
-    liveSections.forEach(({ endpoint, render, containerId }) => {
-      const container = document.getElementById(containerId);
-      if (!container) return;
+  function refreshSection(section) {
+    const container = document.getElementById(section.containerId);
+    if (!container || container.dataset.liveLoaded === 'true') return;
 
-      fetch(`${workerUrl}${endpoint}`)
-        .then((response) => response.ok ? response.json() : Promise.reject(new Error(`Failed to fetch ${endpoint}`)))
-        .then((items) => {
-          if (!Array.isArray(items)) return;
-          render(container, items);
-        })
-        .catch((error) => {
-          console.error(`Live refresh failed for ${endpoint}:`, error);
-        });
+    container.dataset.liveLoaded = 'true';
+
+    fetch(`${workerUrl}${section.endpoint}`)
+      .then((response) => response.ok ? response.json() : Promise.reject(new Error(`Failed to fetch ${section.endpoint}`)))
+      .then((items) => {
+        if (!Array.isArray(items)) return;
+        section.render(container, items);
+      })
+      .catch((error) => {
+        container.dataset.liveLoaded = 'error';
+        console.error(`Live refresh failed for ${section.endpoint}:`, error);
+      });
+  }
+
+  function setupLiveSections() {
+    if (!('IntersectionObserver' in window)) {
+      window.setTimeout(() => {
+        liveSections.forEach(refreshSection);
+      }, 250);
+      return;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+
+        const section = liveSections.find(({ containerId }) => containerId === entry.target.id);
+        if (!section) return;
+
+        refreshSection(section);
+        observer.unobserve(entry.target);
+      });
+    }, {
+      rootMargin: '200px 0px',
+      threshold: 0.01
+    });
+
+    liveSections.forEach((section) => {
+      const container = document.getElementById(section.containerId);
+      if (!container) return;
+      observer.observe(container);
     });
   }
 
   window.addEventListener('load', () => {
     if ('requestIdleCallback' in window) {
-      window.requestIdleCallback(refreshLiveSections, { timeout: 2000 });
+      window.requestIdleCallback(setupLiveSections, { timeout: 2000 });
       return;
     }
 
-    window.setTimeout(refreshLiveSections, 250);
+    window.setTimeout(setupLiveSections, 250);
   });
 
   function renderProjects(container, projects) {
