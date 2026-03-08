@@ -90,6 +90,10 @@
 }
 
 @layer base {
+    html {
+        font-size: 16px;
+    }
+
     * {
         border-color: hsl(var(--border));
     }
@@ -117,6 +121,14 @@
     em,
     i {
         font-style: italic;
+    }
+}
+
+@media (min-width: 1024px) {
+    @layer base {
+        html {
+            font-size: 17px;
+        }
     }
 }
 

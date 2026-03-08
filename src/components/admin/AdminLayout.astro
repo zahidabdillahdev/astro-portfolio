@@ -42,6 +42,7 @@ const firstName = profile?.full_name?.split(' ')[1] || profile?.full_name?.split
     body {
       margin: 0;
       padding: 0;
+      font-size: 16px;
       font-family: var(--font-family-base);
       font-optical-sizing: auto;
       font-style: normal;
@@ -365,6 +366,12 @@ const firstName = profile?.full_name?.split(' ')[1] || profile?.full_name?.split
       font-weight: 600;
       color: var(--color-text);
       margin: 0 0 1.5rem 0;
+    }
+
+    @media (min-width: 1024px) {
+      html {
+        font-size: 17px;
+      }
     }
 
     /* Responsive */
