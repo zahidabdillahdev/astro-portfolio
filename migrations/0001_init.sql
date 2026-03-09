@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS certifications (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   title TEXT NOT NULL, issuer TEXT DEFAULT '',
   issue_date TEXT DEFAULT '', expiry_date TEXT DEFAULT '',
-  credential_id TEXT DEFAULT '',
+  credential_id TEXT DEFAULT '', credential_url TEXT DEFAULT '',
   certificate_url TEXT DEFAULT '', thumbnail_url TEXT DEFAULT '',
   order_index INTEGER DEFAULT 0
 );

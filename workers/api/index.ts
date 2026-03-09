@@ -369,10 +369,10 @@ app.post('/api/admin/certifications', async (c) => {
 
     const stmt = c.env.DB.prepare(
       `INSERT INTO certifications 
-        (title, issuer, issue_date, expiry_date, credential_id,
+        (title, issuer, issue_date, expiry_date, credential_id, credential_url,
          certificate_url, thumbnail_url, order_index) 
        VALUES 
-        (?, ?, ?, ?, ?, ?, ?, ?)`
+        (?, ?, ?, ?, ?, ?, ?, ?, ?)`
     );
 
     await stmt.bind(
@@ -381,6 +381,7 @@ app.post('/api/admin/certifications', async (c) => {
       cert.issueDate || '', 
       cert.expiryDate || '', 
       cert.credentialId || '', 
+      cert.credentialUrl || '', 
       cert.certificateUrl || '', 
       cert.thumbnailUrl || '', 
       cert.orderIndex || 0
@@ -414,7 +415,7 @@ app.put('/api/admin/certifications/:id', async (c) => {
 
     const stmt = c.env.DB.prepare(
       `UPDATE certifications SET 
-        title = ?, issuer = ?, issue_date = ?, expiry_date = ?, credential_id = ?,
+        title = ?, issuer = ?, issue_date = ?, expiry_date = ?, credential_id = ?, credential_url = ?,
         certificate_url = ?, thumbnail_url = ?, order_index = ?
        WHERE id = ?`
     );
@@ -425,6 +426,7 @@ app.put('/api/admin/certifications/:id', async (c) => {
       cert.issueDate || '', 
       cert.expiryDate || '', 
       cert.credentialId || '', 
+      cert.credentialUrl || '', 
       cert.certificateUrl || '', 
       cert.thumbnailUrl || '', 
       cert.orderIndex || 0,

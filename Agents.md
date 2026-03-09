@@ -30,7 +30,7 @@
 - [ ] **Asset Uploads:** 
     - [ ] Upload Profile Photo (R2).
     - [ ] Upload Resume/CV (R2).
-    - [ ] Upload Certifications (PDF to R2).
+    - [ ] Add Certification IDs and verification links.
 - [ ] **Experience & Projects:** Input your career history and key marketing case studies.
 
 ---

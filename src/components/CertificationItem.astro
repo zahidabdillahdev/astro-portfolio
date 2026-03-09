@@ -1,6 +1,4 @@
 ---
-import LinkButton from './common/LinkButton.astro';
-
 export interface Props {
   certification: import('../data/cv').Certification;
 }
@@ -8,8 +6,8 @@ export interface Props {
 const { certification } = Astro.props;
 const issueDate = certification.issueDate || certification.issue_date;
 const expiryDate = certification.expiryDate || certification.expiry_date;
-const certificateUrl = certification.certificateUrl || certification.certificate_url;
 const credentialId = certification.credentialId || certification.credential_id;
+const credentialUrl = certification.credentialUrl || certification.credential_url;
 const thumbnailUrl = certification.thumbnailUrl || certification.thumbnail_url;
 ---
 
@@ -38,13 +36,12 @@ const thumbnailUrl = certification.thumbnailUrl || certification.thumbnail_url;
       )}
     </p>
     {credentialId && <p class="mt-1 text-sm text-gray-600">Credential ID: {credentialId}</p>}
-  </div>
-  
-  <div class="mt-auto flex gap-2">
-    {certificateUrl && (
-      <LinkButton href={certificateUrl} ariaLabel="Open PDF Certificate">
-        <span class="px-2 text-xs">Open PDF</span>
-      </LinkButton>
+    {credentialUrl && (
+      <p class="mt-1 text-sm">
+        <a href={credentialUrl} target="_blank" rel="noopener noreferrer" class="text-gray-700 underline underline-offset-2 hover:text-black">
+          Link Verify
+        </a>
+      </p>
     )}
   </div>
 </div>

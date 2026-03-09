@@ -261,15 +261,19 @@ const jsonLd = {
       if (certification.credential_id || certification.credentialId) {
         meta.appendChild(createTextElement('p', 'text-sm text-gray-600 mt-1', `Credential ID: ${certification.credential_id || certification.credentialId}`));
       }
-      card.appendChild(meta);
-
-      const footer = createElement('div', 'mt-auto flex gap-2');
-      const certificateUrl = certification.certificate_url || certification.certificateUrl;
-
-      if (certificateUrl) {
-        footer.appendChild(createRawLinkButton(certificateUrl, 'Open PDF Certificate', 'Open PDF', 'px-2 text-xs'));
+      const credentialUrl = certification.credential_url || certification.credentialUrl;
+      if (credentialUrl) {
+        const verifyWrap = createElement('p', 'mt-1 text-sm');
+        const verifyLink = document.createElement('a');
+        verifyLink.href = credentialUrl;
+        verifyLink.target = '_blank';
+        verifyLink.rel = 'noopener noreferrer';
+        verifyLink.className = 'text-gray-700 underline underline-offset-2 hover:text-black';
+        verifyLink.textContent = 'Link Verify';
+        verifyWrap.appendChild(verifyLink);
+        meta.appendChild(verifyWrap);
       }
-      card.appendChild(footer);
+      card.appendChild(meta);
       container.appendChild(card);
     });
   }
