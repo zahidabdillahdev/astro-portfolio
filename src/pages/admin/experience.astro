@@ -17,6 +17,7 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
     <table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb;">
       <thead>
         <tr style="background-color: #f9fafb;">
+          <th style="width: 44px; padding: 0.75rem; text-align: center; border: 1px solid #e5e7eb;">Move</th>
           <th style="padding: 0.75rem; text-align: left; border: 1px solid #e5e7eb;">Company</th>
           <th style="padding: 0.75rem; text-align: left; border: 1px solid #e5e7eb;">Role</th>
           <th style="padding: 0.75rem; text-align: left; border: 1px solid #e5e7eb;">Dates</th>
@@ -39,6 +40,7 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
 
       <form id="experience-form" style="display: flex; flex-direction: column; gap: 1rem;">
         <input type="hidden" id="experience-id" />
+        <input type="hidden" id="order-index" value="0" />
         
         <div>
           <label for="company" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Company *</label>
@@ -133,16 +135,6 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
           />
         </div>
         
-        <div>
-          <label for="order-index" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Order Index</label>
-          <input 
-            type="number" 
-            id="order-index" 
-            value="0"
-            style="width: 100px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
-          />
-        </div>
-        
         <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1rem;">
           <button 
             type="button" 
@@ -164,6 +156,8 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
 </AdminLayout>
 
 <script is:inline>
+  let experienceItems = [];
+
   // Load experience on page load
   document.addEventListener('DOMContentLoaded', async () => {
     loadExperience();
@@ -173,7 +167,8 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
   async function loadExperience() {
     try {
       const experience = await api('GET', '/api/experience');
-      renderExperienceTable(experience);
+      experienceItems = Array.isArray(experience) ? experience : [];
+      renderExperienceTable(experienceItems);
     } catch (error) {
       console.error('Error loading experience:', error);
     }
@@ -183,6 +178,11 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
   function renderExperienceTable(experience) {
     const tbody = document.getElementById('experience-table-body');
     tbody.innerHTML = '';
+
+    if (!experience || experience.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="padding: 1rem; text-align: center; color: #6b7280;">No experience found. Click "+ Add New Experience" to get started.</td></tr>';
+      return;
+    }
     
     experience.forEach(exp => {
       const startDate = exp.start_date ? new Date(exp.start_date).toLocaleDateString() : '';
@@ -190,7 +190,10 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       const dates = `${startDate} - ${endDate}`;
       
       const row = document.createElement('tr');
+      row.dataset.id = exp.id;
+      row.dataset.sortable = 'true';
       row.innerHTML = `
+        <td style="padding: 0.75rem; border: 1px solid #e5e7eb; text-align: center; cursor: grab;" data-drag-handle>↕</td>
         <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">${exp.company}</td>
         <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">${exp.role}</td>
         <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">${dates}</td>
@@ -200,6 +203,20 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
         </td>
       `;
       tbody.appendChild(row);
+    });
+
+    makeTableSortable({
+      tbodyId: 'experience-table-body',
+      onReorder: async (ids) => {
+        await api('POST', '/api/admin/experience/reorder', { ids });
+        showToast('Experience order updated!', 'success');
+        await loadExperience();
+        try {
+          await triggerDeploy();
+        } catch (deployError) {
+          console.error('Deploy failed after reordering experience:', deployError);
+        }
+      }
     });
   }
   
@@ -212,14 +229,14 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
     // Reset form
     form.reset();
     document.getElementById('experience-id').value = '';
+    document.getElementById('order-index').value = experienceItems.length;
     
     if (expId) {
       // Editing existing experience
       modalTitle.textContent = 'Edit Experience';
       
       // Find the experience and populate the form
-      api('GET', '/api/experience').then(exp => {
-        const expItem = exp.find(e => e.id === expId);
+      const expItem = experienceItems.find(e => Number(e.id) === Number(expId));
         if (expItem) {
           document.getElementById('experience-id').value = expItem.id;
           document.getElementById('company').value = expItem.company;
@@ -234,7 +251,6 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
           document.getElementById('logo-url').value = expItem.logo_url || '';
           document.getElementById('order-index').value = expItem.order_index || 0;
         }
-      });
     } else {
       // Adding new experience
       modalTitle.textContent = 'Add New Experience';

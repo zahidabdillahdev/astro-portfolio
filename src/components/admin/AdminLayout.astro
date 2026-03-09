@@ -708,6 +708,62 @@ const firstName = profile?.full_name?.split(' ')[1] || profile?.full_name?.split
       }
     };
 
+    window.makeTableSortable = function({ tbodyId, onReorder }) {
+      const tbody = document.getElementById(tbodyId);
+      if (!tbody) return;
+
+      let draggedRow = null;
+
+      const getDragAfterElement = (container, y) => {
+        const rows = [...container.querySelectorAll('tr[data-sortable="true"]:not(.dragging)')];
+        return rows.reduce((closest, child) => {
+          const box = child.getBoundingClientRect();
+          const offset = y - box.top - box.height / 2;
+          if (offset < 0 && offset > closest.offset) {
+            return { offset, element: child };
+          }
+          return closest;
+        }, { offset: Number.NEGATIVE_INFINITY, element: null }).element;
+      };
+
+      tbody.querySelectorAll('tr[data-sortable="true"]').forEach((row) => {
+        row.draggable = true;
+
+        row.addEventListener('dragstart', () => {
+          draggedRow = row;
+          row.classList.add('dragging');
+        });
+
+        row.addEventListener('dragend', async () => {
+          row.classList.remove('dragging');
+          draggedRow = null;
+
+          const ids = [...tbody.querySelectorAll('tr[data-sortable="true"]')]
+            .map((item) => Number(item.dataset.id))
+            .filter((id) => Number.isInteger(id));
+
+          if (typeof onReorder === 'function') {
+            await onReorder(ids);
+          }
+        });
+      });
+
+      tbody.ondragover = (event) => {
+        event.preventDefault();
+        if (!draggedRow) return;
+
+        const afterElement = getDragAfterElement(tbody, event.clientY);
+        if (!afterElement) {
+          tbody.appendChild(draggedRow);
+          return;
+        }
+
+        if (afterElement !== draggedRow) {
+          tbody.insertBefore(draggedRow, afterElement);
+        }
+      };
+    };
+
     // Trigger deploy function
     window.triggerDeploy = async function() {
       try {

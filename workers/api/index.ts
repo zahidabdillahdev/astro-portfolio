@@ -40,6 +40,14 @@ async function deleteManagedAsset(c: any, url: string | null | undefined) {
   await c.env.STORAGE.delete(key);
 }
 
+async function reorderByIds(c: any, table: string, ids: number[]) {
+  const statements = ids.map((id, index) =>
+    c.env.DB.prepare(`UPDATE ${table} SET order_index = ? WHERE id = ?`).bind(index, id)
+  );
+
+  await c.env.DB.batch(statements);
+}
+
 // Enable CORS for all routes
 app.use('*', cors());
 
@@ -357,6 +365,20 @@ app.delete('/api/admin/projects/:id', async (c) => {
   }
 });
 
+app.post('/api/admin/projects/reorder', async (c) => {
+  try {
+    const { ids } = await c.req.json();
+    if (!Array.isArray(ids) || ids.some((id) => !Number.isInteger(id))) {
+      return c.json({ error: 'A numeric ids array is required' }, 400);
+    }
+
+    await reorderByIds(c, 'projects', ids);
+    return c.json({ success: true, message: 'Project order updated successfully' });
+  } catch (error) {
+    return c.json({ error: 'Failed to reorder projects' }, 500);
+  }
+});
+
 // Certifications admin routes
 app.post('/api/admin/certifications', async (c) => {
   try {
@@ -463,6 +485,20 @@ app.delete('/api/admin/certifications/:id', async (c) => {
   }
 });
 
+app.post('/api/admin/certifications/reorder', async (c) => {
+  try {
+    const { ids } = await c.req.json();
+    if (!Array.isArray(ids) || ids.some((id) => !Number.isInteger(id))) {
+      return c.json({ error: 'A numeric ids array is required' }, 400);
+    }
+
+    await reorderByIds(c, 'certifications', ids);
+    return c.json({ success: true, message: 'Certification order updated successfully' });
+  } catch (error) {
+    return c.json({ error: 'Failed to reorder certifications' }, 500);
+  }
+});
+
 // Experience admin routes
 app.post('/api/admin/experience', async (c) => {
   try {
@@ -554,6 +590,20 @@ app.delete('/api/admin/experience/:id', async (c) => {
   }
 });
 
+app.post('/api/admin/experience/reorder', async (c) => {
+  try {
+    const { ids } = await c.req.json();
+    if (!Array.isArray(ids) || ids.some((id) => !Number.isInteger(id))) {
+      return c.json({ error: 'A numeric ids array is required' }, 400);
+    }
+
+    await reorderByIds(c, 'work_experience', ids);
+    return c.json({ success: true, message: 'Experience order updated successfully' });
+  } catch (error) {
+    return c.json({ error: 'Failed to reorder experience' }, 500);
+  }
+});
+
 // Skills admin routes
 app.post('/api/admin/skills', async (c) => {
   try {
@@ -621,6 +671,20 @@ app.delete('/api/admin/skills/:id', async (c) => {
   }
 });
 
+app.post('/api/admin/skills/reorder', async (c) => {
+  try {
+    const { ids } = await c.req.json();
+    if (!Array.isArray(ids) || ids.some((id) => !Number.isInteger(id))) {
+      return c.json({ error: 'A numeric ids array is required' }, 400);
+    }
+
+    await reorderByIds(c, 'skills', ids);
+    return c.json({ success: true, message: 'Skill order updated successfully' });
+  } catch (error) {
+    return c.json({ error: 'Failed to reorder skills' }, 500);
+  }
+});
+
 // Education admin routes
 app.post('/api/admin/education', async (c) => {
   try {
@@ -685,6 +749,20 @@ app.delete('/api/admin/education/:id', async (c) => {
     return c.json({ success: true, message: 'Education deleted successfully' });
   } catch (error) {
     return c.json({ error: 'Failed to delete education' }, 500);
+  }
+});
+
+app.post('/api/admin/education/reorder', async (c) => {
+  try {
+    const { ids } = await c.req.json();
+    if (!Array.isArray(ids) || ids.some((id) => !Number.isInteger(id))) {
+      return c.json({ error: 'A numeric ids array is required' }, 400);
+    }
+
+    await reorderByIds(c, 'education', ids);
+    return c.json({ success: true, message: 'Education order updated successfully' });
+  } catch (error) {
+    return c.json({ error: 'Failed to reorder education' }, 500);
   }
 });
 

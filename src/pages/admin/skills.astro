@@ -17,9 +17,9 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
     <table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb;">
       <thead>
         <tr style="background-color: #f9fafb;">
+          <th style="width: 44px; padding: 0.75rem; text-align: center; border: 1px solid #e5e7eb;">Move</th>
           <th style="padding: 0.75rem; text-align: left; border: 1px solid #e5e7eb;">Skill</th>
           <th style="padding: 0.75rem; text-align: left; border: 1px solid #e5e7eb;">Category</th>
-          <th style="padding: 0.75rem; text-align: left; border: 1px solid #e5e7eb;">Order</th>
           <th style="padding: 0.75rem; text-align: left; border: 1px solid #e5e7eb;">Actions</th>
         </tr>
       </thead>
@@ -39,6 +39,7 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
 
       <form id="skill-form" style="display: flex; flex-direction: column; gap: 1rem;">
         <input type="hidden" id="skill-id" />
+        <input type="hidden" id="order-index" value="0" />
         
         <div>
           <label for="name" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Skill Name *</label>
@@ -56,16 +57,6 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
             type="text" 
             id="category" 
             style="width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
-          />
-        </div>
-        
-        <div>
-          <label for="order-index" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Order Index</label>
-          <input 
-            type="number" 
-            id="order-index" 
-            value="0"
-            style="width: 100px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
           />
         </div>
         
@@ -90,6 +81,8 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
 </AdminLayout>
 
 <script is:inline>
+  let skillItems = [];
+
   // Load skills on page load
   document.addEventListener('DOMContentLoaded', async () => {
     loadSkills();
@@ -99,7 +92,8 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
   async function loadSkills() {
     try {
       const skills = await api('GET', '/api/skills');
-      renderSkillsTable(skills);
+      skillItems = Array.isArray(skills) ? skills : [];
+      renderSkillsTable(skillItems);
     } catch (error) {
       console.error('Error loading skills:', error);
     }
@@ -109,19 +103,40 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
   function renderSkillsTable(skills) {
     const tbody = document.getElementById('skills-table-body');
     tbody.innerHTML = '';
+
+    if (!skills || skills.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" style="padding: 1rem; text-align: center; color: #6b7280;">No skills found. Click "+ Add New Skill" to get started.</td></tr>';
+      return;
+    }
     
     skills.forEach(skill => {
       const row = document.createElement('tr');
+      row.dataset.id = skill.id;
+      row.dataset.sortable = 'true';
       row.innerHTML = `
+        <td style="padding: 0.75rem; border: 1px solid #e5e7eb; text-align: center; cursor: grab;" data-drag-handle>↕</td>
         <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">${skill.name}</td>
         <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">${skill.category || ''}</td>
-        <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">${skill.order_index || 0}</td>
         <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">
           <button onclick="openModal(${skill.id})" style="margin-right: 0.5rem; padding: 0.25rem 0.5rem; background-color: #f3f4f6; border: 1px solid #d1d5db; border-radius: 0.25rem; cursor: pointer;">Edit</button>
           <button onclick="deleteSkill(${skill.id})" style="padding: 0.25rem 0.5rem; background-color: #fee2e2; border: 1px solid #d1d5db; border-radius: 0.25rem; cursor: pointer;">Delete</button>
         </td>
       `;
       tbody.appendChild(row);
+    });
+
+    makeTableSortable({
+      tbodyId: 'skills-table-body',
+      onReorder: async (ids) => {
+        await api('POST', '/api/admin/skills/reorder', { ids });
+        showToast('Skill order updated!', 'success');
+        await loadSkills();
+        try {
+          await triggerDeploy();
+        } catch (deployError) {
+          console.error('Deploy failed after reordering skills:', deployError);
+        }
+      }
     });
   }
   
@@ -134,21 +149,20 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
     // Reset form
     form.reset();
     document.getElementById('skill-id').value = '';
+    document.getElementById('order-index').value = skillItems.length;
     
     if (skillId) {
       // Editing existing skill
       modalTitle.textContent = 'Edit Skill';
       
       // Find the skill and populate the form
-      api('GET', '/api/skills').then(skills => {
-        const skill = skills.find(s => s.id === skillId);
+      const skill = skillItems.find(s => Number(s.id) === Number(skillId));
         if (skill) {
           document.getElementById('skill-id').value = skill.id;
           document.getElementById('name').value = skill.name;
           document.getElementById('category').value = skill.category || '';
           document.getElementById('order-index').value = skill.order_index || 0;
         }
-      });
     } else {
       // Adding new skill
       modalTitle.textContent = 'Add New Skill';

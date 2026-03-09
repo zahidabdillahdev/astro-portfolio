@@ -17,6 +17,7 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
     <table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb;">
       <thead>
         <tr style="background-color: #f9fafb;">
+          <th style="width: 44px; padding: 0.75rem; text-align: center; border: 1px solid #e5e7eb;">Move</th>
           <th style="padding: 0.75rem; text-align: left; border: 1px solid #e5e7eb;">School</th>
           <th style="padding: 0.75rem; text-align: left; border: 1px solid #e5e7eb;">Degree</th>
           <th style="padding: 0.75rem; text-align: left; border: 1px solid #e5e7eb;">Years</th>
@@ -39,6 +40,7 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       
       <form id="education-form" style="display: flex; flex-direction: column; gap: 1rem;">
         <input type="hidden" id="education-id" />
+        <input type="hidden" id="order-index" value="0" />
         
         <div>
           <label for="school" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">School *</label>
@@ -81,16 +83,6 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
           />
         </div>
         
-        <div>
-          <label for="order-index" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Order Index</label>
-          <input 
-            type="number" 
-            id="order-index" 
-            value="0"
-            style="width: 100px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
-          />
-        </div>
-        
         <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1rem;">
           <button 
             type="button" 
@@ -112,6 +104,8 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
 </AdminLayout>
 
 <script is:inline>
+  let educationItems = [];
+
   // Load education on page load
   document.addEventListener('DOMContentLoaded', async () => {
     loadEducation();
@@ -121,7 +115,8 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
   async function loadEducation() {
     try {
       const education = await api('GET', '/api/education');
-      renderEducationTable(education);
+      educationItems = Array.isArray(education) ? education : [];
+      renderEducationTable(educationItems);
     } catch (error) {
       console.error('Error loading education:', error);
     }
@@ -131,12 +126,20 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
   function renderEducationTable(education) {
     const tbody = document.getElementById('education-table-body');
     tbody.innerHTML = '';
+
+    if (!education || education.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="padding: 1rem; text-align: center; color: #6b7280;">No education found. Click "+ Add New Education" to get started.</td></tr>';
+      return;
+    }
     
     education.forEach(edu => {
       const years = `${edu.start_year} - ${edu.end_year || 'Present'}`;
       
       const row = document.createElement('tr');
+      row.dataset.id = edu.id;
+      row.dataset.sortable = 'true';
       row.innerHTML = `
+        <td style="padding: 0.75rem; border: 1px solid #e5e7eb; text-align: center; cursor: grab;" data-drag-handle>↕</td>
         <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">${edu.school}</td>
         <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">${edu.degree}</td>
         <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">${years}</td>
@@ -146,6 +149,20 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
         </td>
       `;
       tbody.appendChild(row);
+    });
+
+    makeTableSortable({
+      tbodyId: 'education-table-body',
+      onReorder: async (ids) => {
+        await api('POST', '/api/admin/education/reorder', { ids });
+        showToast('Education order updated!', 'success');
+        await loadEducation();
+        try {
+          await triggerDeploy();
+        } catch (deployError) {
+          console.error('Deploy failed after reordering education:', deployError);
+        }
+      }
     });
   }
   
@@ -158,14 +175,14 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
     // Reset form
     form.reset();
     document.getElementById('education-id').value = '';
+    document.getElementById('order-index').value = educationItems.length;
     
     if (eduId) {
       // Editing existing education
       modalTitle.textContent = 'Edit Education';
       
       // Find the education and populate the form
-      api('GET', '/api/education').then(edu => {
-        const eduItem = edu.find(e => e.id === eduId);
+      const eduItem = educationItems.find(e => Number(e.id) === Number(eduId));
         if (eduItem) {
           document.getElementById('education-id').value = eduItem.id;
           document.getElementById('school').value = eduItem.school;
@@ -174,7 +191,6 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
           document.getElementById('end-year').value = eduItem.end_year || '';
           document.getElementById('order-index').value = eduItem.order_index || 0;
         }
-      });
     } else {
       // Adding new education
       modalTitle.textContent = 'Add New Education';

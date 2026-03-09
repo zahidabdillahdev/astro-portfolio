@@ -17,6 +17,7 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
     <table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb;">
       <thead>
         <tr style="background-color: #f9fafb;">
+          <th style="width: 44px; padding: 0.75rem; text-align: center; border: 1px solid #e5e7eb;">Move</th>
           <th style="padding: 0.75rem; text-align: left; border: 1px solid #e5e7eb;">Title</th>
           <th style="padding: 0.75rem; text-align: left; border: 1px solid #e5e7eb;">Category</th>
           <th style="padding: 0.75rem; text-align: left; border: 1px solid #e5e7eb;">Featured</th>
@@ -39,6 +40,7 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
       
       <form id="project-form" style="display: flex; flex-direction: column; gap: 1rem;">
         <input type="hidden" id="project-id" />
+        <input type="hidden" id="order-index" value="0" />
         
         <div>
           <label for="title" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Title *</label>
@@ -145,16 +147,6 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
           </label>
         </div>
         
-        <div>
-          <label for="order-index" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Order Index</label>
-          <input 
-            type="number" 
-            id="order-index" 
-            value="0"
-            style="width: 100px; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; outline: none;" 
-          />
-        </div>
-        
         <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1rem;">
           <button 
             type="button" 
@@ -176,6 +168,8 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
 </AdminLayout>
 
 <script is:inline>
+  let projectItems = [];
+
   // Load projects on page load
   document.addEventListener('DOMContentLoaded', async () => {
     loadProjects();
@@ -185,7 +179,8 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
   async function loadProjects() {
     try {
       const projects = await api('GET', '/api/projects');
-      renderProjectsTable(projects);
+      projectItems = Array.isArray(projects) ? projects : [];
+      renderProjectsTable(projectItems);
     } catch (error) {
       console.error('Error loading projects:', error);
     }
@@ -197,13 +192,16 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
     tbody.innerHTML = '';
     
     if (!projects || projects.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="4" style="padding: 1rem; text-align: center; color: #6b7280;">No projects found. Click "+ Add New Project" to get started.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" style="padding: 1rem; text-align: center; color: #6b7280;">No projects found. Click "+ Add New Project" to get started.</td></tr>';
       return;
     }
     
     projects.forEach(project => {
       const row = document.createElement('tr');
+      row.dataset.id = project.id;
+      row.dataset.sortable = 'true';
       row.innerHTML = `
+        <td style="padding: 0.75rem; border: 1px solid #e5e7eb; text-align: center; cursor: grab;" data-drag-handle>↕</td>
         <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">${project.title}</td>
         <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">${project.category || ''}</td>
         <td style="padding: 0.75rem; border: 1px solid #e5e7eb;">${project.is_featured ? 'Yes' : 'No'}</td>
@@ -213,6 +211,20 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
         </td>
       `;
       tbody.appendChild(row);
+    });
+
+    makeTableSortable({
+      tbodyId: 'projects-table-body',
+      onReorder: async (ids) => {
+        await api('POST', '/api/admin/projects/reorder', { ids });
+        showToast('Project order updated!', 'success');
+        await loadProjects();
+        try {
+          await triggerDeploy();
+        } catch (deployError) {
+          console.error('Deploy failed after reordering projects:', deployError);
+        }
+      }
     });
   }
   
@@ -225,14 +237,14 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
     // Reset form
     form.reset();
     document.getElementById('project-id').value = '';
+    document.getElementById('order-index').value = projectItems.length;
     
     if (projectId) {
       // Editing existing project
       modalTitle.textContent = 'Edit Project';
       
       // Find the project and populate the form
-      api('GET', '/api/projects').then(projects => {
-        const project = projects.find(p => p.id === projectId);
+      const project = projectItems.find(p => Number(p.id) === Number(projectId));
         if (project) {
           document.getElementById('project-id').value = project.id;
           document.getElementById('title').value = project.title;
@@ -248,10 +260,6 @@ import AdminLayout from '../../components/admin/AdminLayout.astro';
           document.getElementById('is-featured').checked = !!project.is_featured;
           document.getElementById('order-index').value = project.order_index || 0;
         }
-      }).catch(err => {
-        console.error('Error fetching project details:', err);
-        showToast('Error loading project details', 'error');
-      });
     } else {
       // Adding new project
       modalTitle.textContent = 'Add New Project';
