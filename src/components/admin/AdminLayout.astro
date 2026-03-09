@@ -412,6 +412,17 @@ const firstName = profile?.full_name?.split(' ')[1] || profile?.full_name?.split
         width: 100%;
       }
 
+      input,
+      textarea,
+      select {
+        font-size: 16px !important;
+        max-width: 100%;
+      }
+
+      input[type="number"] {
+        width: 100% !important;
+      }
+
       /* Modal inner padding reduced on small screens */
       [id="modal"] > div {
         padding: 1.25rem !important;
@@ -419,10 +430,36 @@ const firstName = profile?.full_name?.split(' ')[1] || profile?.full_name?.split
         margin-bottom: 1rem !important;
       }
 
+      [id="modal"] form > div[style*="justify-content: flex-end"] {
+        flex-direction: column-reverse;
+        align-items: stretch !important;
+      }
+
+      [id="modal"] form > div[style*="justify-content: flex-end"] > button {
+        width: 100%;
+      }
+
       /* Table cells smaller on mobile */
       th, td {
         padding: 0.5rem !important;
         font-size: 0.8125rem;
+      }
+
+      #current-resume-link {
+        flex-wrap: wrap;
+      }
+
+      #current-resume-link > * {
+        max-width: 100%;
+        word-break: break-word;
+      }
+
+      #profile-form > div[style*="flex-wrap: wrap"] {
+        flex-direction: column;
+      }
+
+      #profile-form > div[style*="flex-wrap: wrap"] > div {
+        width: 100%;
       }
 
       .sidebar-overlay {
