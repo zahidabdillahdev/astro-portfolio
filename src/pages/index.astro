@@ -233,9 +233,20 @@ const jsonLd = {
       const card = createElement('div', 'flex flex-col h-full border border-gray-200 rounded-lg p-4');
       const header = createElement('div', 'flex justify-between items-start gap-4');
       const headingWrap = document.createElement('div');
+      headingWrap.className = 'min-w-0 flex-1';
       headingWrap.appendChild(createTextElement('h3', 'text-lg font-bold mb-1', certification.title || 'Untitled Certification'));
       headingWrap.appendChild(createTextElement('p', 'text-sm text-gray-600 mb-2', certification.issuer || ''));
       header.appendChild(headingWrap);
+      const thumbnailUrl = certification.thumbnail_url || certification.thumbnailUrl;
+      if (thumbnailUrl) {
+        const logo = document.createElement('img');
+        logo.src = thumbnailUrl;
+        logo.alt = `${certification.issuer || 'Certification issuer'} logo`;
+        logo.className = 'h-10 w-10 shrink-0 rounded-md border border-gray-200 bg-white object-contain p-1';
+        logo.loading = 'lazy';
+        logo.decoding = 'async';
+        header.appendChild(logo);
+      }
       card.appendChild(header);
 
       const meta = createElement('div', 'mt-2 mb-4');
